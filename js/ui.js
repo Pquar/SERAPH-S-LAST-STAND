@@ -396,6 +396,68 @@ class UI extends EventEmitter {
             mobileControls.classList.remove('landscape');
         }
     }
+    
+    // Renderizar HUD diretamente no canvas
+    renderHUD(ctx, player) {
+        if (!player) return;
+        
+        const margin = 20;
+        const barWidth = 200;
+        const barHeight = 20;
+        const spacing = 5;
+        
+        // Barra de HP
+        const hpX = margin;
+        const hpY = margin;
+        
+        // Background da barra de HP
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+        ctx.fillRect(hpX - 2, hpY - 2, barWidth + 4, barHeight + 4);
+        
+        // Fundo da barra
+        ctx.fillStyle = 'rgba(60, 60, 60, 0.8)';
+        ctx.fillRect(hpX, hpY, barWidth, barHeight);
+        
+        // Preenchimento da barra de HP
+        const hpPercent = player.hp / player.maxHp;
+        const hpFillWidth = barWidth * hpPercent;
+        const hpColor = hpPercent > 0.6 ? '#4CAF50' : hpPercent > 0.3 ? '#FF9800' : '#F44336';
+        
+        ctx.fillStyle = hpColor;
+        ctx.fillRect(hpX, hpY, hpFillWidth, barHeight);
+        
+        // Texto da HP
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '14px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText(`HP: ${player.hp}/${player.maxHp}`, hpX + barWidth/2, hpY + barHeight/2 + 5);
+        
+        // Barra de EXP
+        const expX = margin;
+        const expY = hpY + barHeight + spacing;
+        
+        // Background da barra de EXP
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+        ctx.fillRect(expX - 2, expY - 2, barWidth + 4, barHeight + 4);
+        
+        // Fundo da barra
+        ctx.fillStyle = 'rgba(60, 60, 60, 0.8)';
+        ctx.fillRect(expX, expY, barWidth, barHeight);
+        
+        // Preenchimento da barra de EXP
+        const expPercent = player.exp / player.expToNext;
+        const expFillWidth = barWidth * expPercent;
+        
+        ctx.fillStyle = '#66ccff';
+        ctx.fillRect(expX, expY, expFillWidth, barHeight);
+        
+        // Texto da EXP
+        ctx.fillStyle = '#ffffff';
+        ctx.fillText(`LVL ${player.level} - EXP: ${player.exp}/${player.expToNext}`, expX + barWidth/2, expY + barHeight/2 + 5);
+        
+        // Reset text align
+        ctx.textAlign = 'left';
+    }
 }
 
 // Input Manager - Gerencia todos os tipos de input
