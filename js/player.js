@@ -464,4 +464,18 @@ class Player extends EventEmitter {
     setPlayerName(name) {
         this.playerName = name || 'Player';
     }
+    
+    // Adicionar sons ao player para tiro e hit
+    playShotSound() {
+        // Verificar se há acesso ao audioSystem através do game
+        if (window.game && window.game.audioSystem) {
+            window.game.audioSystem.playSound('shot');
+        }
+    }
+    
+    playHitSound() {
+        if (window.game && window.game.audioSystem) {
+            window.game.audioSystem.playSound('hit');
+        }
+    }
 }

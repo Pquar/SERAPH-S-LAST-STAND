@@ -461,7 +461,9 @@ class UI extends EventEmitter {
     
     // Sistema de Ranking
     showRankingModal(rankings) {
-        const modal = this.createModal('ranking-modal', 'Ranking - Top 10');
+        console.log('showRankingModal chamado com:', rankings); // Debug
+        
+        const modalBody = this.createModal('ranking-modal', 'Ranking - Top 10');
         
         const content = document.createElement('div');
         content.className = 'ranking-content';
@@ -508,8 +510,7 @@ class UI extends EventEmitter {
         `;
         
         content.appendChild(buttons);
-        modal.appendChild(content);
-        document.body.appendChild(modal);
+        modalBody.appendChild(content);
         
         // Event listeners
         document.getElementById('clearRankingBtn').addEventListener('click', () => {
@@ -525,6 +526,8 @@ class UI extends EventEmitter {
         
         // CSS para o ranking
         this.addRankingStyles();
+        
+        console.log('Modal criado e adicionado ao DOM'); // Debug
     }
     
     // Mostrar popup de novo recorde
@@ -596,6 +599,9 @@ class UI extends EventEmitter {
                 this.closeModal(id);
             }
         });
+        
+        // Adicionar ao DOM
+        document.body.appendChild(modal);
         
         return modal.querySelector('.modal-body');
     }

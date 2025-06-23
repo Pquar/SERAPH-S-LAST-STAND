@@ -198,10 +198,12 @@ class Game extends EventEmitter {
         
         // Botões do menu principal
         document.getElementById('leaderboardBtn').addEventListener('click', () => {
+            console.log('Botão ranking clicado'); // Debug
             this.showRanking();
         });
         
         document.getElementById('settingsBtn').addEventListener('click', () => {
+            console.log('Botão configurações clicado'); // Debug
             this.showSettings();
         });
         
@@ -693,18 +695,31 @@ class Game extends EventEmitter {
     
     // Mostrar ranking
     showRanking() {
+        console.log('showRanking chamado'); // Debug
         const rankings = this.rankingSystem.getRankings();
+        console.log('Rankings obtidos:', rankings); // Debug
         this.ui.showRankingModal(rankings);
     }
     
     // Mostrar configurações
     showSettings() {
-        const currentName = this.playerNamePrompt.getCurrentName();
-        const newName = this.playerNamePrompt.showSettingsPrompt();
-        
-        if (newName !== currentName) {
-            alert(`Nome alterado para: ${newName}`);
-        }
+        this.ui.showSettingsModal({
+            playerName: this.playerNamePrompt.getCurrentName(),
+            audioEnabled: !this.audioSystem.isMuted(),
+            masterVolume: this.audioSystem.getVolumes().master,
+            sfxVolume: this.audioSystem.getVolumes().sfx,
+            xpMultiplier: this.getXpMultiplier()
+        });
+    }
+    
+    // Obter multiplicador de XP atual
+    getXpMultiplier() {
+        return Storage.load('seraphsLastStand_xpMultiplier', 1.0);
+    }
+    
+    // Definir multiplicador de XP
+    setXpMultiplier(multiplier) {
+        Storage.save('seraphsLastStand_xpMultiplier', multiplier);
     }
     
     // Input handling para controles de sidescroller
