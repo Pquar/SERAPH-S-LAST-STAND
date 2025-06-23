@@ -27,6 +27,9 @@ class AudioSystem extends EventEmitter {
         
         // Tentar inicializar (requer interação do usuário)
         this.init();
+        
+        // Carregar configurações salvas
+        this.loadSettings();
     }
     
     async init() {
@@ -382,21 +385,23 @@ class AudioSystem extends EventEmitter {
             this.currentMusic = null;
         }
     }
-    
-    // Controles de volume
+     // Controles de volume
     setMasterVolume(volume) {
-        this.masterVolume = Math2D.clamp(volume, 0, 1);
+        this.masterVolume = Math.max(0, Math.min(1, volume));
         this.emit('volumeChanged', 'master', this.masterVolume);
+        console.log('Master volume definido para:', this.masterVolume);
     }
-    
+
     setSfxVolume(volume) {
-        this.sfxVolume = Math2D.clamp(volume, 0, 1);
+        this.sfxVolume = Math.max(0, Math.min(1, volume));
         this.emit('volumeChanged', 'sfx', this.sfxVolume);
+        console.log('SFX volume definido para:', this.sfxVolume);
     }
-    
+
     setMusicVolume(volume) {
-        this.musicVolume = Math2D.clamp(volume, 0, 1);
+        this.musicVolume = Math.max(0, Math.min(1, volume));
         this.emit('volumeChanged', 'music', this.musicVolume);
+        console.log('Music volume definido para:', this.musicVolume);
     }
     
     // Mute/Unmute
@@ -465,7 +470,9 @@ class AudioSystem extends EventEmitter {
             muted: this.muted
         };
         
+        console.log('Salvando configurações de áudio:', settings); // Debug
         Storage.save('seraphsLastStand_audio', settings);
+        console.log('Configurações de áudio salvas com sucesso'); // Debug
     }
     
     // Cleanup

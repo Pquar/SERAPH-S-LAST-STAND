@@ -1,9 +1,40 @@
 /* CSS Mobile - Otimizações específicas para dispositivos móveis */
 
+/* Suporte completo para tela cheia em dispositivos móveis */
+@media (max-width: 768px) {
+    html, body {
+        height: 100vh;
+        height: -webkit-fill-available;
+        width: 100vw;
+        position: fixed;
+        overflow: hidden;
+    }
+    
+    #gameContainer {
+        width: 100vw;
+        height: 100vh;
+        height: -webkit-fill-available;
+        position: fixed;
+        top: 0;
+        left: 0;
+    }
+    
+    #gameCanvas {
+        width: 100vw !important;
+        height: 100vh !important;
+        height: -webkit-fill-available !important;
+        border: none !important;
+        border-radius: 0 !important;
+        max-width: none !important;
+        max-height: none !important;
+    }
+}
+
 @media (max-width: 768px) and (orientation: portrait) {
     #gameCanvas {
         width: 100vw;
         height: calc(100vh - 200px);
+        height: calc(-webkit-fill-available - 200px);
         border: none;
         border-radius: 0;
     }
@@ -11,6 +42,7 @@
     .hud-top {
         background: linear-gradient(180deg, rgba(15, 15, 35, 0.9) 0%, rgba(15, 15, 35, 0.7) 70%, transparent 100%);
         padding: 10px 15px;
+        padding-top: max(10px, env(safe-area-inset-top));
     }
     
     .hp-bar {
@@ -24,36 +56,40 @@
     }
     
     .joystick-container {
-        bottom: 20px;
-        left: 20px;
+        bottom: max(20px, env(safe-area-inset-bottom));
+        left: max(20px, env(safe-area-inset-left));
     }
     
     .mobile-buttons {
-        bottom: 20px;
-        right: 20px;
+        bottom: max(20px, env(safe-area-inset-bottom));
+        right: max(20px, env(safe-area-inset-right));
     }
 }
 
 @media (max-width: 768px) and (orientation: landscape) {
     #gameCanvas {
-        width: calc(100vw - 240px);
+        width: 100vw;
         height: 100vh;
+        height: -webkit-fill-available;
         border: none;
         border-radius: 0;
     }
     
     .hud-top {
         padding: 8px 15px;
+        padding-top: max(8px, env(safe-area-inset-top));
+        padding-left: max(15px, env(safe-area-inset-left));
+        padding-right: max(15px, env(safe-area-inset-right));
     }
     
     .joystick-container {
-        bottom: 20px;
-        left: 20px;
+        bottom: max(20px, env(safe-area-inset-bottom));
+        left: max(20px, env(safe-area-inset-left));
     }
     
     .mobile-buttons {
-        bottom: 20px;
-        right: 20px;
+        bottom: max(20px, env(safe-area-inset-bottom));
+        right: max(20px, env(safe-area-inset-right));
         flex-direction: row;
         gap: 10px;
     }
@@ -178,4 +214,30 @@ input, button, select, textarea {
 
 .joystick:active .joystick-knob {
     box-shadow: 0 0 15px rgba(102, 255, 255, 0.8);
+}
+
+/* Força tela cheia em dispositivos móveis */
+@media (max-width: 768px) {
+    html {
+        height: 100vh;
+        height: -webkit-fill-available;
+    }
+    
+    body {
+        min-height: 100vh;
+        min-height: -webkit-fill-available;
+    }
+    
+    /* Melhor compatibilidade com PWA */
+    @media (display-mode: fullscreen) {
+        #gameContainer {
+            height: 100vh;
+        }
+    }
+    
+    @media (display-mode: standalone) {
+        #gameContainer {
+            height: 100vh;
+        }
+    }
 }

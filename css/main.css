@@ -6,15 +6,19 @@
     box-sizing: border-box;
 }
 
-body {
+html, body {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
     font-family: 'Courier New', monospace;
     background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
     color: #fff;
-    overflow: hidden;
     user-select: none;
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
 }
 
 #gameContainer {
@@ -24,6 +28,10 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    
+    /* Suporte para viewport seguro em dispositivos com notch */
+    height: 100vh;
+    height: -webkit-fill-available;
 }
 
 #gameCanvas {
@@ -35,7 +43,7 @@ body {
     max-height: 100vh;
 }
 
-/* HUD do jogo */
+/* HUD do jogo - oculto por padrão */
 #gameHUD {
     position: absolute;
     top: 0;
@@ -43,7 +51,8 @@ body {
     width: 100%;
     height: 100%;
     pointer-events: none;
-    z-index: 10;
+    z-index: 100;
+    display: none; /* Oculto por padrão - mostrado apenas durante o jogo */
 }
 
 .hud-top {
@@ -196,25 +205,33 @@ body {
     background: linear-gradient(135deg, #80ffff 0%, #66b3ff 100%);
 }
 
-/* Controles móveis */
+/* Controles móveis - FORÇAR ocultação em desktop */
 .mobile-only {
-    display: none;
+    display: none !important; /* Forçar ocultação por padrão */
+    visibility: hidden !important;
+    pointer-events: none !important;
 }
 
-@media (max-width: 768px) {
+/* Apenas mostrar em dispositivos realmente móveis */
+@media (max-width: 768px) and (pointer: coarse) {
     .mobile-only {
-        display: block;
+        display: block !important;
+        visibility: visible !important;
+        pointer-events: auto !important;
+    }
+}
+
+/* Fallback para dispositivos móveis sem suporte a pointer: coarse */
+@media (max-width: 768px) and (hover: none) {
+    .mobile-only {
+        display: block !important;
+        visibility: visible !important;
+        pointer-events: auto !important;
     }
 }
 
 #mobileControls {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 200px;
-    pointer-events: none;
-    z-index: 20;
+    display: none; /* Oculto por padrão - mostrado apenas em dispositivos móveis durante o jogo */
 }
 
 .joystick-container {

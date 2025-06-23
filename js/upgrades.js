@@ -86,6 +86,12 @@ class UpgradeSystem extends EventEmitter {
         
         if (success) {
             this.selectedUpgrade = selectedCard;
+            
+            // Adicionar carta à build do player
+            if (player.addSelectedCard) {
+                player.addSelectedCard(selectedCard);
+            }
+            
             this.closeUpgradeMenu();
             this.emit('upgradeSelected', selectedCard, player);
             

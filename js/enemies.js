@@ -116,30 +116,61 @@ class Enemy extends EventEmitter {
                 this.vy = 0;
             }
         } else if (this.state === 'following') {
-            // Fase 2: Seguir o jogador com atraso suave
+            // Fase 2: Seguir o jogador mas manter uma distância mínima
             if (!this.target) return;
             
             const dx = this.target.x - this.x;
             const dy = this.target.y - this.y;
             const distance = Math.sqrt(dx * dx + dy * dy);
             
+            // Distância mínima que o inimigo deve manter do player (aumentada)
+            const minDistance = 120; // pixels de distância mínima (dobrou de 60 para 120)
+            const maxDistance = 250; // distância máxima antes de se aproximar
+            const idealDistance = 180; // distância ideal para ficar orbitando
+            
             if (distance > 0) {
-                // Movimento suave com atraso
-                const followStrength = 0.7; // reduz a responsividade para criar atraso
-                const dirX = (dx / distance) * followStrength;
-                const dirY = (dy / distance) * followStrength;
-                
-                // Velocidade baseada na distância (mais longe = mais rápido)
-                const speedMultiplier = Math.min(2.0, distance / 100);
-                const moveSpeed = this.speed * speedMultiplier;
-                
-                this.vx = dirX * moveSpeed;
-                this.vy = dirY * moveSpeed;
+                if (distance > maxDistance) {
+                    // Muito longe - se aproximar
+                    const followStrength = 0.6; // reduzido para movimento mais suave
+                    const dirX = (dx / distance) * followStrength;
+                    const dirY = (dy / distance) * followStrength;
+                    
+                    const speedMultiplier = Math.min(1.5, distance / 150);
+                    const moveSpeed = this.speed * speedMultiplier;
+                    
+                    this.vx = dirX * moveSpeed;
+                    this.vy = dirY * moveSpeed;
+                } else if (distance < minDistance) {
+                    // Muito perto - se afastar mais agressivamente
+                    const dirX = -(dx / distance) * 0.8; // direção oposta, mais forte
+                    const dirY = -(dy / distance) * 0.8;
+                    
+                    this.vx = dirX * this.speed * 1.2; // velocidade aumentada para se afastar
+                    this.vy = dirY * this.speed * 1.2;
+                } else {
+                    // Na distância ideal - movimento orbital/lateral mais pronunciado
+                    const angle = Math.atan2(dy, dx);
+                    const orbitalAngle = angle + Math.PI * 0.5; // perpendicular ao player
+                    
+                    // Movimento orbital mais pronunciado
+                    const orbitalSpeed = this.speed * 0.4;
+                    this.vx = Math.cos(orbitalAngle + this.animationTime * 0.002) * orbitalSpeed;
+                    this.vy = Math.sin(orbitalAngle + this.animationTime * 0.002) * orbitalSpeed * 0.3;
+                    
+                    // Manter distância ideal
+                    const distanceFromIdeal = distance - idealDistance;
+                    if (Math.abs(distanceFromIdeal) > 20) {
+                        const correctionStrength = 0.15;
+                        const correctionDir = distanceFromIdeal > 0 ? -1 : 1;
+                        this.vx += (dx / distance) * this.speed * correctionStrength * correctionDir;
+                        this.vy += (dy / distance) * this.speed * correctionStrength * correctionDir;
+                    }
+                }
                 
                 // Adicionar pequena variação no movimento para parecer mais orgânico
-                if (this.animationTime % 2000 < 100) {
-                    this.vx += Math2D.random(-30, 30);
-                    this.vy += Math2D.random(-30, 30);
+                if (this.animationTime % 3000 < 100) { // menos frequente
+                    this.vx += (Math.random() - 0.5) * 40; // variação reduzida
+                    this.vy += (Math.random() - 0.5) * 30;
                 }
             }
         }
@@ -150,20 +181,20 @@ class Enemy extends EventEmitter {
         
         // Manter dentro do canvas
         const margin = this.size;
-        this.x = Math2D.clamp(this.x, margin, canvas.width - margin);
+        this.x = Math.max(margin, Math.min(canvas.width - margin, this.x));
         
         // Não permitir subir acima de 70% quando em following
         if (this.state === 'following') {
             this.y = Math.max(this.targetHeight, this.y);
         }
         
-        this.y = Math2D.clamp(this.y, margin, canvas.height - margin);
+        this.y = Math.max(margin, Math.min(canvas.height - margin, this.y));
     }
     
     updateCombat(deltaTime, canvas) {
         if (!this.target || this.state === 'descending') return;
         
-        const distance = Math2D.distance(this.x, this.y, this.target.x, this.target.y);
+        const distance = Math.sqrt((this.x - this.target.x) ** 2 + (this.y - this.target.y) ** 2);
         const now = Date.now();
         const attackInterval = 1000 / this.attackSpeed;
         
@@ -201,7 +232,7 @@ class Enemy extends EventEmitter {
     }
     
     shootAt(target) {
-        const angle = Math2D.angle(this.x, this.y, target.x, target.y);
+        const angle = Math.atan2(target.y - this.y, target.x - this.x);
         
         const projectile = {
             x: this.x,
@@ -225,7 +256,7 @@ class Enemy extends EventEmitter {
         
         // Pequeno knockback para trás
         if (this.target) {
-            const angle = Math2D.angle(this.target.x, this.target.y, this.x, this.y);
+            const angle = Math.atan2(this.y - this.target.y, this.x - this.target.x);
             this.vx = Math.cos(angle) * 100;
             this.vy = Math.sin(angle) * 100;
         }
@@ -396,7 +427,7 @@ class EnemySpawner extends EventEmitter {
     
     spawnEnemy(canvas) {
         // Spawnar sempre no topo da tela (conforme descrição)
-        const x = Math2D.random(50, canvas.width - 50);
+        const x = Math.random() * (canvas.width - 100) + 50;
         const y = -30; // acima da tela
         
         // Determinar tipo de inimigo baseado na dificuldade
@@ -457,7 +488,7 @@ class EnemySpawner extends EventEmitter {
             
             // Verificar colisão com jogador (apenas quando muito próximo e player não está invulnerável)
             if (!player.invulnerable) {
-                const distance = Math2D.distance(enemy.x, enemy.y, player.x, player.y);
+                const distance = Math.sqrt((enemy.x - player.x) ** 2 + (enemy.y - player.y) ** 2);
                 const collisionDistance = enemy.size + player.size - 5;
                 
                 if (distance < collisionDistance) {

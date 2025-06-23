@@ -2,12 +2,15 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Seraph's Last Stand</title>
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/mobile.css">
     <meta name="theme-color" content="#1a1a2e">
     <meta name="description" content="Jogo de tiro incremental roguelike inspirado no clássico Heli Attack">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
 </head>
 <body>
     <div id="gameContainer">
@@ -44,7 +47,8 @@
                 </div>
             </div>
             <div class="mobile-buttons">
-                <button class="action-btn" id="specialBtn">ESPECIAL</button>
+                <button class="action-btn" id="shootBtn">ATIRAR</button>
+                <button class="action-btn" id="jumpBtn">PULAR</button>
                 <button class="action-btn" id="pauseBtn">PAUSA</button>
             </div>
         </div>
@@ -56,22 +60,6 @@
                 <button class="menu-btn" id="resumeBtn">CONTINUAR</button>
                 <button class="menu-btn" id="restartBtn">REINICIAR</button>
                 <button class="menu-btn" id="mainMenuBtn">MENU PRINCIPAL</button>
-            </div>
-        </div>
-
-        <!-- Menu principal -->
-        <div id="mainMenu" class="menu">
-            <div class="menu-content">
-                <h1>SERAPH'S LAST STAND</h1>
-                <p class="subtitle">Jogo de Tiro Incremental Roguelike</p>
-                <div class="menu-buttons">
-                    <button class="menu-btn primary" id="playBtn">JOGAR</button>
-                    <button class="menu-btn" id="continueBtn">CONTINUAR</button>
-                    <button class="menu-btn" id="shopBtn">LOJA</button>
-                    <button class="menu-btn" id="leaderboardBtn">PLACAR</button>
-                    <button class="menu-btn" id="settingsBtn">CONFIGURAÇÕES</button>
-                    <button class="menu-btn" id="tutorialBtn">COMO JOGAR</button>
-                </div>
             </div>
         </div>
     </div>

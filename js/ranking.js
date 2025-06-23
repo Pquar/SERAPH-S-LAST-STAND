@@ -42,6 +42,7 @@ class RankingSystem extends EventEmitter {
             criticalHits: stats.criticalHits || 0,
             totalDamageDealt: stats.totalDamageDealt || 0,
             soulOrbs: stats.soulOrbs || 0,
+            build: stats.build || [], // Armazenar build (cartas escolhidas)
             timestamp: stats.timestamp || Date.now(),
             date: new Date(stats.timestamp || Date.now()).toLocaleDateString()
         };
@@ -157,21 +158,25 @@ class PlayerNamePrompt extends EventEmitter {
         this.isOpen = false;
         this.playerName = this.loadPlayerName();
     }
-    
-    // Carregar nome salvo
+     // Carregar nome salvo
     loadPlayerName() {
         try {
-            return localStorage.getItem('seraphsLastStand_playerName') || '';
+            const name = localStorage.getItem('seraphsLastStand_playerName') || '';
+            console.log('Nome carregado do localStorage:', name); // Debug
+            return name;
         } catch (error) {
+            console.error('Erro ao carregar nome do jogador:', error);
             return '';
         }
     }
-    
+
     // Salvar nome
     savePlayerName(name) {
         try {
-            localStorage.setItem('seraphsLastStand_playerName', name);
-            this.playerName = name;
+            const trimmedName = name.trim() || 'Player';
+            localStorage.setItem('seraphsLastStand_playerName', trimmedName);
+            this.playerName = trimmedName;
+            console.log('Nome salvo no localStorage:', trimmedName); // Debug
         } catch (error) {
             console.warn('Erro ao salvar nome do jogador:', error);
         }

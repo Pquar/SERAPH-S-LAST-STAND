@@ -333,7 +333,7 @@ class CardSystem extends EventEmitter {
     handleCardChoiceInput(key) {
         if (!this.isChoosingCard) return false;
         
-        const keyNum = parseInt(key.replace('Digit', '').replace('Numpad', ''));
+        const keyNum = parseInt(key);
         if (keyNum >= 1 && keyNum <= this.cardChoices.length) {
             return keyNum - 1; // Retorna índice da carta
         }

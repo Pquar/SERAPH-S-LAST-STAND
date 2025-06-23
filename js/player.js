@@ -38,6 +38,16 @@ class Player extends EventEmitter {
         // Soul Orbs (moeda do jogo)
         this.soulOrbs = 0;
         
+        // Sistema de equipamentos
+        this.ownedEquipment = {
+            hats: [],
+            staffs: []
+        };
+        this.equippedEquipment = {
+            hats: null,
+            staffs: null
+        };
+        
         // Sistema de pontuação e estatísticas
         this.score = 0;
         this.enemiesKilled = 0;
@@ -47,6 +57,12 @@ class Player extends EventEmitter {
         this.criticalHits = 0;
         this.survivalTime = 0;
         this.playerName = 'Player'; // Nome padrão
+        
+        // Sistema de build/cartas escolhidas
+        this.selectedCards = []; // Array das cartas escolhidas durante a partida
+        this.cardEffects = {}; // Efeitos ativos das cartas
+        this.onKillEffects = []; // Efeitos que ativam quando um inimigo morre
+        this.cardStacks = {}; // Contador de stacks das cartas
         
         // Sistema de tiro (mouse aim)
         this.lastShotTime = 0;
@@ -93,6 +109,7 @@ class Player extends EventEmitter {
         this.handleShooting(deltaTime, enemies);
         this.updateProjectiles(deltaTime, enemies, canvas);
         this.updateInvulnerability(deltaTime);
+        this.updateCardEffects(deltaTime, enemies, canvas);
         
         // Manter dentro do canvas horizontalmente
         this.constrainToCanvas(canvas);
@@ -101,17 +118,53 @@ class Player extends EventEmitter {
     handleMovement(deltaTime, canvas) {
         const dt = deltaTime / 1000;
         
+        // Só processar movimento se o jogo estiver ativo
+        if (window.game && window.game.state !== 'playing') {
+            this.vx = 0;
+            return;
+        }
+        
+        // Verificar se é desktop
+        const isDesktop = !window.DeviceUtils || !DeviceUtils.isMobile();
+        
         // Movimento horizontal (apenas A/D)
         let moveX = 0;
         
-        // Input de teclado ou mobile
-        if (this.input.left || this.mobileControls.left) {
-            moveX -= 1;
-            this.facingRight = false;
-        }
-        if (this.input.right || this.mobileControls.right) {
-            moveX += 1;
-            this.facingRight = true;
+        // DESKTOP: usar APENAS input de teclado, ignorar completamente mobile controls
+        if (isDesktop) {
+            // Limpar mobile controls em desktop para evitar conflitos
+            this.mobileControls.left = false;
+            this.mobileControls.right = false;
+            
+            // Apenas teclado
+            if (this.input.left && !this.input.right) {
+                moveX -= 1;
+                this.facingRight = false;
+            } else if (this.input.right && !this.input.left) {
+                moveX += 1;
+                this.facingRight = true;
+            }
+        } else {
+            // MOBILE: prioridade para teclado, fallback para mobile
+            if (this.input.left || this.input.right) {
+                // Usar apenas input de teclado
+                if (this.input.left && !this.input.right) {
+                    moveX -= 1;
+                    this.facingRight = false;
+                } else if (this.input.right && !this.input.left) {
+                    moveX += 1;
+                    this.facingRight = true;
+                }
+            } else {
+                // Fallback para mobile controls
+                if (this.mobileControls.left && !this.mobileControls.right) {
+                    moveX -= 1;
+                    this.facingRight = false;
+                } else if (this.mobileControls.right && !this.mobileControls.left) {
+                    moveX += 1;
+                    this.facingRight = true;
+                }
+            }
         }
         
         // Aplicar velocidade horizontal
@@ -177,13 +230,46 @@ class Player extends EventEmitter {
         const shotInterval = 1000 / this.attackSpeed;
         
         if (now - this.lastShotTime >= shotInterval) {
-            // Usar posição do mouse ou mobile aim
             let aimX = this.mouseX;
             let aimY = this.mouseY;
             
-            if (this.mobileControls.shooting) {
-                aimX = this.mobileControls.aimX;
-                aimY = this.mobileControls.aimY;
+            // Verificar se é dispositivo móvel
+            const isMobile = window.DeviceUtils && DeviceUtils.isMobile();
+            
+            if (isMobile && this.mobileControls.shooting) {
+                // Mobile: atirar no inimigo mais próximo
+                const nearestEnemy = this.findNearestEnemy(enemies);
+                
+                if (nearestEnemy) {
+                    // Atirar no inimigo mais próximo
+                    aimX = nearestEnemy.x;
+                    aimY = nearestEnemy.y;
+                } else {
+                    // Se não há inimigos próximos, atirar na direção que está andando
+                    const movingLeft = this.input.left || this.mobileControls.left;
+                    const movingRight = this.input.right || this.mobileControls.right;
+                    
+                    if (movingLeft) {
+                        this.facingRight = false;
+                        aimX = this.x - 150;
+                        aimY = this.y;
+                    } else if (movingRight) {
+                        this.facingRight = true;
+                        aimX = this.x + 150;
+                        aimY = this.y;
+                    } else {
+                        // Se não está se movendo, atirar na direção que está olhando
+                        aimX = this.x + (this.facingRight ? 150 : -150);
+                        aimY = this.y;
+                    }
+                }
+            } else if (!isMobile) {
+                // Desktop/Web: continuar usando posição do mouse
+                // Se o mouse não foi movido ainda, atirar na direção que está olhando
+                if (this.mouseX === 0 && this.mouseY === 0) {
+                    aimX = this.x + (this.facingRight ? 150 : -150);
+                    aimY = this.y;
+                }
             }
             
             this.shootAt(aimX, aimY);
@@ -192,7 +278,7 @@ class Player extends EventEmitter {
     }
     
     shootAt(targetX, targetY) {
-        const angle = Math2D.angle(this.x, this.y, targetX, targetY);
+        const angle = Math.atan2(targetY - this.y, targetX - this.x);
         const projectile = {
             x: this.x,
             y: this.y - this.size / 2, // sair do centro do player
@@ -215,25 +301,32 @@ class Player extends EventEmitter {
         this.mouseX = x;
         this.mouseY = y;
     }
-    
+
+    // Métodos para controle de tiro (compatibilidade com mouse e mobile)
     startShooting() {
         this.isShooting = true;
+        this.mobileControls.shooting = true;
     }
     
     stopShooting() {
         this.isShooting = false;
+        this.mobileControls.shooting = false;
     }
-    
+
     // Métodos para controle de experiência
     gainExp(amount) {
-        this.exp += amount;
+        // Aplicar multiplicador de XP
+        const xpMultiplier = window.game ? window.game.getXpMultiplier() : 1.0;
+        const finalAmount = Math.floor(amount * xpMultiplier);
+        
+        this.exp += finalAmount;
         
         // Verificar se subiu de nível
         if (this.exp >= this.expToNext) {
             this.levelUp();
         }
         
-        this.emit('expGained', amount, this.exp, this.expToNext);
+        this.emit('expGained', finalAmount, this.exp, this.expToNext);
     }
     
     levelUp() {
@@ -349,13 +442,108 @@ class Player extends EventEmitter {
     // Métodos de input para compatibilidade
     setInput(key, value) {
         if (this.input.hasOwnProperty(key)) {
-            this.input[key] = value;
+            this.input[key] = Boolean(value);
         }
     }
     
     // Mobile controls
     setMobileControls(controls) {
+        // Limpar primeiro para evitar estados persistentes
+        if (controls.hasOwnProperty('left') || controls.hasOwnProperty('right')) {
+            this.mobileControls.left = false;
+            this.mobileControls.right = false;
+        }
+        
         Object.assign(this.mobileControls, controls);
+    }
+    
+    // Método para limpar completamente os controles
+    clearAllInputs() {
+        // Limpar inputs de teclado
+        this.input = {
+            left: false,
+            right: false,
+            jump: false
+        };
+        
+        // Limpar controles mobile
+        this.resetMobileControls();
+        
+        // Limpar velocidade também para parar movimento imediatamente
+        this.vx = 0;
+    }
+    
+    // Método para desabilitar completamente controles mobile (usado em desktop)
+    disableMobileControls() {
+        this.mobileControls = {
+            left: false,
+            right: false,
+            jump: false,
+            shooting: false,
+            aimX: 0,
+            aimY: 0
+        };
+        console.log('Mobile controls permanently disabled (desktop mode)');
+    }
+    
+    // Sistema de estatísticas e equipamentos
+    updateStats() {
+        // Recalcular estatísticas base do level
+        this.recalculateBaseStats();
+        
+        // Aplicar efeitos dos equipamentos equipados
+        if (this.equippedEquipment.hats) {
+            this.applyEquipmentEffects('hats', this.equippedEquipment.hats);
+        }
+        if (this.equippedEquipment.staffs) {
+            this.applyEquipmentEffects('staffs', this.equippedEquipment.staffs);
+        }
+        
+        // Garantir que HP não exceda maxHp
+        if (this.hp > this.maxHp) {
+            this.hp = this.maxHp;
+        }
+        
+        console.log('Stats atualizadas:', {
+            level: this.level,
+            hp: this.hp,
+            maxHp: this.maxHp,
+            damage: this.damage,
+            defense: this.defense,
+            speed: this.speed,
+            equippedHat: this.equippedEquipment.hats,
+            equippedStaff: this.equippedEquipment.staffs
+        });
+    }
+    
+    recalculateBaseStats() {
+        // Stats base por nível
+        const baseStats = this.getBaseStats();
+        
+        this.maxHp = baseStats.maxHp;
+        this.damage = baseStats.damage;
+        this.defense = baseStats.defense;
+        this.speed = baseStats.speed;
+        this.attackSpeed = baseStats.attackSpeed;
+        this.critChance = baseStats.critChance;
+    }
+    
+    getBaseStats() {
+        // Estatísticas base que crescem com o level
+        return {
+            maxHp: 100 + (this.level - 1) * 20,
+            damage: 15 + (this.level - 1) * 3,
+            defense: (this.level - 1) * 2,
+            speed: 200 + (this.level - 1) * 5,
+            attackSpeed: 3.0 + (this.level - 1) * 0.1,
+            critChance: 0.05 + (this.level - 1) * 0.01
+        };
+    }
+    
+    applyEquipmentEffects(type, itemId) {
+        // Esta função será chamada pelo equipmentManager
+        // quando um equipamento for equipado
+        console.log(`Aplicando efeitos do equipamento ${type}:${itemId}`);
     }
     
     render(ctx) {
@@ -364,6 +552,9 @@ class Player extends EventEmitter {
         
         // Desenhar projéteis
         this.renderProjectiles(ctx);
+        
+        // Desenhar raios do Thunderbolt
+        this.renderLightning(ctx);
     }
     
     renderBody(ctx) {
@@ -396,6 +587,87 @@ class Player extends EventEmitter {
         }
     }
     
+    renderLightning(ctx) {
+        if (!this.lightningStrikes) return;
+        
+        const now = Date.now();
+        
+        for (let lightning of this.lightningStrikes) {
+            const age = now - lightning.createdAt;
+            
+            // Renderizar apenas durante a duração visual
+            if (age > lightning.duration) continue;
+            
+            const isWarningPhase = age < lightning.warningDuration;
+            
+            if (isWarningPhase) {
+                // Fase de aviso - círculo piscante vermelho
+                const opacity = 0.3 + 0.3 * Math.sin(age * 0.02); // Piscando
+                ctx.globalAlpha = opacity;
+                ctx.fillStyle = '#ff4444';
+                ctx.beginPath();
+                ctx.arc(lightning.x, lightning.y, lightning.size, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Borda de aviso
+                ctx.globalAlpha = 0.8;
+                ctx.strokeStyle = '#ff0000';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            } else {
+                // Fase do raio - efeito de raio brilhante
+                const strikeAge = age - lightning.warningDuration;
+                const strikeProgress = strikeAge / lightning.visualDuration;
+                
+                if (strikeProgress <= 1) {
+                    // Desenhar o raio principal
+                    ctx.globalAlpha = 1 - strikeProgress;
+                    
+                    // Raio principal (amarelo brilhante)
+                    ctx.fillStyle = '#ffff00';
+                    ctx.beginPath();
+                    ctx.arc(lightning.x, lightning.y, lightning.size * (1 + strikeProgress * 0.5), 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    // Núcleo brilhante (branco)
+                    ctx.fillStyle = '#ffffff';
+                    ctx.beginPath();
+                    ctx.arc(lightning.x, lightning.y, lightning.size * 0.5 * (1 - strikeProgress), 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    // Efeito de brilho externo
+                    ctx.globalAlpha = (1 - strikeProgress) * 0.3;
+                    ctx.fillStyle = '#ffff88';
+                    ctx.beginPath();
+                    ctx.arc(lightning.x, lightning.y, lightning.size * (2 + strikeProgress), 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    // Raios menores ao redor
+                    ctx.globalAlpha = 1 - strikeProgress;
+                    ctx.strokeStyle = '#ffff00';
+                    ctx.lineWidth = 3;
+                    
+                    for (let i = 0; i < 8; i++) {
+                        const angle = (i / 8) * Math.PI * 2;
+                        const length = lightning.size * (1.5 + Math.random() * 0.5);
+                        const startX = lightning.x + Math.cos(angle) * lightning.size * 0.5;
+                        const startY = lightning.y + Math.sin(angle) * lightning.size * 0.5;
+                        const endX = lightning.x + Math.cos(angle) * length;
+                        const endY = lightning.y + Math.sin(angle) * length;
+                        
+                        ctx.beginPath();
+                        ctx.moveTo(startX, startY);
+                        ctx.lineTo(endX, endY);
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+        
+        // Resetar alpha
+        ctx.globalAlpha = 1.0;
+    }
+    
     // Coletar Soul Orb
     collectSoulOrb(value = 1) {
         this.soulOrbs += value;
@@ -416,6 +688,9 @@ class Player extends EventEmitter {
             'sniper': 20
         };
         this.score += typeBonus[enemy.type] || 10;
+        
+        // Processar efeitos OnKill (como Fragmentation)
+        this.processOnKillEffects(enemy);
     }
     
     addDamage(damage, isCritical = false) {
@@ -456,6 +731,7 @@ class Player extends EventEmitter {
             criticalHits: this.criticalHits,
             totalDamageDealt: this.totalDamageDealt,
             soulOrbs: this.soulOrbs,
+            build: this.getBuild(), // Adicionar build ao placar
             timestamp: Date.now()
         };
     }
@@ -476,6 +752,268 @@ class Player extends EventEmitter {
     playHitSound() {
         if (window.game && window.game.audioSystem) {
             window.game.audioSystem.playSound('hit');
+        }
+    }
+    
+    // Adicionar carta escolhida à build
+    addSelectedCard(card) {
+        if (!card) return;
+        
+        this.selectedCards.push({
+            id: card.id,
+            name: card.name,
+            rarity: card.rarity,
+            description: card.description,
+            selectedAt: Date.now()
+        });
+        
+        console.log('Carta adicionada à build:', card.name, 'Total de cartas:', this.selectedCards.length);
+    }
+    
+    // Obter build (cartas escolhidas)
+    getBuild() {
+        return [...this.selectedCards]; // Retorna cópia
+    }
+    
+    // Métodos para atualizar cartas (ex: fragmentação)
+    updateCards(deltaTime) {
+        const now = Date.now();
+        
+        // Atualizar efeitos de cartas ativas
+        for (let card of this.selectedCards) {
+            if (card.id === 'fragmentation' && card.active) {
+                // Exemplo: fragmentação causa dano ao longo do tempo
+                if (now - card.lastApplied >= 1000) {
+                    this.applyFragmentationDamage();
+                    card.lastApplied = now;
+                }
+            }
+        }
+    }
+    
+    applyFragmentationDamage() {
+        const damage = 5 + Math.floor(this.level * 0.5);
+        this.totalDamageDealt += damage;
+        this.score += Math.floor(damage / 10);
+        
+        console.log('Dano de fragmentação aplicado:', damage);
+    }
+    
+    // Método para resetar controles mobile
+    resetMobileControls() {
+        this.mobileControls = {
+            left: false,
+            right: false,
+            jump: false,
+            shooting: false,
+            aimX: 0,
+            aimY: 0
+        };
+    }
+    
+    // Método para forçar parada do movimento
+    stopMovement() {
+        console.log('Forcing movement stop...');
+        this.vx = 0;
+        this.input.left = false;
+        this.input.right = false;
+        this.mobileControls.left = false;
+        this.mobileControls.right = false;
+        console.log('Movement stopped');
+    }
+    
+    // Método para encontrar o inimigo mais próximo (usado em mobile)
+    findNearestEnemy(enemies) {
+        if (!enemies || enemies.length === 0) return null;
+        
+        let nearestEnemy = null;
+        let nearestDistance = Infinity;
+        const maxTargetRange = 400; // Alcance máximo para mira automática
+        
+        for (let enemy of enemies) {
+            // Ignorar inimigos mortos ou em animação de morte
+            if (enemy.hp <= 0 || enemy.deathAnimation) continue;
+            
+            const distance = Math.sqrt(
+                Math.pow(enemy.x - this.x, 2) + 
+                Math.pow(enemy.y - this.y, 2)
+            );
+            
+            // Só considerar inimigos dentro do alcance
+            if (distance < nearestDistance && distance <= maxTargetRange) {
+                nearestDistance = distance;
+                nearestEnemy = enemy;
+            }
+        }
+        
+        return nearestEnemy;
+    }
+    
+    // Método para processar efeitos das cartas
+    updateCardEffects(deltaTime, enemies, canvas) {
+        const now = Date.now();
+        
+        // Processar efeito de raio (Thunderbolt)
+        if (this.lightningEffect && this.lightningEffect.enabled) {
+            if (now - this.lightningEffect.lastCast >= this.lightningEffect.interval) {
+                this.castLightning(enemies, canvas);
+                this.lightningEffect.lastCast = now;
+            }
+        }
+        
+        // Aqui podem ser adicionados outros efeitos de cartas no futuro
+        // como fragmentação, etc.
+    }
+    
+    // Método para lançar raios do Thunderbolt
+    castLightning(enemies, canvas) {
+        if (!this.lightningEffect || !enemies || enemies.length === 0) return;
+        
+        const lightningStrikes = [];
+        const strikeCount = this.lightningEffect.count || 2;
+        const damage = this.lightningEffect.damage || (this.damage * 2);
+        
+        // Priorizar inimigos próximos ao jogador
+        const sortedEnemies = enemies
+            .filter(enemy => enemy.hp > 0) // Apenas inimigos vivos
+            .sort((a, b) => {
+                const distA = Math.sqrt(Math.pow(a.x - this.x, 2) + Math.pow(a.y - this.y, 2));
+                const distB = Math.sqrt(Math.pow(b.x - this.x, 2) + Math.pow(b.y - this.y, 2));
+                return distA - distB;
+            });
+        
+        // Criar raios
+        for (let i = 0; i < strikeCount; i++) {
+            let targetX, targetY;
+            
+            if (sortedEnemies.length > 0 && i < sortedEnemies.length) {
+                // Mirar em inimigos próximos primeiro
+                const enemy = sortedEnemies[i];
+                targetX = enemy.x + (Math.random() - 0.5) * 40; // Pequena variação
+                targetY = enemy.y + (Math.random() - 0.5) * 40;
+            } else {
+                // Posições aleatórias se não há inimigos suficientes
+                targetX = Math.random() * canvas.width;
+                targetY = Math.random() * canvas.height;
+            }
+            
+            const lightning = {
+                x: targetX,
+                y: targetY,
+                damage: damage,
+                size: 40, // Raio de dano
+                createdAt: Date.now(),
+                duration: 500, // 0.5 segundos
+                visualDuration: 200, // Efeito visual mais rápido
+                warningDuration: 300 // Tempo de aviso antes do dano
+            };
+            
+            lightningStrikes.push(lightning);
+        }
+        
+        // Armazenar raios para renderização e dano
+        this.lightningStrikes = this.lightningStrikes || [];
+        this.lightningStrikes.push(...lightningStrikes);
+        
+        // Processar dano após o tempo de aviso
+        lightningStrikes.forEach(lightning => {
+            setTimeout(() => {
+                this.dealLightningDamage(lightning, enemies);
+            }, lightning.warningDuration);
+        });
+        
+        // Limpar raios antigos
+        this.cleanupOldLightning();
+    }
+    
+    // Método para causar dano dos raios
+    dealLightningDamage(lightning, enemies) {
+        if (!enemies) return;
+        
+        enemies.forEach(enemy => {
+            if (enemy.hp <= 0) return; // Pular inimigos mortos
+            
+            const distance = Math.sqrt(
+                Math.pow(enemy.x - lightning.x, 2) + 
+                Math.pow(enemy.y - lightning.y, 2)
+            );
+            
+            if (distance <= lightning.size) {
+                enemy.takeDamage(lightning.damage);
+                
+                // Efeitos visuais no inimigo atingido
+                if (enemy.flashColor) {
+                    enemy.flashColor = '#ffff00'; // Amarelo para raio
+                    enemy.flashTime = 300;
+                }
+                
+                // Estatísticas
+                this.addDamage(lightning.damage);
+                if (enemy.hp <= 0) {
+                    this.addKill(enemy);
+                }
+            }
+        });
+    }
+    
+    // Método para limpar raios antigos
+    cleanupOldLightning() {
+        if (!this.lightningStrikes) return;
+        
+        const now = Date.now();
+        this.lightningStrikes = this.lightningStrikes.filter(lightning => {
+            return (now - lightning.createdAt) < lightning.duration;
+        });
+    }
+    
+    // Processar efeitos que ativam quando um inimigo é morto
+    processOnKillEffects(enemy) {
+        if (!this.onKillEffects || this.onKillEffects.length === 0) return;
+        
+        for (let effect of this.onKillEffects) {
+            switch (effect.type) {
+                case 'fragmentation':
+                    this.createFragmentationProjectiles(enemy, effect);
+                    break;
+                // Outros efeitos OnKill podem ser adicionados aqui
+            }
+        }
+    }
+    
+    // Criar projéteis de fragmentação quando um inimigo morre
+    createFragmentationProjectiles(enemy, effect) {
+        const projectileCount = effect.projectiles || 2;
+        const projectileDamage = effect.damage || (this.damage * 0.3);
+        
+        console.log(`Criando ${projectileCount} projéteis de fragmentação em`, enemy.x, enemy.y);
+        console.log('Array de projéteis antes:', this.projectiles.length);
+        
+        for (let i = 0; i < projectileCount; i++) {
+            // Ângulo aleatório para cada projétil
+            const angle = (Math.PI * 2 * i / projectileCount) + (Math.random() - 0.5) * 0.5;
+            
+            const projectile = {
+                x: enemy.x,
+                y: enemy.y,
+                vx: Math.cos(angle) * this.projectileSpeed * 0.8, // Velocidade um pouco menor
+                vy: Math.sin(angle) * this.projectileSpeed * 0.8,
+                size: this.projectileSize,
+                damage: projectileDamage,
+                lifetime: 2000, // 2 segundos
+                createdAt: Date.now(),
+                color: '#ff8800', // Cor laranja para distinguir
+                isFragmentation: true
+            };
+            
+            this.projectiles.push(projectile);
+            console.log('Projétil de fragmentação adicionado:', projectile);
+        }
+        
+        console.log('Array de projéteis depois:', this.projectiles.length);
+        
+        // Som de fragmentação (se disponível)
+        if (window.game && window.game.audioSystem) {
+            window.game.audioSystem.playSound('fragmentation');
         }
     }
 }

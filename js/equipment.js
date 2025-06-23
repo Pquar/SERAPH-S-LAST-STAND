@@ -20,84 +20,86 @@ const HAT_DEFINITIONS = {
         id: 'wizardHat',
         name: 'Chapéu de Mago',
         description: 'Clássico pontudo, efeito básico balanceado',
-        image: 'img/equipment/wizard_hat.png', // Placeholder
+        image: 'img/Focus.jpeg',
         type: EquipmentType.HAT,
         rarity: EquipmentRarity.COMMON,
+        cost: 50,
         unlocked: true, // Disponível desde o início
         effects: {
-            // Balanceado - sem modificadores extremos
-            expBonus: 0.1, // +10% EXP
-            allStatsBonus: 0.05 // +5% em todos os stats
+            damage: 5,
+            expMultiplier: 1.1
         },
         apply: (player) => {
             player.expMultiplier = (player.expMultiplier || 1) * 1.1;
-            player.damage *= 1.05;
-            player.speed *= 1.05;
-            player.attackSpeed *= 1.05;
+            player.damage += 5;
         }
     },
     
     helmet: {
         id: 'helmet',
-        name: 'Capacete',
-        description: '+Armadura, -Velocidade de movimento',
-        image: 'img/equipment/helmet.png',
+        name: 'Capacete de Batalha',
+        description: '+Defesa e HP, -Velocidade de movimento',
+        image: 'img/Barrier.jpeg',
         type: EquipmentType.HAT,
         rarity: EquipmentRarity.COMMON,
+        cost: 75,
         unlocked: false,
         unlockCondition: 'Take 1000 damage in a single run',
         effects: {
             defense: 15,
-            speedPenalty: -0.2
+            maxHp: 25
         },
         apply: (player) => {
             player.defense += 15;
-            player.speed *= 0.8; // -20% velocidade
+            player.maxHp += 25;
+            player.speed *= 0.9; // -10% velocidade
         }
     },
     
     propellerBeanie: {
         id: 'propellerBeanie',
         name: 'Gorro Hélice',
-        description: 'Salto duplo automático, altura fixa',
-        image: 'img/equipment/propeller_beanie.png',
+        description: 'Melhora velocidade de movimento e ataque',
+        image: 'img/Swift.jpeg',
         type: EquipmentType.HAT,
         rarity: EquipmentRarity.UNCOMMON,
+        cost: 150,
         unlocked: false,
         unlockCondition: 'Jump 500 times in a single run',
         effects: {
-            autoDoubleJump: true,
-            fixedJumpHeight: true
+            attackSpeed: 0.5,
+            critChance: 0.05
         },
         apply: (player) => {
-            player.maxJumps = Math.max(player.maxJumps, 2);
-            player.abilities = player.abilities || {};
-            player.abilities.autoDoubleJump = true;
-            player.jumpSpeed = 350; // Altura fixa
+            player.attackSpeed += 0.5;
+            player.critChance += 0.05;
+            player.speed *= 1.2; // +20% velocidade
         }
     },
     
     uncommonHat: {
         id: 'uncommonHat',
-        name: 'Chapéu Incomum',
-        description: 'Força cartas apenas de raridade Incomum+',
-        image: 'img/equipment/uncommon_hat.png',
+        name: 'Chapéu da Sorte',
+        description: 'Aumenta chance de crítico e drop de soul orbs',
+        image: 'img/Luck.jpeg',
         type: EquipmentType.HAT,
         rarity: EquipmentRarity.RARE,
+        cost: 300,
         unlocked: false,
         unlockCondition: 'Get 50 uncommon cards',
         effects: {
-            forceUncommonCards: true
+            critChance: 0.1,
+            critMultiplier: 0.5
         },
         apply: (player) => {
-            player.abilities = player.abilities || {};
-            player.abilities.onlyUncommonCards = true;
+            player.critChance += 0.1;
+            player.critMultiplier += 0.5;
         }
     },
     
     challengerHat: {
         id: 'challengerHat',
-        name: 'Chapéu do Desafiante',
+        name: 'Chapéu do Imortal',
         description: '20% chance de double loot, dobra inimigos',
         image: 'img/equipment/challenger_hat.png',
         type: EquipmentType.HAT,
@@ -145,6 +147,7 @@ const STAFF_DEFINITIONS = {
         image: 'img/equipment/wizard_staff.png',
         type: EquipmentType.STAFF,
         rarity: EquipmentRarity.COMMON,
+        cost: 0, // Grátis - item inicial
         unlocked: true,
         shootingPattern: 'single',
         effects: {
@@ -162,6 +165,7 @@ const STAFF_DEFINITIONS = {
         image: 'img/equipment/emerald_staff.png',
         type: EquipmentType.STAFF,
         rarity: EquipmentRarity.UNCOMMON,
+        cost: 100,
         unlocked: false,
         unlockCondition: 'Kill 1000 enemies',
         shootingPattern: 'homing',
@@ -186,6 +190,7 @@ const STAFF_DEFINITIONS = {
         image: 'img/equipment/trident.png',
         type: EquipmentType.STAFF,
         rarity: EquipmentRarity.UNCOMMON,
+        cost: 120,
         unlocked: false,
         unlockCondition: 'Fire 10000 projectiles',
         shootingPattern: 'triple',
@@ -207,6 +212,7 @@ const STAFF_DEFINITIONS = {
         image: 'img/equipment/boomstaff.png',
         type: EquipmentType.STAFF,
         rarity: EquipmentRarity.RARE,
+        cost: 200,
         unlocked: false,
         unlockCondition: 'Deal 50000 damage in a single run',
         shootingPattern: 'explosive',
@@ -231,6 +237,7 @@ const STAFF_DEFINITIONS = {
         image: 'img/equipment/thunder_staff.png',
         type: EquipmentType.STAFF,
         rarity: EquipmentRarity.RARE,
+        cost: 250,
         unlocked: false,
         unlockCondition: 'Get Thunderbolt card 10 times',
         shootingPattern: 'lightning',
@@ -256,6 +263,7 @@ const STAFF_DEFINITIONS = {
         image: 'img/equipment/frozen_tip.png',
         type: EquipmentType.STAFF,
         rarity: EquipmentRarity.RARE,
+        cost: 180,
         unlocked: false,
         unlockCondition: 'Kill 3 enemies with one projectile',
         shootingPattern: 'piercing',
@@ -278,6 +286,7 @@ const STAFF_DEFINITIONS = {
         image: 'img/equipment/rainbow_staff.png',
         type: EquipmentType.STAFF,
         rarity: EquipmentRarity.LEGENDARY,
+        cost: 500,
         unlocked: false,
         unlockCondition: 'Use all other staffs at least once',
         shootingPattern: 'random',
@@ -399,6 +408,112 @@ class EquipmentManager {
             this.equippedStaff = data.equippedStaff || 'wizardStaff';
             this.unlockedEquipment = data.unlockedEquipment || ['wizardHat', 'wizardStaff'];
         }
+    }
+    
+    // Métodos para integração com a loja
+    getAllEquipment() {
+        return {
+            hats: HAT_DEFINITIONS,
+            staffs: STAFF_DEFINITIONS
+        };
+    }
+    
+    getEquipment(type, itemId) {
+        if (type === 'hats') {
+            return HAT_DEFINITIONS[itemId];
+        } else if (type === 'staffs') {
+            return STAFF_DEFINITIONS[itemId];
+        }
+        return null;
+    }
+    
+    applyEquipmentEffects(player, type, itemId) {
+        const equipment = this.getEquipment(type, itemId);
+        if (!equipment || !equipment.effects) return;
+        
+        console.log(`Aplicando efeitos de ${equipment.name}:`, equipment.effects);
+        
+        // Aplicar cada efeito
+        Object.entries(equipment.effects).forEach(([effect, value]) => {
+            switch(effect) {
+                case 'damage':
+                    player.damage += value;
+                    break;
+                case 'defense':
+                    player.defense += value;
+                    break;
+                case 'speed':
+                    player.speed += value;
+                    break;
+                case 'critChance':
+                    player.critChance += value / 100; // converter porcentagem
+                    break;
+                case 'hp':
+                case 'maxHp':
+                    player.maxHp += value;
+                    if (player.hp < player.maxHp) {
+                        player.hp = Math.min(player.hp + value, player.maxHp);
+                    }
+                    break;
+                case 'xpBonus':
+                case 'expMultiplier':
+                    player.expMultiplier = (player.expMultiplier || 1) * (1 + value / 100);
+                    break;
+                case 'specialCooldown':
+                    // Reduzir cooldown de habilidades especiais
+                    if (player.abilities) {
+                        Object.keys(player.abilities).forEach(ability => {
+                            if (ability.includes('Cooldown') || ability.includes('cooldown')) {
+                                player.abilities[ability] *= (1 - value / 100);
+                            }
+                        });
+                    }
+                    break;
+                case 'fireRate':
+                case 'attackSpeed':
+                    player.attackSpeed *= (1 + value / 100);
+                    break;
+            }
+        });
+    }
+    
+    unapplyEquipmentEffects(player, type, itemId) {
+        const equipment = this.getEquipment(type, itemId);
+        if (!equipment || !equipment.effects) return;
+        
+        console.log(`Removendo efeitos de ${equipment.name}:`, equipment.effects);
+        
+        // Remover cada efeito (operação inversa)
+        Object.entries(equipment.effects).forEach(([effect, value]) => {
+            switch(effect) {
+                case 'damage':
+                    player.damage -= value;
+                    break;
+                case 'defense':
+                    player.defense -= value;
+                    break;
+                case 'speed':
+                    player.speed -= value;
+                    break;
+                case 'critChance':
+                    player.critChance -= value / 100;
+                    break;
+                case 'maxHp':
+                    player.maxHp -= value;
+                    if (player.hp > player.maxHp) {
+                        player.hp = player.maxHp;
+                    }
+                    break;
+                case 'xpBonus':
+                case 'expMultiplier':
+                    player.expMultiplier = (player.expMultiplier || 1) / (1 + value / 100);
+                    break;
+                case 'fireRate':
+                case 'attackSpeed':
+                    player.attackSpeed /= (1 + value / 100);
+                    break;
+            }
+        });
     }
 }
 
