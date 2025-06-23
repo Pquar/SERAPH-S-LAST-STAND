@@ -307,6 +307,23 @@ class UpgradeSystem extends EventEmitter {
         return colors[rarity] || colors.common;
     }
     
+    // Mostrar menu de upgrade
+    showUpgradeMenu(player) {
+        if (this.isUpgradeMenuOpen) {
+            return; // Já está aberto
+        }
+        
+        // Gerar opções de upgrade
+        this.generateUpgradeOptions(player);
+        
+        return this.currentUpgradeOptions;
+    }
+    
+    // Esconder menu de upgrade
+    hideUpgradeMenu() {
+        this.closeUpgradeMenu();
+    }
+    
     // Detectar clique nas cartas
     handleClick(x, y) {
         if (!this.isUpgradeMenuOpen) return null;

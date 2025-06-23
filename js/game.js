@@ -524,7 +524,8 @@ class Game extends EventEmitter {
         });
         
         this.player.on('expGained', (amount, currentExp, expToNext) => {
-            this.updateExpBar(currentExp, expToNext);
+            // A barra de EXP é atualizada automaticamente no renderHUD do UI
+            // this.updateExpBar(currentExp, expToNext);
         });
         
         // Enemy spawner events
@@ -593,6 +594,16 @@ class Game extends EventEmitter {
         document.querySelectorAll('.menu').forEach(menu => {
             menu.classList.add('hidden');
         });
+    }
+    
+    showUpgradeMenu(options) {
+        // Delegar para o sistema de upgrades
+        this.upgradeSystem.showUpgradeMenu(this.player, options);
+    }
+    
+    hideUpgradeMenu() {
+        // Delegar para o sistema de upgrades
+        this.upgradeSystem.hideUpgradeMenu();
     }
     
     // Input handling para controles de sidescroller
