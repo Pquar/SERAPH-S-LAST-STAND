@@ -106,7 +106,7 @@ class Game extends EventEmitter {
     }
     
     setupEventListeners() {
-        // Input events
+        // Input events para controles de sidescroller
         this.inputManager.on('keyDown', (key) => {
             this.handleKeyDown(key);
         });
@@ -115,15 +115,53 @@ class Game extends EventEmitter {
             this.handleKeyUp(key);
         });
         
-        this.inputManager.on('joystickMove', (x, y) => {
-            if (this.player) {
-                this.player.setJoystick(x, y, true);
+        // Mouse events para mira e tiro
+        this.canvas.addEventListener('mousemove', (e) => {
+            if (this.player && this.state === 'playing') {
+                const rect = this.canvas.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left;
+                const mouseY = e.clientY - rect.top;
+                this.player.setMousePosition(mouseX, mouseY);
             }
         });
         
-        this.inputManager.on('joystickStop', () => {
+        this.canvas.addEventListener('mousedown', (e) => {
+            if (this.player && this.state === 'playing') {
+                e.preventDefault();
+                this.player.startShooting();
+            }
+        });
+        
+        this.canvas.addEventListener('mouseup', (e) => {
+            if (this.player && this.state === 'playing') {
+                e.preventDefault();
+                this.player.stopShooting();
+            }
+        });
+        
+        // Mobile controls
+        this.inputManager.on('mobileMove', (direction) => {
             if (this.player) {
-                this.player.setJoystick(0, 0, false);
+                const controls = { left: false, right: false };
+                if (direction === 'left') controls.left = true;
+                if (direction === 'right') controls.right = true;
+                this.player.setMobileControls(controls);
+            }
+        });
+        
+        this.inputManager.on('mobileJump', () => {
+            if (this.player) {
+                this.player.setMobileControls({ jump: true });
+            }
+        });
+        
+        this.inputManager.on('mobileShoot', (aimX, aimY, shooting) => {
+            if (this.player) {
+                this.player.setMobileControls({ 
+                    shooting: shooting,
+                    aimX: aimX,
+                    aimY: aimY 
+                });
             }
         });
         
@@ -203,16 +241,14 @@ class Game extends EventEmitter {
         this.gameTime += deltaTime;
         
         // Atualizar entidades
-        if (this.player) {
-            this.player.update(deltaTime, this.waveSystem.enemies, this.canvas);
+        if (this.player && this.terrain) {
+            const platforms = this.terrain.getPlatforms();
+            this.player.update(deltaTime, this.enemySpawner.getEnemies(), this.canvas, platforms);
         }
         
-        if (this.waveSystem) {
-            this.waveSystem.update(deltaTime, this.player, this.canvas);
+        if (this.enemySpawner) {
+            this.enemySpawner.update(deltaTime, this.player, this.canvas);
         }
-        
-        // Atualizar soul orbs
-        this.updateSoulOrbs(deltaTime);
         
         // Atualizar UI
         this.updateUI();
@@ -252,13 +288,15 @@ class Game extends EventEmitter {
         // Background pattern
         this.renderBackground();
         
-        // Renderizar entidades
-        if (this.waveSystem) {
-            this.waveSystem.render(this.ctx);
+        // Renderizar terreno
+        if (this.terrain) {
+            this.terrain.render(this.ctx);
         }
         
-        // Renderizar soul orbs
-        this.renderSoulOrbs();
+        // Renderizar entidades
+        if (this.enemySpawner) {
+            this.enemySpawner.render(this.ctx);
+        }
         
         if (this.player) {
             this.player.render(this.ctx);
@@ -449,17 +487,22 @@ class Game extends EventEmitter {
         this.gameStartTime = Date.now();
         this.gameTime = 0;
         
-        // Criar jogador
-        this.player = new Player(this.canvas.width / 2, this.canvas.height / 2);
+        // Criar terreno
+        this.terrain = new Terrain(this.canvas.width, this.canvas.height);
         
-        // Criar sistema de ondas
-        this.waveSystem = new WaveSystem();
+        // Criar jogador no centro da tela, mas no chão
+        const spawnX = this.canvas.width / 2;
+        const spawnY = this.canvas.height - 100; // próximo ao chão
+        this.player = new Player(spawnX, spawnY);
+        
+        // Criar sistema de spawn de inimigos
+        this.enemySpawner = new EnemySpawner();
+        
+        // Criar sistema de upgrades
+        this.upgradeSystem = new UpgradeSystem();
         
         // Event listeners
         this.setupGameEventListeners();
-        
-        // Limpar arrays
-        this.soulOrbs = [];
         
         // Esconder menu
         this.hideAllMenus();
@@ -476,25 +519,35 @@ class Game extends EventEmitter {
             this.gameOver();
         });
         
-        // Wave system events
-        this.waveSystem.on('waveStart', (wave) => {
-            this.audioSystem.playSound('waveStart');
+        this.player.on('levelUp', (level) => {
+            this.handlePlayerLevelUp(level);
         });
         
-        this.waveSystem.on('waveComplete', (wave) => {
-            this.audioSystem.playSound('waveComplete');
+        this.player.on('expGained', (amount, currentExp, expToNext) => {
+            this.updateExpBar(currentExp, expToNext);
         });
         
-        this.waveSystem.on('enemyKilled', (enemy) => {
-            this.audioSystem.playSound('enemyDeath');
+        // Enemy spawner events
+        this.enemySpawner.on('enemyKilled', (enemy) => {
+            this.audioSystem.playSound('enemyKilled');
         });
         
-        this.waveSystem.on('soulOrbDrop', (orbData) => {
-            const orb = this.soulOrbPool.get();
-            Object.assign(orb, orbData);
-            orb.lifetime = 30000;
-            this.soulOrbs.push(orb);
+        // Upgrade system events
+        this.upgradeSystem.on('upgradeMenuOpened', (options) => {
+            this.pauseGame(); // Pausar quando abrir menu de upgrade
+            this.showUpgradeMenu(options);
         });
+        
+        this.upgradeSystem.on('upgradeSelected', (upgrade) => {
+            this.hideUpgradeMenu();
+            this.resumeGame();
+            this.audioSystem.playSound('upgradeSelected');
+        });
+    }
+    
+    handlePlayerLevelUp(level) {
+        this.audioSystem.playSound('levelUp');
+        this.upgradeSystem.showUpgradeMenu(this.player);
     }
     
     togglePause() {
@@ -542,18 +595,10 @@ class Game extends EventEmitter {
         });
     }
     
-    // Input handling
+    // Input handling para controles de sidescroller
     handleKeyDown(key) {
         if (this.state === 'playing' && this.player) {
             switch (key) {
-                case 'KeyW':
-                case 'ArrowUp':
-                    this.player.setInput('up', true);
-                    break;
-                case 'KeyS':
-                case 'ArrowDown':
-                    this.player.setInput('down', true);
-                    break;
                 case 'KeyA':
                 case 'ArrowLeft':
                     this.player.setInput('left', true);
@@ -563,7 +608,7 @@ class Game extends EventEmitter {
                     this.player.setInput('right', true);
                     break;
                 case 'Space':
-                    this.player.setInput('special', true);
+                    this.player.setInput('jump', true);
                     break;
             }
         }
@@ -588,14 +633,6 @@ class Game extends EventEmitter {
     handleKeyUp(key) {
         if (this.state === 'playing' && this.player) {
             switch (key) {
-                case 'KeyW':
-                case 'ArrowUp':
-                    this.player.setInput('up', false);
-                    break;
-                case 'KeyS':
-                case 'ArrowDown':
-                    this.player.setInput('down', false);
-                    break;
                 case 'KeyA':
                 case 'ArrowLeft':
                     this.player.setInput('left', false);
@@ -605,7 +642,7 @@ class Game extends EventEmitter {
                     this.player.setInput('right', false);
                     break;
                 case 'Space':
-                    this.player.setInput('special', false);
+                    this.player.setInput('jump', false);
                     break;
             }
         }

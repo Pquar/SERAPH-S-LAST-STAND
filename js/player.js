@@ -1,145 +1,180 @@
-// player.js - Sistema do jogador com as mecânicas principais
+// player.js - Sistema do jogador com mecânicas de plataforma
 
 class Player extends EventEmitter {
     constructor(x, y) {
         super();
         
-        // Posição e movimento
+        // Posição e movimento (plataforma)
         this.x = x;
         this.y = y;
         this.vx = 0;
         this.vy = 0;
-        this.speed = 250; // pixels por segundo
+        this.speed = 200; // pixels por segundo horizontal
         this.size = 20;
+        
+        // Física de plataforma
+        this.onGround = false;
+        this.jumpSpeed = 400; // velocidade inicial do pulo
+        this.gravity = 1200; // acelereção da gravidade
+        this.jumpsAvailable = 1;
+        this.maxJumps = 1;
+        this.groundY = 0; // será definido pela plataforma atual
         
         // Estatísticas base
         this.maxHp = 100;
         this.hp = this.maxHp;
-        this.damage = 10;
-        this.attackSpeed = 1.0; // ataques por segundo
+        this.damage = 15;
+        this.attackSpeed = 3.0; // tiros por segundo
         this.critChance = 0.05; // 5%
         this.critMultiplier = 1.5;
         this.defense = 0;
         
-        // Sistema de tiro
-        this.lastShotTime = 0;
-        this.autoAim = true;
-        this.projectiles = [];
-        this.projectileSpeed = 400;
-        this.projectileSize = 5;
+        // Sistema de experiência e nível
+        this.level = 1;
+        this.exp = 0;
+        this.expToNext = 100; // EXP necessária para próximo nível
+        this.expGrowthRate = 1.5; // multiplicador de EXP por nível
         
-        // Sistema de movimento/salto
-        this.onGround = true;
-        this.jumpHeight = 300;
-        this.gravity = 800;
-        this.jumpsAvailable = 1;
-        this.maxJumps = 1;
+        // Sistema de tiro (mouse aim)
+        this.lastShotTime = 0;
+        this.mouseX = 0;
+        this.mouseY = 0;
+        this.isShooting = false; // para disparo automático ao segurar
+        this.projectiles = [];
+        this.projectileSpeed = 500;
+        this.projectileSize = 6;
         
         // Estados especiais
         this.invulnerable = false;
         this.invulnerabilityTime = 0;
-        this.invulnerabilityDuration = 1000; // 1 segundo
-        
-        // Soul Orbs coletados
-        this.soulOrbs = 0;
+        this.invulnerabilityDuration = 500; // 0.5 segundos
         
         // Visual
         this.color = '#66ffff';
-        this.trailPoints = [];
-        this.maxTrailPoints = 10;
+        this.facingRight = true; // direção que está olhando
         
-        // Input
+        // Input (apenas A/D/Space)
         this.input = {
-            left: false,
-            right: false,
-            up: false,
-            down: false,
-            jump: false,
-            special: false
+            left: false,   // A
+            right: false,  // D
+            jump: false    // Space
         };
         
         // Mobile controls
-        this.joystick = {
-            x: 0,
-            y: 0,
-            active: false
+        this.mobileControls = {
+            left: false,
+            right: false,
+            jump: false,
+            shooting: false,
+            aimX: 0,
+            aimY: 0
         };
         
-        // Target para auto-aim
-        this.currentTarget = null;
-        this.targetingRange = 300;
+        // Plataformas para colisão
+        this.platforms = [];
     }
     
-    update(deltaTime, enemies, canvas) {
+    update(deltaTime, enemies, canvas, platforms = []) {
+        this.platforms = platforms;
         this.handleMovement(deltaTime, canvas);
         this.handleShooting(deltaTime, enemies);
         this.updateProjectiles(deltaTime, enemies, canvas);
         this.updateInvulnerability(deltaTime);
-        this.updateTrail();
-        this.updateTargeting(enemies);
         
-        // Manter dentro do canvas
+        // Manter dentro do canvas horizontalmente
         this.constrainToCanvas(canvas);
     }
     
     handleMovement(deltaTime, canvas) {
         const dt = deltaTime / 1000;
         
-        // Movimento horizontal baseado no input ou joystick
+        // Movimento horizontal (apenas A/D)
         let moveX = 0;
-        let moveY = 0;
         
-        if (this.joystick.active) {
-            moveX = this.joystick.x;
-            moveY = this.joystick.y;
-        } else {
-            if (this.input.left) moveX -= 1;
-            if (this.input.right) moveX += 1;
-            if (this.input.up) moveY -= 1;
-            if (this.input.down) moveY += 1;
+        // Input de teclado ou mobile
+        if (this.input.left || this.mobileControls.left) {
+            moveX -= 1;
+            this.facingRight = false;
+        }
+        if (this.input.right || this.mobileControls.right) {
+            moveX += 1;
+            this.facingRight = true;
         }
         
-        // Normalizar movimento diagonal
-        if (moveX !== 0 && moveY !== 0) {
-            const length = Math.sqrt(moveX * moveX + moveY * moveY);
-            moveX /= length;
-            moveY /= length;
-        }
-        
-        // Aplicar velocidade
+        // Aplicar velocidade horizontal
         this.vx = moveX * this.speed;
-        this.vy = moveY * this.speed;
         
-        // Atualizar posição
-        this.x += this.vx * dt;
-        this.y += this.vy * dt;
-        
-        // Sistema de salto (para implementações futuras com plataformas)
-        if (this.input.jump && this.jumpsAvailable > 0) {
-            this.vy = -this.jumpHeight;
+        // Sistema de pulo (Space)
+        if ((this.input.jump || this.mobileControls.jump) && this.jumpsAvailable > 0) {
+            this.vy = -this.jumpSpeed;
             this.jumpsAvailable--;
             this.onGround = false;
             this.input.jump = false; // Evita salto contínuo
+            this.mobileControls.jump = false;
+        }
+        
+        // Aplicar gravidade
+        if (!this.onGround) {
+            this.vy += this.gravity * dt;
+        }
+        
+        // Atualizar posição
+        const oldY = this.y;
+        this.x += this.vx * dt;
+        this.y += this.vy * dt;
+        
+        // Verificar colisão com plataformas
+        this.checkPlatformCollisions(oldY, canvas);
+    }
+    
+    checkPlatformCollisions(oldY, canvas) {
+        // Colisão com o chão (bottom do canvas)
+        const groundLevel = canvas.height - 40; // espaço para o chão
+        if (this.y + this.size >= groundLevel) {
+            this.y = groundLevel - this.size;
+            this.vy = 0;
+            this.onGround = true;
+            this.jumpsAvailable = this.maxJumps;
+            return;
+        }
+        
+        // Colisão com plataformas (degraus)
+        this.onGround = false;
+        
+        for (let platform of this.platforms) {
+            // Verificar se está caindo na plataforma
+            if (this.vy >= 0 && oldY + this.size <= platform.y && 
+                this.y + this.size >= platform.y &&
+                this.x + this.size > platform.x && 
+                this.x < platform.x + platform.width) {
+                
+                this.y = platform.y - this.size;
+                this.vy = 0;
+                this.onGround = true;
+                this.jumpsAvailable = this.maxJumps;
+                break;
+            }
         }
     }
     
     handleShooting(deltaTime, enemies) {
+        if (!this.isShooting && !this.mobileControls.shooting) return;
+        
         const now = Date.now();
         const shotInterval = 1000 / this.attackSpeed;
         
         if (now - this.lastShotTime >= shotInterval) {
-            // Auto-aim: encontrar o inimigo mais próximo
-            if (this.autoAim && this.currentTarget) {
-                this.shootAt(this.currentTarget.x, this.currentTarget.y);
-                this.lastShotTime = now;
-            } else if (enemies.length > 0) {
-                // Se não tem target específico, atira no mais próximo
-                const closest = this.findClosestEnemy(enemies);
-                if (closest && Math2D.distance(this.x, this.y, closest.x, closest.y) <= this.targetingRange) {
-                    this.shootAt(closest.x, closest.y);
-                    this.lastShotTime = now;
-                }
+            // Usar posição do mouse ou mobile aim
+            let aimX = this.mouseX;
+            let aimY = this.mouseY;
+            
+            if (this.mobileControls.shooting) {
+                aimX = this.mobileControls.aimX;
+                aimY = this.mobileControls.aimY;
             }
+            
+            this.shootAt(aimX, aimY);
+            this.lastShotTime = now;
         }
     }
     
@@ -147,7 +182,7 @@ class Player extends EventEmitter {
         const angle = Math2D.angle(this.x, this.y, targetX, targetY);
         const projectile = {
             x: this.x,
-            y: this.y,
+            y: this.y - this.size / 2, // sair do centro do player
             vx: Math.cos(angle) * this.projectileSpeed,
             vy: Math.sin(angle) * this.projectileSpeed,
             size: this.projectileSize,
@@ -159,6 +194,43 @@ class Player extends EventEmitter {
         
         this.projectiles.push(projectile);
         this.emit('shot', projectile);
+    }
+    
+    // Métodos para controle de mira
+    setMousePosition(x, y) {
+        this.mouseX = x;
+        this.mouseY = y;
+    }
+    
+    startShooting() {
+        this.isShooting = true;
+    }
+    
+    stopShooting() {
+        this.isShooting = false;
+    }
+    
+    // Métodos para controle de experiência
+    gainExp(amount) {
+        this.exp += amount;
+        
+        // Verificar se subiu de nível
+        if (this.exp >= this.expToNext) {
+            this.levelUp();
+        }
+        
+        this.emit('expGained', amount, this.exp, this.expToNext);
+    }
+    
+    levelUp() {
+        this.level++;
+        this.exp -= this.expToNext;
+        this.expToNext = Math.floor(this.expToNext * this.expGrowthRate);
+        
+        // Curar um pouco ao subir de nível
+        this.hp = Math.min(this.maxHp, this.hp + Math.floor(this.maxHp * 0.1));
+        
+        this.emit('levelUp', this.level);
     }
     
     calculateDamage() {
@@ -200,6 +272,12 @@ class Player extends EventEmitter {
                     enemy.x, enemy.y, enemy.size
                 )) {
                     enemy.takeDamage(projectile.damage);
+                    
+                    // Ganhar EXP por hit
+                    if (enemy.hp <= 0) {
+                        this.gainExp(enemy.expValue || 10);
+                    }
+                    
                     this.emit('hit', enemy, projectile.damage);
                     return false; // Remove o projétil
                 }
@@ -209,154 +287,67 @@ class Player extends EventEmitter {
         });
     }
     
-    updateTargeting(enemies) {
-        // Atualizar target atual
-        if (enemies.length === 0) {
-            this.currentTarget = null;
-            return;
-        }
-        
-        // Se não tem target ou target morreu, encontrar novo
-        if (!this.currentTarget || this.currentTarget.hp <= 0) {
-            this.currentTarget = this.findClosestEnemy(enemies);
-        }
-        
-        // Verificar se target ainda está no alcance
-        if (this.currentTarget) {
-            const distance = Math2D.distance(this.x, this.y, this.currentTarget.x, this.currentTarget.y);
-            if (distance > this.targetingRange) {
-                this.currentTarget = this.findClosestEnemy(enemies);
-            }
-        }
-    }
-    
-    findClosestEnemy(enemies) {
-        let closest = null;
-        let closestDistance = Infinity;
-        
-        for (let enemy of enemies) {
-            const distance = Math2D.distance(this.x, this.y, enemy.x, enemy.y);
-            if (distance < closestDistance && distance <= this.targetingRange) {
-                closest = enemy;
-                closestDistance = distance;
-            }
-        }
-        
-        return closest;
-    }
-    
     updateInvulnerability(deltaTime) {
         if (this.invulnerable) {
-            this.invulnerabilityTime -= deltaTime;
-            if (this.invulnerabilityTime <= 0) {
+            this.invulnerabilityTime += deltaTime;
+            if (this.invulnerabilityTime >= this.invulnerabilityDuration) {
                 this.invulnerable = false;
+                this.invulnerabilityTime = 0;
             }
         }
     }
     
-    updateTrail() {
-        // Adicionar ponto atual ao trail
-        this.trailPoints.push({ x: this.x, y: this.y, alpha: 1.0 });
-        
-        // Limitar número de pontos
-        if (this.trailPoints.length > this.maxTrailPoints) {
-            this.trailPoints.shift();
-        }
-        
-        // Reduzir alpha dos pontos
-        this.trailPoints.forEach((point, index) => {
-            point.alpha = (index + 1) / this.trailPoints.length * 0.5;
-        });
-    }
-    
-    constrainToCanvas(canvas) {
-        const margin = this.size / 2;
-        this.x = Math2D.clamp(this.x, margin, canvas.width - margin);
-        this.y = Math2D.clamp(this.y, margin, canvas.height - margin);
-    }
-    
-    takeDamage(damage) {
+    takeDamage(amount) {
         if (this.invulnerable) return;
         
         // Aplicar defesa
-        const actualDamage = Math.max(1, damage - this.defense);
-        this.hp -= actualDamage;
+        const damageReduction = this.defense / (this.defense + 100);
+        const finalDamage = Math.max(1, Math.floor(amount * (1 - damageReduction)));
         
-        // Ativar invulnerabilidade
+        this.hp = Math.max(0, this.hp - finalDamage);
         this.invulnerable = true;
-        this.invulnerabilityTime = this.invulnerabilityDuration;
+        this.invulnerabilityTime = 0;
         
-        this.emit('damaged', actualDamage);
+        this.emit('damaged', finalDamage, this.hp);
         
         if (this.hp <= 0) {
-            this.hp = 0;
             this.emit('death');
         }
     }
     
     heal(amount) {
-        const oldHp = this.hp;
         this.hp = Math.min(this.maxHp, this.hp + amount);
-        const healed = this.hp - oldHp;
-        
-        if (healed > 0) {
-            this.emit('healed', healed);
+        this.emit('healed', amount, this.hp);
+    }
+    
+    constrainToCanvas(canvas) {
+        // Apenas controlar horizontalmente, verticalmente é controlado pelas plataformas
+        if (this.x - this.size < 0) {
+            this.x = this.size;
         }
-        
-        return healed;
+        if (this.x + this.size > canvas.width) {
+            this.x = canvas.width - this.size;
+        }
     }
     
-    collectSoulOrb(value = 1) {
-        this.soulOrbs += value;
-        this.emit('soulOrbCollected', value);
-    }
-    
-    // Input handling
+    // Métodos de input para compatibilidade
     setInput(key, value) {
         if (this.input.hasOwnProperty(key)) {
             this.input[key] = value;
         }
     }
     
-    setJoystick(x, y, active) {
-        this.joystick.x = x;
-        this.joystick.y = y;
-        this.joystick.active = active;
+    // Mobile controls
+    setMobileControls(controls) {
+        Object.assign(this.mobileControls, controls);
     }
     
     render(ctx) {
-        // Desenhar trail
-        this.renderTrail(ctx);
-        
         // Desenhar corpo do jogador
         this.renderBody(ctx);
         
         // Desenhar projéteis
         this.renderProjectiles(ctx);
-        
-        // Desenhar linha de mira (se houver target)
-        if (this.currentTarget && this.autoAim) {
-            this.renderTargetLine(ctx);
-        }
-    }
-    
-    renderTrail(ctx) {
-        if (this.trailPoints.length < 2) return;
-        
-        ctx.beginPath();
-        ctx.moveTo(this.trailPoints[0].x, this.trailPoints[0].y);
-        
-        for (let i = 1; i < this.trailPoints.length; i++) {
-            const point = this.trailPoints[i];
-            ctx.lineTo(point.x, point.y);
-            
-            ctx.strokeStyle = `rgba(102, 255, 255, ${point.alpha})`;
-            ctx.lineWidth = 3;
-            ctx.stroke();
-            
-            ctx.beginPath();
-            ctx.moveTo(point.x, point.y);
-        }
     }
     
     renderBody(ctx) {
@@ -370,53 +361,22 @@ class Player extends EventEmitter {
         // Borda
         CanvasUtils.drawCircle(ctx, this.x, this.y, this.size, '#ffffff', false);
         
+        // Indicador de direção
+        const dirX = this.facingRight ? this.size * 0.8 : -this.size * 0.8;
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(this.x, this.y);
+        ctx.lineTo(this.x + dirX, this.y);
+        ctx.stroke();
+        
         // Reset alpha
         ctx.globalAlpha = 1.0;
-        
-        // HP bar acima do jogador (se não estiver com HP cheio)
-        if (this.hp < this.maxHp) {
-            this.renderHealthBar(ctx);
-        }
-    }
-    
-    renderHealthBar(ctx) {
-        const barWidth = this.size * 2;
-        const barHeight = 4;
-        const barY = this.y - this.size - 10;
-        
-        // Background
-        CanvasUtils.drawRect(ctx, this.x - barWidth/2, barY, barWidth, barHeight, 'rgba(255, 255, 255, 0.3)');
-        
-        // HP fill
-        const hpPercent = this.hp / this.maxHp;
-        const fillWidth = barWidth * hpPercent;
-        const color = hpPercent > 0.5 ? '#4CAF50' : hpPercent > 0.25 ? '#FF9800' : '#F44336';
-        
-        CanvasUtils.drawRect(ctx, this.x - barWidth/2, barY, fillWidth, barHeight, color);
     }
     
     renderProjectiles(ctx) {
-        this.projectiles.forEach(projectile => {
-            const age = (Date.now() - projectile.createdAt) / projectile.lifetime;
-            const alpha = 1 - age;
-            
-            ctx.globalAlpha = alpha;
+        for (let projectile of this.projectiles) {
             CanvasUtils.drawCircle(ctx, projectile.x, projectile.y, projectile.size, projectile.color);
-            ctx.globalAlpha = 1.0;
-        });
-    }
-    
-    renderTargetLine(ctx) {
-        if (!this.currentTarget) return;
-        
-        ctx.setLineDash([5, 5]);
-        CanvasUtils.drawLine(
-            ctx,
-            this.x, this.y,
-            this.currentTarget.x, this.currentTarget.y,
-            'rgba(255, 255, 255, 0.3)',
-            1
-        );
-        ctx.setLineDash([]);
+        }
     }
 }
