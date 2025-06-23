@@ -1,150 +1,228 @@
-# OBJETIVO:
+# SERAPH'S LAST STAND
+## Jogo de Tiro Incremental Roguelike Web
 
-CRIE UM jogo de tiro incremental baseado no clássico da era Flash "Heli Attack" com elementos roguelike. Derrote ondas de inimigos e escolha uma melhoria entre várias opções. Domine o jogo de todas as maneiras possíveis e concorra a um lugar no placar. A cada rodada, você fica mais forte, mas os inimigos também.
+### OBJETIVO:
+Criar um jogo de tiro incremental baseado no clássico da era Flash "Heli Attack" com elementos roguelike modernos. Um jogo web HTML5 otimizado para desktop e dispositivos móveis.
 
-# JOGABILIDADE
+### CONCEITO PRINCIPAL:
+- **Plataforma**: HTML5 Canvas com JavaScript vanilla
+- **Compatibilidade**: Desktop (mouse/teclado) e Mobile (touch/gyroscópio)
+- **Estilo Visual**: Pixel art inspirado nos clássicos Flash games
+- **Progressão**: Sistema roguelike com upgrades permanentes
 
-O jogador controla um personagem que pode se mover e atira automaticamente. O objetivo é derrotar ondas de inimigos e coletar orbes da alma para comprar melhorias.
+## JOGABILIDADE CORE
 
-tem um timer que aumenta a dificuldade ao longo do tempo e invoca a próxima onda de inimigos.
+### Controles:
+**Desktop:**
+- WASD ou Arrow Keys para movimento
+- Mouse para mira (opcional - auto-aim disponível)
+- Spacebar ou clique para habilidades especiais
 
-# MENU
+**Mobile:**
+- Joystick virtual para movimento
+- Auto-aim inteligente
+- Botões touch para habilidades
+- Suporte a gestos (swipe para dash)
 
-## BOTAO DE JOGAR
-## PLACAS
-ARMAZENAR NO LOCALSTORAGE
+### Mecânicas Principais:
+1. **Movimento livre em 2D** - O jogador controla um personagem que pode se mover em todas as direções
+2. **Tiro automático** - Dispara continuamente no inimigo mais próximo ou na direção do movimento
+3. **Sistema de ondas** - Ondas progressivamente mais difíceis de inimigos
+4. **Coleta de orbes** - Orbes da alma dropados pelos inimigos mortos
+5. **Timer de dificuldade** - A dificuldade aumenta gradualmente com o tempo, spawning mais inimigos e tipos mais fortes
 
-## COMPRAR MELHORIAS
-Melhorias são melhorias de atributos que podem ser compradas com orbes da alma no menu.
+## INTERFACE E MENUS
+
+### Menu Principal:
+- **JOGAR** - Inicia uma nova partida
+- **CONTINUAR** - Retoma partida salva (localStorage)
+- **LOJA** - Comprar upgrades permanentes com Soul Orbs
+- **PLACAR** - Rankings locais (localStorage) e globais (opcional)
+- **CONFIGURAÇÕES** - Controles, áudio, gráficos
+- **COMO JOGAR** - Tutorial interativo
+
+### Interface In-Game:
+- **HP Bar** - Barra de vida do jogador
+- **Soul Orbs Counter** - Contador de orbes coletados
+- **Wave Counter** - Onda atual e progresso
+- **Timer** - Tempo de partida atual
+- **Mini-mapa** - Posição de inimigos próximos (opcional)
+
+### Sistema de Pausa:
+- **Menu de pausa** completo durante o jogo
+- **Salvamento automático** a cada onda completada
+- **Estatísticas da partida** em tempo real
+
+### Responsividade Mobile:
+- **Interface adaptativa** que se ajusta ao tamanho da tela
+- **Botões touch otimizados** com feedback visual
+- **HUD reorganizado** para dispositivos móveis
+- **Suporte a orientação** portrait e landscape
 
 
-# EQUIPAMENTOS:
+## SISTEMA DE EQUIPAMENTOS
 
-## CHAPEUS
-Chapéu de Mago – Um chapéu pontudo e bacana.
-Capacete – Mais armadura. Menos velocidade de movimento.
-Gorro Hélice – Tem salto duplo. Não é possível controlar a altura do salto.
-Chapéu Incomum – Receba apenas cartas incomuns.
-Chapéu do Desafiante – 20% de chance de obter o dobro de itens. Inimigos em dobro.
-Fedora – Pode rolar novamente gratuitamente. Não entra no ranking.
+### Chapéus (Modificam gameplay):
+- **Chapéu de Mago** – Clássico pontudo, efeito básico balanceado
+- **Capacete** – +Armadura, -Velocidade de movimento
+- **Gorro Hélice** – Salto duplo automático, altura fixa
+- **Chapéu Incomum** – Força cartas apenas de raridade Incomum+
+- **Chapéu do Desafiante** – 20% chance de double loot, dobra inimigos
+- **Fedora** – Reroll gratuito infinito, desabilita ranking online
 
-## Cajados
+### Cajados (Definem padrão de tiro):
+- **Cajado do Mago** – Projétil único em linha reta (padrão)
+- **Cajado de Esmeralda** – Projéteis teleguiados, +velocidade de ataque, -50% dano
+- **Tridente** – Disparo triplo em leque
+- **Boomstaff** – Projéteis explosivos com área de dano
+- **Cajado do Trovão** – Invoca raios do céu em área aleatória
+- **Ponta Congelada** – Projéteis perfuram múltiplos inimigos
+- **Cajado Arco-Íris** – Efeito aleatório a cada tiro
 
-Cajado do Mago – Atira um projétil em linha reta.
-Cajado de Esmeralda – Atira projéteis teleguiados e tem maior velocidade de ataque, mas causa metade do dano.
-Tridente – Atira 3 projéteis em um ângulo.
-Boomstaff – Atira projéteis explosivos.
-Cajado do Trovão – Invoca um raio de cima.
-Ponta Congelada – Projéteis perfuram os inimigos.
-Cajado Arco-Íris – Atira projéteis aleatórios.
+### Sistema de Desbloqueio:
+- **Equipamentos iniciais** disponíveis no tutorial
+- **Novos equipamentos** desbloqueados por conquistas
+- **Combinações especiais** entre chapéu e cajado criam sinergias únicas
 
-# CARTAS
+## SISTEMA DE CARTAS ROGUELIKE
 
-## Comum
-Catalisador — Dano de Projétil +2
-Visão — Chance crítica +5%
-Crescimento — HP máx. +10
-Impulso — Altura do Salto +30%
-Renovar — Curar até o máximo de HP
-Resistência — Defesa +4%
-Ressonância — Velocidade de Ataque +12%
-Almas — Chance de dropar orbe de alma 1%
-Estabilidade — O projétil recebe +1 de acerto antes de explodir
-Veloz — Velocidade de Movimento +20%
-## Incomum
-Catalisador+ — Dano de Projétil +4
-Carga — Tamanho do Projétil +20%
-Manto – Invulnerabilidade após receber dano +10% de duração
-Fragmentação – Ao serem mortos, os inimigos liberam 2 projéteis mais fracos em direções aleatórias
-Atrito – Para cada metro que você corre, 1 projétil explosivo é lançado para cima
-Crescimento+ — HP máx. +20
-Gush — Adiciona +1 Salto
-Sanguessuga — Roubo de Vida de 3% de Dano
-Sorte — Maior chance de rolar itens incomuns
-Orbe — Inimigos mortos têm 5% de chance de derrubar um orbe de cura
-Precisão — Crítico causa +50% de dano
-Fúria — Se tiver menos de 50% de HP, aumenta o dano do projétil e do corpo de acordo (até 50%)
-Recrescimento — Regenera HP% com base no número de inimigos vivos
-Ressonância+ — Velocidade de Ataque +24%
-Encolher — Torna você 10% menor
-Swift+ — Velocidade de Movimento +40%
-Thunderbolt — Chama 2 raios dos céus a cada poucos segundos
-## Épico
-Avaliação — +1 escolha de item a partir de agora
-Barreira — Cria um escudo que bloqueia o dano uma vez a cada poucos segundos
-Frio — Os inimigos ficam 1% mais lentos cada vez que recebem dano (até 80%)
-Fragmentação+ – Ao serem mortos, os inimigos liberam 6 projéteis mais fracos em direções aleatórias
-Friction+ – Para cada metro que você corre, 3 projéteis explosivos são lançados para cima
-Foco — Ganha velocidade de ataque a cada segundo que você não se move. Reinicia a cada onda
-Crescimento++ — HP máx. +40
-Imortal — +1 Reviver (mata todos os inimigos ao reviver) - carta removida do jogo
-Leech+ — Roubo de Vida de 9% de Dano
-Superaquecimento — Seu corpo causa 40 de dano ao contato
-Thunderbolt+ — Chama 6 raios dos céus a cada poucos segundos
-Tome — Novos itens comuns (brancos) que você pega são 35% mais eficazes
-Will-O-Wisp — Invoca um fogo-fátuo que herda metade do seu dano de ataque e velocidade
-Ferimento — Causar dano aplica sangramento ao inimigo
+### Raridades e Probabilidades:
+- **Comum (Branco)**: 70% chance - Melhorias básicas essenciais
+- **Incomum (Azul)**: 25% chance - Melhorias significativas com mecânicas especiais  
+- **Épico (Roxo)**: 4.5% chance - Modificadores de gameplay poderosos
+- **Ascensão (Dourado)**: 0.5% chance - Transformações extremas que redefinem o build
 
-### Ascensão
-Absorvente — Cada projétil que te atinge quando invulnerável te cura em 1 PV. Receba 4 acúmulos de Camuflagem
-Antiaéreo — Maior área de explosão de projéteis de fricção. Obtenha 10 acúmulos de Fricção.
-Vingador — Se você for morrer, mate metade dos inimigos e cure metade dos seus pontos de vida. Tem um tempo de recarga de 5 ondas. Receba 5 acúmulos de Fúria.
-Abençoado — 5% de chance de encontrar itens épicos. Ganhe 5 acúmulos de Sorte.
-Mago Sangrento — Sangramento causa dano mais rápido. Obtenha 3 acúmulos de Ferimento.
-Trator de esteira — Empurrar inimigos com o corpo ficou mais fácil. Ganhe 8 acúmulos de Veloz.
-Bunker — Ganha +4 de armadura a cada segundo que você não se move, até 95. Reinicia a cada onda. Ganhe 3 acúmulos de Foco.
-Burning Man — Causa dano corporal a cada 2 segundos em um círculo ao seu redor. Obtenha 3 acúmulos de Superaquecimento.
-Colosso — Seus PV e tamanho são dobrados. Obtenha 15 acúmulos de Crescimento.
-Cometa — Após cair de um salto, causa dano em área com base na distância da sua queda. Ganhe 5 acúmulos de Impulso.
-Dealer — Você pode rolar novamente de graça. Ganhe 4 acúmulos de Avaliação.
-Desesperado — Recupera todo o HP no início de cada onda. Escolha Renovar 5 vezes.
-Encantador — Fogos-fátuos agora se concentram perto da ponta do seu cajado e atiram na direção que você mira. Ganhe 4 acúmulos de Fogo-fátuo.
-Exorcista — Um raio de alma é liberado quando você pega um orbe de alma. Receba 6 acúmulos de Almas.
-Congelante — Agora pode desacelerar inimigos em até 100%. Quando isso acontece, o dano de qualquer fonte tem 1% de chance de matar o inimigo instantaneamente. Receba 3 acúmulos de Frio.
-Feiticeiro Voador — Você pode pular o quanto quiser. Ganhe 5 acúmulos de Gush.
-Gnomo — Projéteis inimigos têm 33% de chance de errar. Obtenha 5 acúmulos de Encolher
-Deus do Trovão — Seus raios causam 3x mais dano, incluindo o raio invocado pelo Cajado do Trovão. Obtenha 10 acúmulos de Raio do Trovão.
-Acumulador — Os orbes de cura que você coleta concedem uma carga ao seu próximo ataque (pode acumular). Obtenha 5 acúmulos de Orbe.
-Atirador — Seu primeiro acerto é sempre crítico. Obtenha 6 acúmulos de Visão.
-Nerd — Receba uma carta comum aleatória a cada onda. Ganhe 4 pilhas de Tomo.
-Pac-Man — Aumente o dano de um projétil inimigo sempre que seus projéteis passarem por ele. Ganhe 5 acúmulos de Estabilidade.
-Espalhador de Pragas — Remove 1% de PV de todos os seus inimigos a cada 1 segundo. Obtenha 5 acúmulos de Recrescimento.
-Protetor — Quando seu escudo quebrar, atire projéteis ao seu redor. Ganhe 3 acúmulos de Barreira.
-Destruidor de RAM — Balas de fragmentação decaem menos. Obtenha 10 acúmulos de Fragmentação.
-Sádico — Causa dano nas costas do agressor. Recebe 6 acúmulos de Resistência.
-Especulador — Pode causar acertos supercríticos. Obtenha 5 acúmulos de Precisão.
-Streamer — Dispara um raio do seu cajado que causa dano com base na velocidade de ataque. Obtenha 8 acúmulos de Ressonância.
-Tryhard — Não faz absolutamente nada. Obtenha 20 acúmulos de Catalisador.
-Vampiro — Metade de todo o seu dano retorna como PV. Obtenha 12 acúmulos de Drenagem.
-Anão Branco — O tamanho do seu projétil retorna ao normal. Se um projétil atingir o chão ou as paredes, ele se torna um buraco negro. Obtenha 5 acúmulos de Carga.
+### Cartas Comuns (Base para builds):
+- **Catalisador** — Dano de Projétil +2
+- **Visão** — Chance crítica +5%
+- **Crescimento** — HP máximo +10
+- **Impulso** — Altura do Salto +30%
+- **Renovar** — Cura completa instantânea
+- **Resistência** — Redução de dano +4%
+- **Ressonância** — Velocidade de Ataque +12%
+- **Almas** — +1% chance de drop de Soul Orb
+- **Estabilidade** — Projéteis atravessam +1 inimigo antes de sumir
+- **Veloz** — Velocidade de Movimento +20%
 
-Obrigatório	Ascensão	Efeito
-4 Manto	Absorvente	Cada projétil que atinge você quando está invulnerável recupera 1 PV. Não funciona para dano corpo a corpo revivido de inimigos.
-Antiaéreo	A área de explosão dos projéteis de fricção é dobrada. Projéteis explosivos causam mais dano aos inimigos quanto mais próximos eles estiverem do centro da explosão.
-5 Sorte	Abençoado	Agora você tem +5% de chance de encontrar itens épicos em cada rolagem.
-3 Ferida	Mago Sangrento	O efeito de sangramento agora ocorre a cada 0,5 segundos em vez de a cada 1 segundo.
-3 Foco	Bunker	Ganha +4 de armadura a cada segundo que você não se move, até 95, o que significa 95% de redução de dano. Reinicia a cada onda.
-Homem em Chamas	
-15 Crescimento	Colosso	
-Cometa	
-3 Avaliação	Distribuidor	Você pode recarregar gratuitamente.
-5 Renovar	Desesperado	Recupera o HP máximo no início de cada onda.
-6 Almas	Exorcista	
-Feiticeiro Voador	
-3 Frio	Freezer	Agora pode desacelerar inimigos em até 100%. Quando isso acontece, todo dano de qualquer fonte tem 1% de chance de matar o inimigo instantaneamente.
-5 Encolher	Gnomo	Cada projétil que atinge você tem 33% de chance de errar.
-10 Raio	Deus do Trovão	Seus raios causam 3x mais dano, incluindo os raios invocados pelo Cajado do Trovão.
-Acumulador	
-Atirador	
-4 Tomo	Nerd	Receba uma carta comum a cada onda.
-Pac-Man	
-5 Recrescimento	Espalhador de pragas	Remove 1% de HP de todos os inimigos a cada 1 segundo.
-Protetor	
-6 Resist	Sádico	
-Especulador	
-20 Catalisador	Tryhard	Não faz nada.
-Destruidor de RAM	
-12 Sanguessuga	Vampiro	
-5 Carga	Anã Branca	O tamanho do seu projétil retorna ao normal. Se um projétil atingir o chão ou paredes, ele se transforma em um buraco negro, que dura 3 segundos e atrai todos os inimigos para si. Buracos negros têm um tempo de recarga de 1 segundo.
+### Cartas Incomuns (Mecânicas especiais):
+- **Catalisador+** — Dano de Projétil +4
+- **Carga** — Tamanho do Projétil +20%
+- **Manto** — +10% duração de invulnerabilidade pós-dano
+- **Fragmentação** — Inimigos mortos liberam 2 projéteis fracos aleatórios
+- **Atrito** — A cada metro corrido, dispara 1 projétil explosivo para cima
+- **Crescimento+** — HP máximo +20  
+- **Gush** — +1 Salto adicional (multi-jump)
+- **Sanguessuga** — 3% de lifesteal em todo dano causado
+- **Sorte** — Aumenta chance de cartas Incomuns+
+- **Orbe** — 5% chance de inimigos droparem orbe de cura pequena
+- **Precisão** — Dano crítico causa +50% dano extra
+- **Fúria** — <50% HP: +1% dano para cada 1% de HP perdido (max 50%)
+- **Recrescimento** — Regenera HP baseado no número de inimigos vivos nearby
+- **Ressonância+** — Velocidade de Ataque +24%
+- **Encolher** — Reduz hitbox do jogador em 10%
+- **Swift+** — Velocidade de Movimento +40%
+- **Thunderbolt** — A cada 3s, invoca 2 raios em posições aleatórias
+
+### Cartas Épicas (Game changers):
+- **Avaliação** — +1 opção em todas as seleções de carta futuras
+- **Barreira** — Gera escudo que absorve 1 hit a cada 5s
+- **Frio** — Inimigos ficam -1% velocidade por hit recebido (max -80%)
+- **Fragmentação+** — Inimigos mortos liberam 6 projéteis fracos
+- **Friction+** — A cada metro corrido, dispara 3 projéteis explosivos para cima
+- **Foco** — +2% velocidade de ataque por segundo parado (reset por onda)
+- **Crescimento++** — HP máximo +40
+- **Imortal** — +1 Vida extra (mata todos inimigos ao reviver) [carta única]
+- **Leech+** — 9% lifesteal em todo dano
+- **Superaquecimento** — Corpo causa 40 de dano de contato por segundo
+- **Thunderbolt+** — A cada 2s, invoca 6 raios em posições aleatórias
+- **Tome** — Cartas Comuns futuras são 35% mais eficazes
+- **Will-O-Wisp** — Spawn wisp que orbita e ataca (50% do seu dano e velocidade)
+- **Ferimento** — Todo dano aplica sangramento (DPS overtime)
+
+### Cartas de Ascensão (Ultra raras - Builds extremos):
+> **Requisito**: Mínimo de stacks específicos de outras cartas para desbloquear
+
+- **Absorvente** [4x Manto] — Projéteis inimigos em invulnerabilidade curam +1 HP
+- **Antiaéreo** [10x Atrito] — Área de explosão 2x maior, dano escala com proximidade
+- **Vingador** [5x Fúria] — Ao morrer: mata 50% inimigos, cura 50% HP, cooldown 5 ondas
+- **Abençoado** [5x Sorte] — +5% chance de encontrar cartas Épicas
+- **Mago Sangrento** [3x Ferimento] — Sangramento 2x mais rápido (0.5s intervals)
+- **Trator de Esteira** [8x Veloz] — Empurrar inimigos com corpo é mais fácil
+- **Bunker** [3x Foco] — +4 armadura/s parado (max 95% redução), reset por onda
+- **Burning Man** [3x Superaquecimento] — Dano corporal em área a cada 2s
+- **Colosso** [15x Crescimento] — HP e tamanho do jogador dobrados
+- **Cometa** [5x Impulso] — Aterrissagem causa dano baseado na altura da queda
+- **Dealer** [4x Avaliação] — Rerolls infinitos gratuitos
+- **Desesperado** [5x Renovar] — HP completo no início de cada onda
+- **Encantador** [4x Will-O-Wisp] — Wisps se concentram na ponta do cajado
+- **Exorcista** [6x Almas] — Soul orbs coletados disparam raio da alma
+- **Congelante** [3x Frio] — Pode reduzir velocidade inimiga até 100%, 1% chance de insta-kill
+- **Feiticeiro Voador** [5x Gush] — Pulos infinitos
+- **Gnomo** [5x Encolher] — 33% chance de projéteis inimigos errarem
+- **Deus do Trovão** [10x Thunderbolt] — Raios causam 3x dano (inclui Cajado do Trovão)
+- **Acumulador** [5x Orbe] — Orbes de cura dão carga extra no próximo ataque
+- **Atirador** [6x Visão] — Primeiro hit sempre crítico
+- **Nerd** [4x Tome] — Carta comum grátis a cada onda
+- **Pac-Man** [5x Estabilidade] — Projéteis ganham dano ao atravessar inimigos
+- **Espalhador de Pragas** [5x Recrescimento] — Remove 1% HP de todos inimigos/s
+- **Protetor** [3x Barreira] — Escudo quebrado dispara projéteis em volta
+- **Destruidor de RAM** [10x Fragmentação] — Projéteis de fragmentação duram mais
+- **Sádico** [6x Resistência] — Reflete dano no atacante
+- **Especulador** [5x Precisão] — Pode causar super-críticos
+- **Streamer** [8x Ressonância] — Dispara laser contínuo baseado na velocidade de ataque
+- **Tryhard** [20x Catalisador] — Não faz nada especial, apenas muito dano
+- **Vampiro** [12x Sanguessuga] — 50% de todo dano retorna como HP
+- **Anão Branco** [5x Carga] — Projétil normal, mas cria buraco negro ao atingir paredes (3s duração, 1s cooldown)
+
+## ARQUITETURA TÉCNICA WEB
+
+### Tecnologias Base:
+- **HTML5 Canvas** para renderização de gráficos
+- **JavaScript ES6+** para lógica do jogo
+- **Web Audio API** para efeitos sonoros e música
+- **LocalStorage** para persistência de dados
+- **Service Workers** para cache offline
+- **CSS3** para UI responsiva
+
+### Otimizações Mobile:
+- **Touch Events** com fallback para mouse
+- **RequestAnimationFrame** para smooth gameplay
+- **Object Pooling** para performance
+- **Sprite Batching** para reduzir draw calls
+- **Audio Context** com user gesture requirement
+- **Viewport meta tag** para scale adequada
+
+### Estrutura de Arquivos Sugerida:
+```
+index.html
+├── css/
+│   ├── main.css
+│   └── mobile.css
+├── js/
+│   ├── game.js (core game loop)
+│   ├── player.js
+│   ├── enemies.js  
+│   ├── cards.js
+│   ├── ui.js
+│   ├── audio.js
+│   └── utils.js
+├── assets/
+│   ├── sprites/
+│   ├── sounds/
+│   └── fonts/
+└── manifest.json (PWA support)
+```
+
+### Performance Targets:
+- **60 FPS** em dispositivos modernos
+- **30 FPS mínimo** em dispositivos mais antigos
+- **<3 segundos** tempo de carregamento inicial
+- **<100MB** tamanho total dos assets
+- **Compatibilidade** com navegadores dos últimos 3 anos
+
+---
+
+*Última atualização: Junho 2025*
+*Versão do documento: 2.0*
 
 
