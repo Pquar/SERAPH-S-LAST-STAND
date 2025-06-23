@@ -1,0 +1,181 @@
+/* CSS Mobile - Otimizações específicas para dispositivos móveis */
+
+@media (max-width: 768px) and (orientation: portrait) {
+    #gameCanvas {
+        width: 100vw;
+        height: calc(100vh - 200px);
+        border: none;
+        border-radius: 0;
+    }
+    
+    .hud-top {
+        background: linear-gradient(180deg, rgba(15, 15, 35, 0.9) 0%, rgba(15, 15, 35, 0.7) 70%, transparent 100%);
+        padding: 10px 15px;
+    }
+    
+    .hp-bar {
+        width: 120px;
+        height: 14px;
+    }
+    
+    .wave-counter, .timer {
+        font-size: 0.8em;
+        padding: 6px 12px;
+    }
+    
+    .joystick-container {
+        bottom: 20px;
+        left: 20px;
+    }
+    
+    .mobile-buttons {
+        bottom: 20px;
+        right: 20px;
+    }
+}
+
+@media (max-width: 768px) and (orientation: landscape) {
+    #gameCanvas {
+        width: calc(100vw - 240px);
+        height: 100vh;
+        border: none;
+        border-radius: 0;
+    }
+    
+    .hud-top {
+        padding: 8px 15px;
+    }
+    
+    .joystick-container {
+        bottom: 20px;
+        left: 20px;
+    }
+    
+    .mobile-buttons {
+        bottom: 20px;
+        right: 20px;
+        flex-direction: row;
+        gap: 10px;
+    }
+    
+    .action-btn {
+        padding: 10px 15px;
+        font-size: 0.8em;
+    }
+}
+
+/* Otimizações para telas muito pequenas */
+@media (max-width: 480px) {
+    .menu-content h1 {
+        font-size: 1.8em;
+    }
+    
+    .subtitle {
+        font-size: 1em;
+    }
+    
+    .menu-btn {
+        padding: 10px 20px;
+        font-size: 0.9em;
+    }
+    
+    .joystick {
+        width: 90px;
+        height: 90px;
+    }
+    
+    .joystick-knob {
+        width: 30px;
+        height: 30px;
+    }
+}
+
+/* Otimizações para iPhone SE e telas similares */
+@media (max-width: 375px) {
+    .hud-top {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+    
+    .hp-bar {
+        width: 100px;
+        height: 12px;
+    }
+    
+    .hp-text {
+        font-size: 9px;
+    }
+    
+    .wave-counter, .timer, .soul-orbs {
+        font-size: 0.7em;
+        padding: 4px 8px;
+    }
+    
+    .joystick {
+        width: 80px;
+        height: 80px;
+    }
+    
+    .joystick-knob {
+        width: 25px;
+        height: 25px;
+    }
+    
+    .action-btn {
+        padding: 8px 15px;
+        font-size: 0.8em;
+    }
+}
+
+/* Suporte para dispositivos com notch */
+@supports (padding: max(0px)) {
+    .hud-top {
+        padding-top: max(20px, env(safe-area-inset-top));
+        padding-left: max(20px, env(safe-area-inset-left));
+        padding-right: max(20px, env(safe-area-inset-right));
+    }
+    
+    .joystick-container {
+        bottom: max(30px, env(safe-area-inset-bottom));
+        left: max(30px, env(safe-area-inset-left));
+    }
+    
+    .mobile-buttons {
+        bottom: max(30px, env(safe-area-inset-bottom));
+        right: max(30px, env(safe-area-inset-right));
+    }
+}
+
+/* Melhorias de performance para dispositivos móveis */
+.joystick, .joystick-knob, .action-btn {
+    will-change: transform;
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+}
+
+/* Evita zoom acidental em dispositivos móveis */
+input, button, select, textarea {
+    font-size: 16px;
+}
+
+/* Melhora a experiência tátil */
+.action-btn, .menu-btn, .joystick {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* Feedback visual para toques */
+.action-btn:active, .menu-btn:active {
+    transform: scale(0.95);
+    transition: transform 0.1s ease;
+}
+
+.joystick:active .joystick-knob {
+    box-shadow: 0 0 15px rgba(102, 255, 255, 0.8);
+}

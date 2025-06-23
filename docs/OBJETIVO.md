@@ -1,6 +1,8 @@
 # SERAPH'S LAST STAND
 ## Jogo de Tiro Incremental Roguelike Web
 
+ This game plays as a sidescroller platformer that happens on a single screen, so no need to programm a camera. You control a character that can walk around usind A and D, and can jump using spacebar. You can shoot projectiles by aiming with your mouse and clicking (if you hold the click, you shoot automatically, respecting the cooldown time between shots). The topology of the ground is like image 1, with blocks creating steps. Flying enemies keep spawning from the top of the scene, and they stop moving when they reach 70% the height of the screen, where they instead start following your character (with a smooth delay) and shooting towards him. If you character gets shot, he loses HP, but stays invincible for about half a second (to prevent multiple shots). Enemies keep spawning non stop, and they get stronger and more numerous as the game goes. Killing enemies give your character EXP, which levels him up eventually. Create an HP bar and an EXP bar for the character on the top left of the screen. Each levels becomes a little harder to get. When your character levels up, he's presented with 3 upgrade choices, which can be any one from this list
+
 ### OBJETIVO:
 Criar um jogo de tiro incremental baseado no clássico da era Flash "Heli Attack" com elementos roguelike modernos. Um jogo web HTML5 otimizado para desktop e dispositivos móveis.
 
@@ -93,86 +95,86 @@ Criar um jogo de tiro incremental baseado no clássico da era Flash "Heli Attack
 - **Ascensão (Dourado)**: 0.5% chance - Transformações extremas que redefinem o build
 
 ### Cartas Comuns (Base para builds):
-- **Catalisador** — Dano de Projétil +2
-- **Visão** — Chance crítica +5%
-- **Crescimento** — HP máximo +10
-- **Impulso** — Altura do Salto +30%
-- **Renovar** — Cura completa instantânea
-- **Resistência** — Redução de dano +4%
-- **Ressonância** — Velocidade de Ataque +12%
-- **Almas** — +1% chance de drop de Soul Orb
-- **Estabilidade** — Projéteis atravessam +1 inimigo antes de sumir
-- **Veloz** — Velocidade de Movimento +20%
+- **Catalyst** — Dano de Projétil +2
+- **Eyesight** — Chance crítica +5%
+- **Growth** — HP máximo +10
+- **Impulse** — Altura do Salto +30%
+- **Renew** — Cura completa instantânea
+- **Resist** — Redução de dano +4%
+- **Resonance** — Velocidade de Ataque +12%
+- **Souls** — +1% chance de drop de Soul Orb
+- **Stability** — Projéteis atravessam +1 inimigo antes de sumir
+- **Swift** — Velocidade de Movimento +20%
 
 ### Cartas Incomuns (Mecânicas especiais):
-- **Catalisador+** — Dano de Projétil +4
-- **Carga** — Tamanho do Projétil +20%
-- **Manto** — +10% duração de invulnerabilidade pós-dano
-- **Fragmentação** — Inimigos mortos liberam 2 projéteis fracos aleatórios
-- **Atrito** — A cada metro corrido, dispara 1 projétil explosivo para cima
-- **Crescimento+** — HP máximo +20  
+- **Catalyst+** — Dano de Projétil +4
+- **Charge** — Tamanho do Projétil +20%
+- **Clock** — +10% duração de invulnerabilidade pós-dano
+- **Fragmentation** — Inimigos mortos liberam 2 projéteis fracos aleatórios
+- **Friction** — A cada metro corrido, dispara 1 projétil explosivo para cima
+- **Growth+** — HP máximo +20
 - **Gush** — +1 Salto adicional (multi-jump)
-- **Sanguessuga** — 3% de lifesteal em todo dano causado
-- **Sorte** — Aumenta chance de cartas Incomuns+
-- **Orbe** — 5% chance de inimigos droparem orbe de cura pequena
-- **Precisão** — Dano crítico causa +50% dano extra
-- **Fúria** — <50% HP: +1% dano para cada 1% de HP perdido (max 50%)
-- **Recrescimento** — Regenera HP baseado no número de inimigos vivos nearby
-- **Ressonância+** — Velocidade de Ataque +24%
-- **Encolher** — Reduz hitbox do jogador em 10%
+- **Leech** — 3% de lifesteal em todo dano causado
+- **Luck** — Aumenta chance de cartas Incomuns+
+- **Orb** — 5% chance de inimigos droparem orbe de cura pequena
+- **Precision** — Dano crítico causa +50% dano extra
+- **Rage** — <50% HP: +1% dano para cada 1% de HP perdido (max 50%)
+- **Regrowth** — Regenera HP baseado no número de inimigos vivos nearby
+- **Resonance+** — Velocidade de Ataque +24%
+- **Shrink** — Reduz hitbox do jogador em 10%
 - **Swift+** — Velocidade de Movimento +40%
 - **Thunderbolt** — A cada 3s, invoca 2 raios em posições aleatórias
 
 ### Cartas Épicas (Game changers):
-- **Avaliação** — +1 opção em todas as seleções de carta futuras
-- **Barreira** — Gera escudo que absorve 1 hit a cada 5s
-- **Frio** — Inimigos ficam -1% velocidade por hit recebido (max -80%)
-- **Fragmentação+** — Inimigos mortos liberam 6 projéteis fracos
+- **Appraisal** — +1 opção em todas as seleções de carta futuras
+- **Barrier** — Gera escudo que absorve 1 hit a cada 5s
+- **Cold** — Inimigos ficam -1% velocidade por hit recebido (max -80%)
+- **Fragmentation+** — Inimigos mortos liberam 6 projéteis fracos
 - **Friction+** — A cada metro corrido, dispara 3 projéteis explosivos para cima
-- **Foco** — +2% velocidade de ataque por segundo parado (reset por onda)
-- **Crescimento++** — HP máximo +40
-- **Imortal** — +1 Vida extra (mata todos inimigos ao reviver) [carta única]
+- **Focus** — +2% velocidade de ataque por segundo parado (reset por onda)
+- **Growth++** — HP máximo +40
+- **Immortal** — +1 Vida extra (mata todos inimigos ao reviver) [carta única]
 - **Leech+** — 9% lifesteal em todo dano
-- **Superaquecimento** — Corpo causa 40 de dano de contato por segundo
+- **Overheat** — Corpo causa 40 de dano de contato por segundo
 - **Thunderbolt+** — A cada 2s, invoca 6 raios em posições aleatórias
 - **Tome** — Cartas Comuns futuras são 35% mais eficazes
 - **Will-O-Wisp** — Spawn wisp que orbita e ataca (50% do seu dano e velocidade)
-- **Ferimento** — Todo dano aplica sangramento (DPS overtime)
+- **Wound** — Todo dano aplica sangramento (DPS overtime)
 
 ### Cartas de Ascensão (Ultra raras - Builds extremos):
 > **Requisito**: Mínimo de stacks específicos de outras cartas para desbloquear
 
-- **Absorvente** [4x Manto] — Projéteis inimigos em invulnerabilidade curam +1 HP
-- **Antiaéreo** [10x Atrito] — Área de explosão 2x maior, dano escala com proximidade
-- **Vingador** [5x Fúria] — Ao morrer: mata 50% inimigos, cura 50% HP, cooldown 5 ondas
-- **Abençoado** [5x Sorte] — +5% chance de encontrar cartas Épicas
-- **Mago Sangrento** [3x Ferimento] — Sangramento 2x mais rápido (0.5s intervals)
-- **Trator de Esteira** [8x Veloz] — Empurrar inimigos com corpo é mais fácil
-- **Bunker** [3x Foco] — +4 armadura/s parado (max 95% redução), reset por onda
-- **Burning Man** [3x Superaquecimento] — Dano corporal em área a cada 2s
-- **Colosso** [15x Crescimento] — HP e tamanho do jogador dobrados
-- **Cometa** [5x Impulso] — Aterrissagem causa dano baseado na altura da queda
-- **Dealer** [4x Avaliação] — Rerolls infinitos gratuitos
-- **Desesperado** [5x Renovar] — HP completo no início de cada onda
-- **Encantador** [4x Will-O-Wisp] — Wisps se concentram na ponta do cajado
-- **Exorcista** [6x Almas] — Soul orbs coletados disparam raio da alma
-- **Congelante** [3x Frio] — Pode reduzir velocidade inimiga até 100%, 1% chance de insta-kill
-- **Feiticeiro Voador** [5x Gush] — Pulos infinitos
-- **Gnomo** [5x Encolher] — 33% chance de projéteis inimigos errarem
-- **Deus do Trovão** [10x Thunderbolt] — Raios causam 3x dano (inclui Cajado do Trovão)
-- **Acumulador** [5x Orbe] — Orbes de cura dão carga extra no próximo ataque
-- **Atirador** [6x Visão] — Primeiro hit sempre crítico
+- **Absorbent** [4x Clock] — Projéteis inimigos em invulnerabilidade curam +1 HP
+- **Anti-Aircraft** [10x Friction] — Área de explosão 2x maior, dano escala com proximidade
+- **Avenger** [5x Rage] — Ao morrer: mata 50% inimigos, cura 50% HP, cooldown 5 ondas
+- **Blessed** [5x Luck] — +5% chance de encontrar cartas Épicas
+- **Bloody Mage** [3x Wound] — Sangramento 2x mais rápido (0.5s intervals)
+- **Buildozer** [8x Swift] — Empurrar inimigos com corpo é mais fácil
+- **Bunker** [3x Focus] — +4 armadura/s parado (max 95% redução), reset por onda
+- **Burning Man** [3x Overheat] — Dano corporal em área a cada 2s
+- **Colossus** [15x Growth] — HP e tamanho do jogador dobrados
+- **Comet** [5x Impulse] — Aterrissagem causa dano baseado na altura da queda
+- **Dealer** [4x Appraisal] — Rerolls infinitos gratuitos
+- **Desperate** [5x Renew] — HP completo no início de cada onda
+- **Enchanter** [4x Will-O-Wisp] — Wisps se concentram na ponta do cajado
+- **Exorcist** [6x Souls] — Soul orbs coletados disparam raio da alma
+- **Freezing** [3x Cold] — Pode reduzir velocidade inimiga até 100%, 1% chance de insta-kill
+- **Flying Sorcerer** [5x Gush] — Pulos infinitos
+- **Gnome** [5x Shrink] — 33% chance de projéteis inimigos errarem
+- **God of Thunder** [10x Thunderbolt] — Raios causam 3x dano (inclui Cajado do Trovão)
+- **Hoarder** [5x Orb] — Orbes de cura dão carga extra no próximo ataque
+- **Marksman** [6x Vision] — Primeiro hit sempre crítico
 - **Nerd** [4x Tome] — Carta comum grátis a cada onda
-- **Pac-Man** [5x Estabilidade] — Projéteis ganham dano ao atravessar inimigos
-- **Espalhador de Pragas** [5x Recrescimento] — Remove 1% HP de todos inimigos/s
-- **Protetor** [3x Barreira] — Escudo quebrado dispara projéteis em volta
-- **Destruidor de RAM** [10x Fragmentação] — Projéteis de fragmentação duram mais
-- **Sádico** [6x Resistência] — Reflete dano no atacante
-- **Especulador** [5x Precisão] — Pode causar super-críticos
-- **Streamer** [8x Ressonância] — Dispara laser contínuo baseado na velocidade de ataque
-- **Tryhard** [20x Catalisador] — Não faz nada especial, apenas muito dano
-- **Vampiro** [12x Sanguessuga] — 50% de todo dano retorna como HP
-- **Anão Branco** [5x Carga] — Projétil normal, mas cria buraco negro ao atingir paredes (3s duração, 1s cooldown)
+- **Pac-Man** [5x Stability] — Projéteis ganham dano ao atravessar inimigos
+- **Plague Spreader** [5x Regrowth] — Remove 1% HP de todos inimigos/s
+- **Protector** [3x Barrier] — Escudo quebrado dispara projéteis em volta
+- **RAM Destroyer** [10x Fragmentation] — Projéteis de fragmentação duram mais
+- **Sadist** [6x Resistance] — Reflete dano no atacante
+- **Speculator** [5x Precision] — Pode causar super-críticos
+- **Streamer** [8x Resonance] — Dispara laser contínuo baseado na velocidade de ataque
+- **Tryhard** [20x Catalyst] — Não faz nada especial, apenas muito dano
+- **Vampire** [12x Lifesteal] — 50% de todo dano retorna como HP
+- **White Dwarf** [5x Charge] — Projétil normal, mas cria buraco negro ao atingir paredes (3s duração, 1s cooldown)
 
 ## ARQUITETURA TÉCNICA WEB
 

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Seraph's Last Stand</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/mobile.css">
+    <meta name="theme-color" content="#1a1a2e">
+    <meta name="description" content="Jogo de tiro incremental roguelike inspirado no clássico Heli Attack">
+</head>
+<body>
+    <div id="gameContainer">
+        <canvas id="gameCanvas"></canvas>
+        
+        <!-- HUD do jogo -->
+        <div id="gameHUD">
+            <div class="hud-top">
+                <div class="hp-container">
+                    <div class="hp-bar">
+                        <div class="hp-fill" id="hpFill"></div>
+                        <span class="hp-text" id="hpText">100/100</span>
+                    </div>
+                </div>
+                <div class="wave-counter">
+                    <span id="waveText">Onda: 1</span>
+                </div>
+                <div class="timer">
+                    <span id="timerText">00:00</span>
+                </div>
+            </div>
+            <div class="hud-bottom">
+                <div class="soul-orbs">
+                    <span id="soulOrbsText">Orbes: 0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Controles móveis -->
+        <div id="mobileControls" class="mobile-only">
+            <div class="joystick-container">
+                <div class="joystick" id="movementJoystick">
+                    <div class="joystick-knob" id="joystickKnob"></div>
+                </div>
+            </div>
+            <div class="mobile-buttons">
+                <button class="action-btn" id="specialBtn">ESPECIAL</button>
+                <button class="action-btn" id="pauseBtn">PAUSA</button>
+            </div>
+        </div>
+
+        <!-- Menu de pausa -->
+        <div id="pauseMenu" class="menu hidden">
+            <div class="menu-content">
+                <h2>JOGO PAUSADO</h2>
+                <button class="menu-btn" id="resumeBtn">CONTINUAR</button>
+                <button class="menu-btn" id="restartBtn">REINICIAR</button>
+                <button class="menu-btn" id="mainMenuBtn">MENU PRINCIPAL</button>
+            </div>
+        </div>
+
+        <!-- Menu principal -->
+        <div id="mainMenu" class="menu">
+            <div class="menu-content">
+                <h1>SERAPH'S LAST STAND</h1>
+                <p class="subtitle">Jogo de Tiro Incremental Roguelike</p>
+                <div class="menu-buttons">
+                    <button class="menu-btn primary" id="playBtn">JOGAR</button>
+                    <button class="menu-btn" id="continueBtn">CONTINUAR</button>
+                    <button class="menu-btn" id="shopBtn">LOJA</button>
+                    <button class="menu-btn" id="leaderboardBtn">PLACAR</button>
+                    <button class="menu-btn" id="settingsBtn">CONFIGURAÇÕES</button>
+                    <button class="menu-btn" id="tutorialBtn">COMO JOGAR</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts do jogo -->
+    <script src="js/utils.js"></script>
+    <script src="js/audio.js"></script>
+    <script src="js/player.js"></script>
+    <script src="js/enemies.js"></script>
+    <script src="js/cards.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/game.js"></script>
+</body>
+</html>
