@@ -458,6 +458,364 @@ class UI extends EventEmitter {
         // Reset text align
         ctx.textAlign = 'left';
     }
+    
+    // Sistema de Ranking
+    showRankingModal(rankings) {
+        const modal = this.createModal('ranking-modal', 'Ranking - Top 10');
+        
+        const content = document.createElement('div');
+        content.className = 'ranking-content';
+        
+        if (rankings.length === 0) {
+            content.innerHTML = `
+                <div class="no-rankings">
+                    <p>Nenhuma pontuação registrada ainda.</p>
+                    <p>Jogue para aparecer no ranking!</p>
+                </div>
+            `;
+        } else {
+            const rankingList = document.createElement('div');
+            rankingList.className = 'ranking-list';
+            
+            rankings.forEach((entry, index) => {
+                const rankItem = document.createElement('div');
+                rankItem.className = `rank-item ${index < 3 ? 'top-three' : ''}`;
+                rankItem.innerHTML = `
+                    <div class="rank-position">#${index + 1}</div>
+                    <div class="rank-info">
+                        <div class="rank-name">${entry.playerName}</div>
+                        <div class="rank-stats">
+                            <span class="score">${RankingSystem.formatScore(entry.score)} pts</span>
+                            <span class="level">Nível ${entry.level}</span>
+                            <span class="kills">${entry.enemiesKilled} mortes</span>
+                            <span class="time">${RankingSystem.formatSurvivalTime(entry.survivalTime)}</span>
+                        </div>
+                        <div class="rank-date">${entry.date}</div>
+                    </div>
+                `;
+                rankingList.appendChild(rankItem);
+            });
+            
+            content.appendChild(rankingList);
+        }
+        
+        // Botões
+        const buttons = document.createElement('div');
+        buttons.className = 'modal-buttons';
+        buttons.innerHTML = `
+            <button id="clearRankingBtn" class="btn-secondary">Limpar Ranking</button>
+            <button id="closeRankingBtn" class="btn-primary">Fechar</button>
+        `;
+        
+        content.appendChild(buttons);
+        modal.appendChild(content);
+        document.body.appendChild(modal);
+        
+        // Event listeners
+        document.getElementById('clearRankingBtn').addEventListener('click', () => {
+            if (confirm('Tem certeza que deseja limpar o ranking? Esta ação não pode ser desfeita.')) {
+                this.emit('clearRanking');
+                this.closeModal('ranking-modal');
+            }
+        });
+        
+        document.getElementById('closeRankingBtn').addEventListener('click', () => {
+            this.closeModal('ranking-modal');
+        });
+        
+        // CSS para o ranking
+        this.addRankingStyles();
+    }
+    
+    // Mostrar popup de novo recorde
+    showNewRecordPopup(position, stats) {
+        const popup = document.createElement('div');
+        popup.className = 'new-record-popup';
+        popup.innerHTML = `
+            <div class="record-content">
+                <h2>🏆 NOVO RECORDE!</h2>
+                <div class="record-position">#${position} no Ranking</div>
+                <div class="record-stats">
+                    <div class="stat">
+                        <span class="stat-label">Pontuação:</span>
+                        <span class="stat-value">${RankingSystem.formatScore(stats.score)}</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">Nível:</span>
+                        <span class="stat-value">${stats.level}</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">Inimigos:</span>
+                        <span class="stat-value">${stats.enemiesKilled}</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">Tempo:</span>
+                        <span class="stat-value">${RankingSystem.formatSurvivalTime(stats.survivalTime)}</span>
+                    </div>
+                </div>
+                <button id="closeRecordPopup" class="btn-primary">Continuar</button>
+            </div>
+        `;
+        
+        document.body.appendChild(popup);
+        
+        document.getElementById('closeRecordPopup').addEventListener('click', () => {
+            popup.remove();
+        });
+        
+        // Auto-fechar após 10 segundos
+        setTimeout(() => {
+            if (popup.parentNode) {
+                popup.remove();
+            }
+        }, 10000);
+    }
+    
+    // Criar modal base
+    createModal(id, title) {
+        const modal = document.createElement('div');
+        modal.id = id;
+        modal.className = 'modal-overlay';
+        modal.innerHTML = `
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>${title}</h2>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="modal-body"></div>
+            </div>
+        `;
+        
+        // Fechar modal
+        modal.querySelector('.modal-close').addEventListener('click', () => {
+            this.closeModal(id);
+        });
+        
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                this.closeModal(id);
+            }
+        });
+        
+        return modal.querySelector('.modal-body');
+    }
+    
+    // Fechar modal
+    closeModal(id) {
+        const modal = document.getElementById(id);
+        if (modal) {
+            modal.remove();
+        }
+    }
+    
+    // Adicionar estilos do ranking
+    addRankingStyles() {
+        if (document.getElementById('ranking-styles')) return;
+        
+        const style = document.createElement('style');
+        style.id = 'ranking-styles';
+        style.textContent = `
+            .modal-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.8);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 1000;
+            }
+            
+            .modal-content {
+                background: #1a1a1a;
+                border: 2px solid #333;
+                border-radius: 10px;
+                max-width: 600px;
+                max-height: 80vh;
+                overflow-y: auto;
+                color: white;
+            }
+            
+            .modal-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 20px;
+                border-bottom: 1px solid #333;
+            }
+            
+            .modal-close {
+                background: none;
+                border: none;
+                color: white;
+                font-size: 24px;
+                cursor: pointer;
+            }
+            
+            .ranking-content {
+                padding: 20px;
+            }
+            
+            .ranking-list {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .rank-item {
+                display: flex;
+                align-items: center;
+                padding: 15px;
+                background: #222;
+                border-radius: 8px;
+                gap: 15px;
+            }
+            
+            .rank-item.top-three {
+                background: linear-gradient(135deg, #333, #444);
+                border: 1px solid #555;
+            }
+            
+            .rank-position {
+                font-size: 24px;
+                font-weight: bold;
+                min-width: 40px;
+                text-align: center;
+            }
+            
+            .rank-item:nth-child(1) .rank-position { color: #ffd700; }
+            .rank-item:nth-child(2) .rank-position { color: #c0c0c0; }
+            .rank-item:nth-child(3) .rank-position { color: #cd7f32; }
+            
+            .rank-info {
+                flex: 1;
+            }
+            
+            .rank-name {
+                font-size: 18px;
+                font-weight: bold;
+                margin-bottom: 5px;
+            }
+            
+            .rank-stats {
+                display: flex;
+                gap: 15px;
+                font-size: 14px;
+                color: #ccc;
+            }
+            
+            .rank-date {
+                font-size: 12px;
+                color: #888;
+                margin-top: 5px;
+            }
+            
+            .score { color: #4CAF50; }
+            .level { color: #2196F3; }
+            .kills { color: #FF5722; }
+            .time { color: #FF9800; }
+            
+            .no-rankings {
+                text-align: center;
+                padding: 40px;
+                color: #888;
+            }
+            
+            .modal-buttons {
+                display: flex;
+                gap: 10px;
+                justify-content: center;
+                margin-top: 20px;
+            }
+            
+            .btn-primary, .btn-secondary {
+                padding: 10px 20px;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                font-size: 16px;
+            }
+            
+            .btn-primary {
+                background: #4CAF50;
+                color: white;
+            }
+            
+            .btn-secondary {
+                background: #757575;
+                color: white;
+            }
+            
+            .new-record-popup {
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+                border: 3px solid #ffd700;
+                border-radius: 15px;
+                padding: 30px;
+                text-align: center;
+                color: white;
+                z-index: 1001;
+                box-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+                animation: recordPopup 0.5s ease-out;
+            }
+            
+            @keyframes recordPopup {
+                from {
+                    opacity: 0;
+                    transform: translate(-50%, -50%) scale(0.8);
+                }
+                to {
+                    opacity: 1;
+                    transform: translate(-50%, -50%) scale(1);
+                }
+            }
+            
+            .record-content h2 {
+                color: #ffd700;
+                margin-bottom: 20px;
+                font-size: 32px;
+            }
+            
+            .record-position {
+                font-size: 24px;
+                font-weight: bold;
+                margin-bottom: 20px;
+                color: #4CAF50;
+            }
+            
+            .record-stats {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 15px;
+                margin-bottom: 30px;
+            }
+            
+            .stat {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .stat-label {
+                font-size: 14px;
+                color: #ccc;
+                margin-bottom: 5px;
+            }
+            
+            .stat-value {
+                font-size: 20px;
+                font-weight: bold;
+                color: white;
+            }
+        `;
+        
+        document.head.appendChild(style);
+    }
 }
 
 // Input Manager - Gerencia todos os tipos de input
@@ -567,6 +925,202 @@ style.textContent = `
         flex-direction: row !important;
         gap: 10px !important;
     }
+    
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+    }
+    
+    .modal-content {
+        background: #1a1a1a;
+        border: 2px solid #333;
+        border-radius: 10px;
+        max-width: 600px;
+        max-height: 80vh;
+        overflow-y: auto;
+        color: white;
+    }
+    
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px;
+        border-bottom: 1px solid #333;
+    }
+    
+    .modal-close {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 24px;
+        cursor: pointer;
+    }
+    
+    .ranking-content {
+        padding: 20px;
+    }
+    
+    .ranking-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .rank-item {
+        display: flex;
+        align-items: center;
+        padding: 15px;
+        background: #222;
+        border-radius: 8px;
+        gap: 15px;
+    }
+    
+    .rank-item.top-three {
+        background: linear-gradient(135deg, #333, #444);
+        border: 1px solid #555;
+    }
+    
+    .rank-position {
+        font-size: 24px;
+        font-weight: bold;
+        min-width: 40px;
+        text-align: center;
+    }
+    
+    .rank-item:nth-child(1) .rank-position { color: #ffd700; }
+    .rank-item:nth-child(2) .rank-position { color: #c0c0c0; }
+    .rank-item:nth-child(3) .rank-position { color: #cd7f32; }
+    
+    .rank-info {
+        flex: 1;
+    }
+    
+    .rank-name {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+    
+    .rank-stats {
+        display: flex;
+        gap: 15px;
+        font-size: 14px;
+        color: #ccc;
+    }
+    
+    .rank-date {
+        font-size: 12px;
+        color: #888;
+        margin-top: 5px;
+    }
+    
+    .score { color: #4CAF50; }
+    .level { color: #2196F3; }
+    .kills { color: #FF5722; }
+    .time { color: #FF9800; }
+    
+    .no-rankings {
+        text-align: center;
+        padding: 40px;
+        color: #888;
+    }
+    
+    .modal-buttons {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        margin-top: 20px;
+    }
+    
+    .btn-primary, .btn-secondary {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+    
+    .btn-primary {
+        background: #4CAF50;
+        color: white;
+    }
+    
+    .btn-secondary {
+        background: #757575;
+        color: white;
+    }
+    
+    .new-record-popup {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+        border: 3px solid #ffd700;
+        border-radius: 15px;
+        padding: 30px;
+        text-align: center;
+        color: white;
+        z-index: 1001;
+        box-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+        animation: recordPopup 0.5s ease-out;
+    }
+    
+    @keyframes recordPopup {
+        from {
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(0.8);
+        }
+        to {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+    }
+    
+    .record-content h2 {
+        color: #ffd700;
+        margin-bottom: 20px;
+        font-size: 32px;
+    }
+    
+    .record-position {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 20px;
+        color: #4CAF50;
+    }
+    
+    .record-stats {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        margin-bottom: 30px;
+    }
+    
+    .stat {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .stat-label {
+        font-size: 14px;
+        color: #ccc;
+        margin-bottom: 5px;
+    }
+    
+    .stat-value {
+        font-size: 20px;
+        font-weight: bold;
+        color: white;
+    }
 `;
-
-document.head.appendChild(style);

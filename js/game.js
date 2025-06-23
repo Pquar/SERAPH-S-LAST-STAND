@@ -23,6 +23,8 @@ class Game extends EventEmitter {
         this.inputManager = new InputManager();
         this.ui = new UI();
         this.audioSystem = new AudioSystem();
+        this.rankingSystem = new RankingSystem();
+        this.playerNamePrompt = new PlayerNamePrompt();
         
         // Configurações
         this.targetFPS = 60;
@@ -126,9 +128,17 @@ class Game extends EventEmitter {
         });
         
         this.canvas.addEventListener('mousedown', (e) => {
+            const rect = this.canvas.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+            
             if (this.player && this.state === 'playing') {
                 e.preventDefault();
                 this.player.startShooting();
+            } else if (this.state === 'paused' && this.upgradeSystem && this.upgradeSystem.isUpgradeMenuOpen) {
+                // Verificar clique em carta de upgrade
+                e.preventDefault();
+                this.handleUpgradeCardClick(mouseX, mouseY);
             }
         });
         
@@ -186,6 +196,15 @@ class Game extends EventEmitter {
             this.showMainMenu();
         });
         
+        // Botões do menu principal
+        document.getElementById('leaderboardBtn').addEventListener('click', () => {
+            this.showRanking();
+        });
+        
+        document.getElementById('settingsBtn').addEventListener('click', () => {
+            this.showSettings();
+        });
+        
         // Verificar se há save game
         const saveData = Storage.load('seraphsLastStand_save');
         if (saveData) {
@@ -213,6 +232,15 @@ class Game extends EventEmitter {
         
         this.ui.on('timeUpdate', (time) => {
             this.updateTimeDisplay(time);
+        });
+        
+        // Event listeners para ranking
+        this.ui.on('clearRanking', () => {
+            this.rankingSystem.clearRankings();
+        });
+        
+        this.rankingSystem.on('newRecord', (entry, position) => {
+            this.ui.showNewRecordPopup(position, entry);
         });
     }
     
@@ -244,6 +272,9 @@ class Game extends EventEmitter {
         if (this.player && this.terrain) {
             const platforms = this.terrain.getPlatforms();
             this.player.update(deltaTime, this.enemySpawner.getEnemies(), this.canvas, platforms);
+            
+            // Atualizar tempo de sobrevivência
+            this.player.updateSurvivalTime(deltaTime);
         }
         
         if (this.enemySpawner) {
@@ -300,6 +331,16 @@ class Game extends EventEmitter {
         
         if (this.player) {
             this.player.render(this.ctx);
+        }
+        
+        // Renderizar HUD
+        if (this.player) {
+            this.ui.renderHUD(this.ctx, this.player);
+        }
+        
+        // Renderizar menu de upgrade se estiver aberto
+        if (this.upgradeSystem) {
+            this.upgradeSystem.renderUpgradeMenu(this.ctx, this.canvas);
         }
         
         // Efeitos visuais
@@ -498,6 +539,9 @@ class Game extends EventEmitter {
         // Criar sistema de spawn de inimigos
         this.enemySpawner = new EnemySpawner();
         
+        // O waveSystem é o mesmo que o enemySpawner (compatibilidade)
+        this.waveSystem = this.enemySpawner;
+        
         // Criar sistema de upgrades
         this.upgradeSystem = new UpgradeSystem();
         
@@ -528,20 +572,40 @@ class Game extends EventEmitter {
             // this.updateExpBar(currentExp, expToNext);
         });
         
+        this.player.on('critical', () => {
+            this.audioSystem.playSound('critical');
+        });
+        
         // Enemy spawner events
         this.enemySpawner.on('enemyKilled', (enemy) => {
-            this.audioSystem.playSound('enemyKilled');
+            this.audioSystem.playSound('enemyDeath');
+            // Atualizar estatísticas do player
+            if (this.player) {
+                this.player.addKill(enemy);
+            }
+        });
+        
+        // Player events para estatísticas
+        this.player.on('hit', (enemy, damage) => {
+            // Verificar se foi crítico
+            const isCritical = damage > this.player.damage;
+            this.player.addDamage(damage, isCritical);
+            this.player.addShot(true); // Tiro que acertou
+        });
+        
+        this.player.on('shot', () => {
+            this.player.addShot(false); // Tiro disparado
         });
         
         // Upgrade system events
         this.upgradeSystem.on('upgradeMenuOpened', (options) => {
-            this.pauseGame(); // Pausar quando abrir menu de upgrade
+            this.state = 'paused'; // Pausar sem mostrar menu de pausa
             this.showUpgradeMenu(options);
         });
         
         this.upgradeSystem.on('upgradeSelected', (upgrade) => {
             this.hideUpgradeMenu();
-            this.resumeGame();
+            this.state = 'playing'; // Retomar sem usar resumeGame
             this.audioSystem.playSound('upgradeSelected');
         });
     }
@@ -572,8 +636,14 @@ class Game extends EventEmitter {
     gameOver() {
         this.state = 'gameOver';
         
-        // Salvar high score
+        // Atualizar tempo de sobrevivência
+        if (this.player) {
+            this.player.updateSurvivalTime(Date.now() - this.gameStartTime);
+        }
+        
+        // Salvar high score e adicionar ao ranking
         this.saveHighScore();
+        this.addToRanking();
         
         // Limpar save game
         Storage.remove('seraphsLastStand_save');
@@ -581,6 +651,21 @@ class Game extends EventEmitter {
         setTimeout(() => {
             this.showMainMenu();
         }, 5000);
+    }
+    
+    // Adicionar pontuação ao ranking
+    addToRanking() {
+        if (!this.player) return;
+        
+        // Verificar se a pontuação merece entrar no ranking
+        if (this.rankingSystem.wouldMakeRanking(this.player.score)) {
+            // Prompt para nome do jogador
+            this.playerNamePrompt.showNamePrompt((playerName) => {
+                this.player.setPlayerName(playerName);
+                const stats = this.player.getStats();
+                this.rankingSystem.addScore(stats);
+            });
+        }
     }
     
     showMainMenu() {
@@ -604,6 +689,22 @@ class Game extends EventEmitter {
     hideUpgradeMenu() {
         // Delegar para o sistema de upgrades
         this.upgradeSystem.hideUpgradeMenu();
+    }
+    
+    // Mostrar ranking
+    showRanking() {
+        const rankings = this.rankingSystem.getRankings();
+        this.ui.showRankingModal(rankings);
+    }
+    
+    // Mostrar configurações
+    showSettings() {
+        const currentName = this.playerNamePrompt.getCurrentName();
+        const newName = this.playerNamePrompt.showSettingsPrompt();
+        
+        if (newName !== currentName) {
+            alert(`Nome alterado para: ${newName}`);
+        }
     }
     
     // Input handling para controles de sidescroller
@@ -709,6 +810,27 @@ class Game extends EventEmitter {
         scores.splice(10); // Manter apenas top 10
         
         Storage.save('seraphsLastStand_scores', scores);
+    }
+    
+    // Tratar clique em carta de upgrade
+    handleUpgradeCardClick(mouseX, mouseY) {
+        if (!this.upgradeSystem || !this.upgradeSystem.isUpgradeMenuOpen) {
+            return;
+        }
+        
+        const options = this.upgradeSystem.currentUpgradeOptions;
+        for (let i = 0; i < options.length; i++) {
+            const card = options[i];
+            if (card._clickArea) {
+                const area = card._clickArea;
+                if (mouseX >= area.x && mouseX <= area.x + area.width &&
+                    mouseY >= area.y && mouseY <= area.y + area.height) {
+                    // Carta clicada!
+                    this.upgradeSystem.selectUpgrade(card.id, this.player);
+                    break;
+                }
+            }
+        }
     }
 }
 

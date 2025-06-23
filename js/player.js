@@ -35,6 +35,19 @@ class Player extends EventEmitter {
         this.expToNext = 100; // EXP necessária para próximo nível
         this.expGrowthRate = 1.5; // multiplicador de EXP por nível
         
+        // Soul Orbs (moeda do jogo)
+        this.soulOrbs = 0;
+        
+        // Sistema de pontuação e estatísticas
+        this.score = 0;
+        this.enemiesKilled = 0;
+        this.totalDamageDealt = 0;
+        this.shotsHit = 0;
+        this.shotsFired = 0;
+        this.criticalHits = 0;
+        this.survivalTime = 0;
+        this.playerName = 'Player'; // Nome padrão
+        
         // Sistema de tiro (mouse aim)
         this.lastShotTime = 0;
         this.mouseX = 0;
@@ -47,7 +60,7 @@ class Player extends EventEmitter {
         // Estados especiais
         this.invulnerable = false;
         this.invulnerabilityTime = 0;
-        this.invulnerabilityDuration = 500; // 0.5 segundos
+        this.invulnerabilityDuration = 1000; // 1 segundo
         
         // Visual
         this.color = '#66ffff';
@@ -194,6 +207,7 @@ class Player extends EventEmitter {
         
         this.projectiles.push(projectile);
         this.emit('shot', projectile);
+        this.playShotSound(); // Toca som de tiro
     }
     
     // Métodos para controle de mira
@@ -233,6 +247,7 @@ class Player extends EventEmitter {
         this.emit('levelUp', this.level);
     }
     
+    // Calcular dano com chance de crítico
     calculateDamage() {
         let damage = this.damage;
         
@@ -309,6 +324,7 @@ class Player extends EventEmitter {
         this.invulnerabilityTime = 0;
         
         this.emit('damaged', finalDamage, this.hp);
+        this.playHitSound(); // Toca som de hit
         
         if (this.hp <= 0) {
             this.emit('death');
@@ -378,5 +394,74 @@ class Player extends EventEmitter {
         for (let projectile of this.projectiles) {
             CanvasUtils.drawCircle(ctx, projectile.x, projectile.y, projectile.size, projectile.color);
         }
+    }
+    
+    // Coletar Soul Orb
+    collectSoulOrb(value = 1) {
+        this.soulOrbs += value;
+        this.score += value * 5; // 5 pontos por soul orb
+        this.emit('soulOrbCollected', this.soulOrbs);
+    }
+    
+    // Métodos para atualizar estatísticas e pontuação
+    addKill(enemy) {
+        this.enemiesKilled++;
+        this.score += enemy.points || 10;
+        
+        // Bônus por tipo de inimigo
+        const typeBonus = {
+            'basic': 10,
+            'fast': 15,
+            'heavy': 25,
+            'sniper': 20
+        };
+        this.score += typeBonus[enemy.type] || 10;
+    }
+    
+    addDamage(damage, isCritical = false) {
+        this.totalDamageDealt += damage;
+        this.score += Math.floor(damage / 10); // 1 ponto a cada 10 de dano
+        
+        if (isCritical) {
+            this.criticalHits++;
+            this.score += 25; // Bônus por crítico
+        }
+    }
+    
+    addShot(hit = false) {
+        this.shotsFired++;
+        if (hit) {
+            this.shotsHit++;
+            this.score += 2; // Pontos por acerto
+        }
+    }
+    
+    updateSurvivalTime(deltaTime) {
+        this.survivalTime += deltaTime;
+        // 1 ponto por segundo sobrevivido
+        this.score += Math.floor(deltaTime / 1000);
+    }
+    
+    // Obter estatísticas para o ranking
+    getStats() {
+        const accuracy = this.shotsFired > 0 ? (this.shotsHit / this.shotsFired) * 100 : 0;
+        
+        return {
+            playerName: this.playerName,
+            score: this.score,
+            level: this.level,
+            enemiesKilled: this.enemiesKilled,
+            survivalTime: this.survivalTime,
+            accuracy: Math.round(accuracy * 100) / 100,
+            criticalHits: this.criticalHits,
+            totalDamageDealt: this.totalDamageDealt,
+            soulOrbs: this.soulOrbs,
+            timestamp: Date.now()
+        };
+    }
+    
+    // Definir nome do jogador
+    setPlayerName(name) {
+        this.playerName = name || 'Player';
     }
 }

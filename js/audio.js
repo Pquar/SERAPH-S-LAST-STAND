@@ -16,6 +16,15 @@ class AudioSystem extends EventEmitter {
         this.initialized = false;
         this.muted = false;
         
+        // Sistema de throttling para evitar spam de sons
+        this.soundThrottling = new Map();
+        this.throttleSettings = {
+            'hit': 150,      // Máximo 1 som de hit a cada 150ms
+            'playerShot': 50, // Máximo 1 som de tiro a cada 50ms
+            'enemyHit': 100,  // Máximo 1 som de acerto em inimigo a cada 100ms
+            'soulOrb': 200    // Máximo 1 som de soul orb a cada 200ms
+        };
+        
         // Tentar inicializar (requer interação do usuário)
         this.init();
     }
@@ -118,6 +127,18 @@ class AudioSystem extends EventEmitter {
                 duration: 0.3,
                 volume: 0.6,
                 shimmer: true
+            },
+            levelUp: {
+                type: 'fanfare',
+                frequencies: [440, 554, 659, 880], // A, C#, E, A
+                duration: 1.5,
+                volume: 0.7
+            },
+            upgradeSelected: {
+                type: 'success',
+                frequencies: [659, 784, 988], // E, G, B
+                duration: 0.8,
+                volume: 0.5
             }
         };
         
@@ -300,6 +321,20 @@ class AudioSystem extends EventEmitter {
     // Tocar som
     playSound(soundName) {
         if (!this.initialized || this.muted) return;
+        
+        // Verificar throttling para este som
+        const now = Date.now();
+        const throttleTime = this.throttleSettings[soundName];
+        
+        if (throttleTime) {
+            const lastPlayed = this.soundThrottling.get(soundName);
+            if (lastPlayed && (now - lastPlayed) < throttleTime) {
+                // Som ainda está em throttling, não tocar
+                return;
+            }
+            // Atualizar timestamp do último som tocado
+            this.soundThrottling.set(soundName, now);
+        }
         
         const definition = this.soundDefinitions[soundName];
         if (!definition) {
@@ -544,5 +579,21 @@ class ProceduralMusic extends EventEmitter {
         
         oscillator.start(time);
         oscillator.stop(time + note.duration);
+    }
+    
+    // Configurar throttling para um som específico
+    setThrottling(soundName, milliseconds) {
+        this.throttleSettings[soundName] = milliseconds;
+    }
+    
+    // Remover throttling para um som específico
+    removeThrottling(soundName) {
+        delete this.throttleSettings[soundName];
+        this.soundThrottling.delete(soundName);
+    }
+    
+    // Limpar todos os throttlings (útil para reiniciar o jogo)
+    clearThrottling() {
+        this.soundThrottling.clear();
     }
 }

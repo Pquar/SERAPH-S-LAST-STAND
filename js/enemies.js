@@ -238,6 +238,12 @@ class Enemy extends EventEmitter {
     die() {
         this.deathAnimation = true;
         this.deathTime = 0;
+        
+        // Tocar som de morte
+        if (window.game && window.game.audioSystem) {
+            window.game.audioSystem.playSound('enemyDeath');
+        }
+        
         this.emit('death', this);
     }
     
@@ -339,6 +345,10 @@ class EnemySpawner extends EventEmitter {
         this.difficultyMultiplier = 1.0;
         this.difficultyIncreaseInterval = 30000; // aumenta a cada 30 segundos
         
+        // Sistema de ondas (compatibilidade com game.js)
+        this.currentWave = 1;
+        this.enemiesKilled = 0; // Total de inimigos mortos
+        
         // Estatísticas
         this.totalEnemiesSpawned = 0;
         this.totalEnemiesKilled = 0;
@@ -354,6 +364,13 @@ class EnemySpawner extends EventEmitter {
     updateDifficulty() {
         const timeElapsed = Date.now() - this.gameStartTime;
         const difficultyLevel = Math.floor(timeElapsed / this.difficultyIncreaseInterval);
+        
+        // Atualizar onda atual baseado no tempo
+        const newWave = Math.max(1, difficultyLevel + 1);
+        if (newWave > this.currentWave) {
+            this.currentWave = newWave;
+            this.emit('waveChanged', this.currentWave);
+        }
         
         // Aumentar dificuldade gradualmente
         this.difficultyMultiplier = 1.0 + (difficultyLevel * 0.2);
@@ -395,8 +412,7 @@ class EnemySpawner extends EventEmitter {
         
         // Event listeners
         enemy.on('death', () => {
-            this.totalEnemiesKilled++;
-            this.removeEnemy(enemy);
+            this.removeEnemy(enemy, true); // wasKilled = true
             this.emit('enemyKilled', enemy);
         });
         
@@ -439,13 +455,15 @@ class EnemySpawner extends EventEmitter {
         this.enemies = this.enemies.filter(enemy => {
             enemy.update(deltaTime, player, canvas);
             
-            // Verificar colisão com jogador (apenas quando muito próximo)
-            const distance = Math2D.distance(enemy.x, enemy.y, player.x, player.y);
-            const collisionDistance = enemy.size + player.size - 5;
-            
-            if (distance < collisionDistance) {
-                player.takeDamage(enemy.damage);
-                enemy.takeDamage(enemy.maxHp * 0.5); // Dano no inimigo também
+            // Verificar colisão com jogador (apenas quando muito próximo e player não está invulnerável)
+            if (!player.invulnerable) {
+                const distance = Math2D.distance(enemy.x, enemy.y, player.x, player.y);
+                const collisionDistance = enemy.size + player.size - 5;
+                
+                if (distance < collisionDistance) {
+                    player.takeDamage(enemy.damage);
+                    enemy.takeDamage(enemy.maxHp * 0.5); // Dano no inimigo também
+                }
             }
             
             return enemy.hp > 0 || (enemy.deathAnimation && enemy.deathTime < 500);
@@ -472,8 +490,8 @@ class EnemySpawner extends EventEmitter {
                 return false;
             }
             
-            // Verificar colisão com jogador
-            if (Collision.circleCircle(
+            // Verificar colisão com jogador (apenas se não está invulnerável)
+            if (!player.invulnerable && Collision.circleCircle(
                 projectile.x, projectile.y, projectile.size,
                 player.x, player.y, player.size
             )) {
@@ -485,10 +503,16 @@ class EnemySpawner extends EventEmitter {
         });
     }
     
-    removeEnemy(enemy) {
+    removeEnemy(enemy, wasKilled = false) {
         const index = this.enemies.indexOf(enemy);
         if (index > -1) {
             this.enemies.splice(index, 1);
+            
+            // Contabilizar se foi morto pelo jogador
+            if (wasKilled) {
+                this.enemiesKilled++;
+                this.totalEnemiesKilled++;
+            }
         }
     }
     
