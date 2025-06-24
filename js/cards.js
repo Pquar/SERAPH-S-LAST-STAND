@@ -341,6 +341,12 @@ class CardSystem extends EventEmitter {
         return -1;
     }
     
+    // Cancelar escolha de carta
+    cancelCardChoice() {
+        this.isChoosingCard = false;
+        this.cardChoices = [];
+    }
+    
     // Reset para novo jogo
     reset() {
         this.playerCards = [];
