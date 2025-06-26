@@ -77,6 +77,62 @@
 - **Tipos de Notificação:** 'success' (verde), 'error' (vermelho), 'info' (azul)
 - **Duração:** 2000ms para todas as notificações de debug e loja
 
+### ✅ **CORREÇÃO CRÍTICA - Múltiplos Saves no Game Over**
+- **Problema:** Jogo salva pontuação 4 vezes quando termina a partida
+- **Causa:** Dupla chamada de `saveHighScore()` e `addToRanking()` + múltiplos triggers de game over
+- **Solução:** 
+  - Removido método `saveHighScore()` duplicado
+  - Unificada lógica de save em `addToRanking()`
+  - Adicionada proteção contra múltiplas chamadas de `gameOver()`
+  - Game over agora salva apenas uma vez
+
+### ✅ **CORREÇÃO CRÍTICA - Auto-restart Após Game Over**
+- **Problema:** Jogo reinicia automaticamente após 5 segundos do game over
+- **Causa:** `setTimeout()` forçava retorno ao menu principal
+- **Solução:** 
+  - Removido timeout automático
+  - Adicionado controle manual via teclado:
+    - **R** = Reiniciar jogo
+    - **ESC** = Voltar ao menu principal
+  - Melhorada tela de game over com pontuação final
+
+### ✅ **CORREÇÃO - Equipamentos Não Aparecem Visualmente no Jogo**
+- **Problema:** Equipamentos comprados e equipados não aparecem visualmente no personagem durante o jogo
+- **Causa:** Equipamentos não eram aplicados ao iniciar nova partida (apenas no `startGame`)
+- **Solução:** 
+  - Adicionada inicialização de equipamentos padrão no `startNewGame()`
+  - Equipamentos iniciais agora são aplicados sempre: `wizardHat` e `wizardStaff`
+  - Melhorado sistema de carregamento de sprites com verificações robustas
+  - Adicionado logging detalhado para debug dos equipamentos
+  - Garantida aplicação dos efeitos de equipamentos com `updateStats()`
+
+### ✅ **CORREÇÃO DE UI - Tamanho dos Equipamentos**
+- **Problema:** Chapéu e cajado estavam do mesmo tamanho do personagem, parecendo desproporcionais
+- **Solução:** Ajustado tamanho e posicionamento dos equipamentos:
+  - **Chapéu:** Reduzido para 60% do tamanho do personagem e centralizado acima da cabeça
+  - **Cajado:** Reduzido para 70% do tamanho e reposicionado ao lado do mago
+- **Resultado:** Equipamentos agora ficam visualmente proporcionais e mais realistas
+
+### ✅ **CORREÇÃO DE VALIDAÇÃO - Loja de Equipamentos**
+- **Problema:** Warning "Item de equipamento inválido: wizardStaff" aparecia ao abrir a loja
+- **Causa:** Validação `!item.cost` considerava `cost: 0` (cajado inicial grátis) como inválido
+- **Solução:** Alterado para `typeof item.cost !== 'number'` para aceitar custos zero
+- **Resultado:** Warning removido, loja funciona corretamente para itens gratuitos e pagos
+
+### ✅ **IMPLEMENTAÇÃO COMPLETA - Menu de Game Over**
+- **Problema:** Ao terminar o jogo, jogador ficava apenas com overlay no canvas
+- **Solução Implementada:**
+  - Criado método `showGameOverMenu()` para exibir menu HTML com estatísticas
+  - Adicionados event listeners para botões "JOGAR NOVAMENTE" e "MENU PRINCIPAL"
+  - Método `populateGameOverStats()` preenche estatísticas finais dinamicamente
+  - Controles por teclado mantidos: **R** (jogar novamente) e **ESC** (menu principal)
+- **Funcionalidades:**
+  - Exibe pontuação final, nível, tempo de sobrevivência, precisão, etc.
+  - Botões clicáveis para navegação
+  - Teclas de atalho para acesso rápido
+  - Interface consistente com o resto do jogo
+- **Resultado:** Game over agora oferece múltiplas opções para retornar ao menu ou reiniciar
+
 ## Impacto das Mudanças
 
 ### ✅ **Benefícios:**

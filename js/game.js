@@ -470,11 +470,44 @@ class Game extends EventEmitter {
             });
         }
         
+        // Botões do Game Over Menu
+        const playAgainBtn = document.getElementById('playAgainBtn');
+        if (playAgainBtn) {
+            playAgainBtn.addEventListener('click', (e) => {
+                console.log('Botão Jogar Novamente clicado');
+                e.preventDefault();
+                this.startGame();
+            });
+        }
+        
+        const backToMenuBtn = document.getElementById('backToMenuBtn');
+        if (backToMenuBtn) {
+            backToMenuBtn.addEventListener('click', (e) => {
+                console.log('Botão Menu Principal clicado (Game Over)');
+                e.preventDefault();
+                this.showMainMenu();
+            });
+        }
+        
         console.log('Todos os listeners dos menus foram configurados');
     }
     
     // Métodos para lidar com input de teclado
     handleKeyDown(key) {
+        // Handle game over state
+        if (this.state === 'gameOver') {
+            switch(key.toLowerCase()) {
+                case 'r':
+                    this.startGame();
+                    break;
+                case 'escape':
+                    this.showMainMenu();
+                    break;
+            }
+            return;
+        }
+        
+        // Handle playing state
         if (!this.player || this.state !== 'playing') return;
         
         switch(key.toLowerCase()) {
@@ -970,7 +1003,7 @@ class Game extends EventEmitter {
                 this.renderMenu();
                 break;
             case 'gameOver':
-                this.renderGameOver();
+                // Game over é tratado via menu HTML, não precisa renderizar no canvas
                 break;
         }
     }
@@ -1155,7 +1188,13 @@ class Game extends EventEmitter {
         this.ctx.fillStyle = '#ff6666';
         this.ctx.font = 'bold 48px Arial';
         this.ctx.textAlign = 'center';
-        this.ctx.fillText('GAME OVER', this.canvas.width / 2, this.canvas.height / 2 - 50);
+        this.ctx.fillText('GAME OVER', this.canvas.width / 2, this.canvas.height / 2 - 100);
+        
+        // Final Score
+        const finalScore = this.calculateScore();
+        this.ctx.fillStyle = '#ffaa00';
+        this.ctx.font = 'bold 32px Arial';
+        this.ctx.fillText(`Pontuação Final: ${finalScore}`, this.canvas.width / 2, this.canvas.height / 2 - 50);
         
         // Estatísticas
         if (this.waveSystem) {
@@ -1167,10 +1206,10 @@ class Game extends EventEmitter {
             ];
             
             this.ctx.fillStyle = '#ffffff';
-            this.ctx.font = '20px Arial';
+            this.ctx.font = '18px Arial';
             
             stats.forEach((stat, index) => {
-                this.ctx.fillText(stat, this.canvas.width / 2, this.canvas.height / 2 + 20 + index * 30);
+                this.ctx.fillText(stat, this.canvas.width / 2, this.canvas.height / 2 + 10 + index * 25);
             });
         }
         
@@ -1237,6 +1276,32 @@ class Game extends EventEmitter {
         const spawnX = this.canvas.width / 2;
         const spawnY = this.canvas.height - 100; // próximo ao chão
         this.player = new Player(spawnX, spawnY);
+        
+        // Garantir que o player tenha equipamentos iniciais
+        if (!this.player.ownedEquipment.hats.includes('wizardHat')) {
+            this.player.ownedEquipment.hats.push('wizardHat');
+        }
+        if (!this.player.ownedEquipment.staffs.includes('wizardStaff')) {
+            this.player.ownedEquipment.staffs.push('wizardStaff');
+        }
+        
+        // Equipar itens iniciais se não tiver nada equipado
+        if (!this.player.equippedEquipment.hats) {
+            this.player.equippedEquipment.hats = 'wizardHat';
+        }
+        if (!this.player.equippedEquipment.staffs) {
+            this.player.equippedEquipment.staffs = 'wizardStaff';
+        }
+        
+        // Atualizar sprites dos equipamentos
+        if (this.player.updateEquipmentSprites) {
+            this.player.updateEquipmentSprites();
+        }
+        
+        // Garantir que o player aplique os efeitos dos equipamentos
+        if (this.player.updateStats) {
+            this.player.updateStats();
+        }
         
         // Limpar build anterior (nova partida = nova build)
         this.player.selectedCards = [];
@@ -1484,6 +1549,9 @@ class Game extends EventEmitter {
     }
     
     gameOver() {
+        // Prevent multiple game over calls
+        if (this.state === 'gameOver') return;
+        
         this.state = 'gameOver';
         
         // Limpar inputs do player quando o jogo acabar
@@ -1496,30 +1564,38 @@ class Game extends EventEmitter {
             this.player.updateSurvivalTime(Date.now() - this.gameStartTime);
         }
         
-        // Salvar high score e adicionar ao ranking
-        this.saveHighScore();
+        // Adicionar ao ranking (faz o save internamente)
         this.addToRanking();
         
         // Limpar save game
         Storage.remove('seraphsLastStand_save');
         
-        setTimeout(() => {
-            this.showMainMenu();
-        }, 5000);
+        // Mostrar menu de game over HTML
+        this.showGameOverMenu();
     }
     
     // Adicionar pontuação ao ranking
     addToRanking() {
         if (!this.player) return;
         
-        // Verificar se a pontuação merece entrar no ranking
-        if (this.rankingSystem.wouldMakeRanking(this.player.score)) {
-            // Prompt para nome do jogador
-            this.playerNamePrompt.showNamePrompt((playerName) => {
-                this.player.setPlayerName(playerName);
-                const stats = this.player.getStats();
-                this.rankingSystem.addScore(stats);
-            });
+        // Calculate final score
+        const score = this.calculateScore();
+        
+        // Create stats entry
+        const stats = {
+            playerName: this.player.playerName || 'Player',
+            score: score,
+            level: this.player.level,
+            survivalTime: this.gameTime,
+            enemiesKilled: this.waveSystem?.enemiesKilled || 0,
+            build: this.player.selectedCards || [],
+            date: new Date().toLocaleDateString('pt-BR')
+        };
+        
+        // Always add to ranking (let the ranking system handle duplicates/limits)
+        if (this.rankingSystem) {
+            this.rankingSystem.addScore(stats);
+            console.log('Score added to ranking:', stats);
         }
     }
     
@@ -1882,30 +1958,6 @@ class Game extends EventEmitter {
         return this.settings?.xpMultiplier || 1.0;
     }
     
-    // Método para salvar pontuação
-    saveHighScore() {
-        if (!this.player) return;
-        
-        try {
-            const score = this.calculateScore();
-            const entry = {
-                playerName: this.settings?.playerName || 'Player',
-                score: score,
-                level: this.player.level,
-                survivalTime: this.gameTime,
-                enemiesKilled: this.waveSystem?.enemiesKilled || 0,
-                build: this.player.selectedCards || [],
-                date: new Date().toLocaleDateString('pt-BR')
-            };
-            
-            if (this.rankingSystem) {
-                this.rankingSystem.addScore(entry);
-            }
-        } catch (error) {
-            console.error('Erro ao salvar pontuação:', error);
-        }
-    }
-    
     // Calcular pontuação final
     calculateScore() {
         if (!this.player) return 0;
@@ -1917,6 +1969,84 @@ class Game extends EventEmitter {
         score += this.player.soulOrbs;
         
         return score;
+    }
+    
+    showGameOverMenu() {
+        console.log('Mostrando menu de game over...');
+        
+        // Ocultar canvas e HUD do jogo
+        this.canvas.style.display = 'none';
+        const gameHUD = document.getElementById('gameHUD');
+        if (gameHUD) {
+            gameHUD.style.display = 'none';
+        }
+        
+        // Ocultar controles móveis
+        const mobileControls = document.getElementById('mobileControls');
+        if (mobileControls) {
+            mobileControls.style.display = 'none';
+        }
+        
+        // Fechar todos os outros menus primeiro
+        this.hideAllOtherMenus();
+        
+        // Mostrar menu de game over
+        const gameOverMenu = document.getElementById('gameOverMenu');
+        if (gameOverMenu) {
+            gameOverMenu.classList.remove('hidden');
+            gameOverMenu.style.display = 'flex';
+            
+            // Preencher estatísticas
+            this.populateGameOverStats();
+            
+            console.log('Menu de game over mostrado');
+        } else {
+            console.error('Elemento gameOverMenu não encontrado');
+        }
+    }
+    
+    populateGameOverStats() {
+        const statsContainer = document.getElementById('gameOverStats');
+        if (!statsContainer || !this.player) return;
+        
+        const finalScore = this.calculateScore();
+        const survivalTimeFormatted = TimeUtils.formatTime(this.gameTime);
+        const accuracy = this.player.shotsFired > 0 ? 
+            Math.round((this.player.shotsHit / this.player.shotsFired) * 100) : 0;
+        
+        statsContainer.innerHTML = `
+            <div class="stat-item">
+                <span class="stat-label">Pontuação Final:</span>
+                <span class="stat-value">${finalScore}</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Nível Alcançado:</span>
+                <span class="stat-value">${this.player.level}</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Tempo de Sobrevivência:</span>
+                <span class="stat-value">${survivalTimeFormatted}</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Inimigos Eliminados:</span>
+                <span class="stat-value">${this.player.enemiesKilled}</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Precisão:</span>
+                <span class="stat-value">${accuracy}%</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Críticos:</span>
+                <span class="stat-value">${this.player.criticalHits}</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Soul Orbs:</span>
+                <span class="stat-value">${this.player.soulOrbs}</span>
+            </div>
+            <div class="controls-hint">
+                <p><strong>R</strong> - Jogar Novamente | <strong>ESC</strong> - Menu Principal</p>
+            </div>
+        `;
     }
 }
 

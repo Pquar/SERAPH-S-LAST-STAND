@@ -601,18 +601,19 @@ class Player extends EventEmitter {
         
         // Renderizar chapéu equipado (acima da cabeça)
         if (this.sprites.hat && this.sprites.hat.complete) {
-            // Posicionar chapéu no topo da cabeça
-            const hatX = renderX;
-            const hatY = renderY - renderSize * 0.1; // Ligeiramente acima
-            ctx.drawImage(this.sprites.hat, hatX, hatY, renderSize, renderSize);
+            // Posicionar chapéu no topo da cabeça com tamanho menor
+            const hatSize = renderSize * 0.6; // 60% do tamanho do personagem
+            const hatX = renderX + (renderSize - hatSize) / 2; // Centralizar
+            const hatY = renderY - hatSize * 0.3; // Posicionar acima da cabeça
+            ctx.drawImage(this.sprites.hat, hatX, hatY, hatSize, hatSize);
         }
         
-        // Renderizar cajado equipado (ao lado esquerdo)
+        // Renderizar cajado equipado (ao lado do mago)
         if (this.sprites.staff && this.sprites.staff.complete) {
-            // Posicionar cajado ao lado esquerdo do mago
-            const staffX = renderX - renderSize * 0.3;
-            const staffY = renderY + renderSize * 0.2;
-            const staffSize = renderSize * 0.8;
+            // Posicionar cajado ao lado do mago com tamanho menor
+            const staffSize = renderSize * 0.7; // 70% do tamanho do personagem
+            const staffX = renderX - staffSize * 0.4; // Ao lado esquerdo
+            const staffY = renderY + renderSize * 0.1; // Ligeiramente abaixo do centro
             ctx.drawImage(this.sprites.staff, staffX, staffY, staffSize, staffSize);
         }
         
@@ -1081,6 +1082,14 @@ class Player extends EventEmitter {
     loadHatSprite() {
         if (!this.equippedEquipment.hats) {
             this.sprites.hat = null;
+            console.log('Nenhum chapéu equipado');
+            return;
+        }
+        
+        // Verificar se EQUIPMENT_DEFINITIONS está disponível
+        if (typeof EQUIPMENT_DEFINITIONS === 'undefined') {
+            console.warn('EQUIPMENT_DEFINITIONS não está disponível. Tentando novamente em 1 segundo...');
+            setTimeout(() => this.loadHatSprite(), 1000);
             return;
         }
         
@@ -1098,7 +1107,9 @@ class Player extends EventEmitter {
                 this.sprites.hat = new Image();
                 this.sprites.hat.src = hatData.image;
             }
-            console.log('Sprite do chapéu configurado:', hatData.name);
+            console.log('Sprite do chapéu configurado:', hatData.name, 'Imagem:', hatData.image);
+        } else {
+            console.error('Dados do chapéu não encontrados:', this.equippedEquipment.hats);
         }
     }
     
@@ -1106,6 +1117,14 @@ class Player extends EventEmitter {
     loadStaffSprite() {
         if (!this.equippedEquipment.staffs) {
             this.sprites.staff = null;
+            console.log('Nenhum cajado equipado');
+            return;
+        }
+        
+        // Verificar se EQUIPMENT_DEFINITIONS está disponível
+        if (typeof EQUIPMENT_DEFINITIONS === 'undefined') {
+            console.warn('EQUIPMENT_DEFINITIONS não está disponível. Tentando novamente em 1 segundo...');
+            setTimeout(() => this.loadStaffSprite(), 1000);
             return;
         }
         
@@ -1123,7 +1142,9 @@ class Player extends EventEmitter {
                 this.sprites.staff = new Image();
                 this.sprites.staff.src = staffData.image;
             }
-            console.log('Sprite do cajado configurado:', staffData.name);
+            console.log('Sprite do cajado configurado:', staffData.name, 'Imagem:', staffData.image);
+        } else {
+            console.error('Dados do cajado não encontrados:', this.equippedEquipment.staffs);
         }
     }
     

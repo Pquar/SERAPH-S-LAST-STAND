@@ -1625,7 +1625,7 @@ class UI extends EventEmitter {
         
         Object.entries(equipment).forEach(([itemId, item]) => {
             // Verificar se o item tem os dados necessários
-            if (!item || !item.name || !item.cost) {
+            if (!item || !item.name || typeof item.cost !== 'number') {
                 console.warn('Item de equipamento inválido:', itemId, item);
                 return;
             }
