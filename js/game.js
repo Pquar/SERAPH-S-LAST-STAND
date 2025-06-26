@@ -1,5 +1,12 @@
 // game.js - Core game loop e sistema principal
-// Última atualização: 2025-06-23 - Fix upgrade system
+// Última atualização: 2025-06-24 - Refatoração para remover duplicações
+// 
+// REFATORAÇÃO APLICADA:
+// 1. Removida duplicação do método showSettings() (linha 1692)
+// 2. Unificados os métodos hideAllMenus() e hideAllOtherMenus()
+// 3. Consolidados event listeners duplicados
+// 4. Criado sistema híbrido para compatibilidade entre menus HTML e modais
+// 5. Removidos event listeners redundantes de showRanking/showSettings em setupUI()
 
 class Game extends EventEmitter {
     constructor() {
@@ -7,7 +14,16 @@ class Game extends EventEmitter {
         
         // Canvas e contexto
         this.canvas = document.getElementById('gameCanvas');
+        if (!this.canvas) {
+            console.error('Canvas element not found! Make sure gameCanvas element exists in DOM.');
+            throw new Error('Canvas element not found');
+        }
+        
         this.ctx = this.canvas.getContext('2d');
+        if (!this.ctx) {
+            console.error('Could not get 2D context from canvas!');
+            throw new Error('Could not get 2D context from canvas');
+        }
         
         // Estado do jogo
         this.state = 'menu'; // menu, playing, paused, gameOver
@@ -32,6 +48,15 @@ class Game extends EventEmitter {
         this.targetFPS = 60;
         this.deltaTime = 1000 / this.targetFPS;
         
+        // Configurações do jogo
+        this.settings = {
+            playerName: 'Player',
+            audioEnabled: true,
+            masterVolume: 0.7,
+            sfxVolume: 0.8,
+            xpMultiplier: 1.0
+        };
+        
         // Pool de objetos para performance
         this.soulOrbPool = new ObjectPool(
             () => ({ x: 0, y: 0, value: 1, size: 8, collected: false, alpha: 1.0 }),
@@ -51,6 +76,12 @@ class Game extends EventEmitter {
         console.log('UI configurada');
         this.initializeShop();
         console.log('Loja inicializada');
+        
+        // Configurar event listeners dos menus uma única vez
+        setTimeout(() => {
+            this.setupAllMenuListeners();
+            console.log('Menu listeners configurados');
+        }, 100);
         
         // Começar com o menu
         this.showMainMenu();
@@ -78,14 +109,33 @@ class Game extends EventEmitter {
     
     resizeCanvas() {
         const container = document.getElementById('gameContainer');
-        const containerRect = container.getBoundingClientRect();
         
         // Definir tamanho base
         let width = 1024;
         let height = 768;
+        let containerRect = null; // Declarar a variável no escopo correto
+        
+        // Se o container existir, usar suas dimensões
+        if (container && container.getBoundingClientRect) {
+            try {
+                containerRect = container.getBoundingClientRect();
+                // Use container dimensions if available
+                if (containerRect.width > 0 && containerRect.height > 0) {
+                    width = containerRect.width;
+                    height = containerRect.height;
+                }
+            } catch (error) {
+                console.warn('Error getting container rect, using default size:', error);
+                containerRect = null; // Reset em caso de erro
+            }
+        } else {
+            // Fallback para viewport ou valores padrão
+            width = window.innerWidth || 1024;
+            height = window.innerHeight || 768;
+        }
         
         // Ajustar para dispositivos móveis
-        if (DeviceUtils.isMobile()) {
+        if (typeof DeviceUtils !== 'undefined' && DeviceUtils.isMobile()) {
             const viewport = DeviceUtils.getViewportSize();
             if (viewport.width < viewport.height) {
                 // Portrait
@@ -97,17 +147,19 @@ class Game extends EventEmitter {
                 height = Math.min(viewport.height, 600);
             }
         } else {
-            // Desktop: ajustar ao container
-            const maxWidth = containerRect.width * 0.9;
-            const maxHeight = containerRect.height * 0.9;
-            
-            const aspectRatio = width / height;
-            if (maxWidth / maxHeight > aspectRatio) {
-                height = maxHeight;
-                width = height * aspectRatio;
-            } else {
-                width = maxWidth;
-                height = width / aspectRatio;
+            // Desktop: ajustar ao container apenas se containerRect estiver disponível
+            if (containerRect && containerRect.width > 0 && containerRect.height > 0) {
+                const maxWidth = containerRect.width * 0.9;
+                const maxHeight = containerRect.height * 0.9;
+                
+                const aspectRatio = width / height;
+                if (maxWidth / maxHeight > aspectRatio) {
+                    height = maxHeight;
+                    width = height * aspectRatio;
+                } else {
+                    width = maxWidth;
+                    height = width / aspectRatio;
+                }
             }
         }
         
@@ -191,7 +243,7 @@ class Game extends EventEmitter {
         // Novos controles mobile - DESABILITADOS COMPLETAMENTE em desktop
         this.ui.on('joystickMove', (normalizedX, normalizedY) => {
             // IGNORAR COMPLETAMENTE se não for dispositivo móvel
-            if (!DeviceUtils.isMobile()) {
+            if (typeof DeviceUtils === 'undefined' || !DeviceUtils.isMobile()) {
                 console.log('Joystick event BLOCKED - not a mobile device'); // Debug
                 return; // Sair imediatamente
             }
@@ -234,7 +286,7 @@ class Game extends EventEmitter {
         
         this.ui.on('joystickStop', () => {
             // IGNORAR COMPLETAMENTE se não for dispositivo móvel
-            if (!DeviceUtils.isMobile()) {
+            if (typeof DeviceUtils === 'undefined' || !DeviceUtils.isMobile()) {
                 console.log('Joystick stop BLOCKED - not a mobile device'); // Debug
                 return; // Sair imediatamente
             }
@@ -283,33 +335,185 @@ class Game extends EventEmitter {
         // UI events - estes elementos são criados dinamicamente
         // Os event listeners do menu principal são configurados no showMainMenu()
         
-        // Event listeners para elementos que sempre existem
+        // Event listeners para elementos que sempre existem - REMOVIDO duplicação
+        // Os listeners de resumeBtn, restartBtn e mainMenuBtn são configurados em setupAllMenuListeners()
         const pauseBtn = document.getElementById('pauseBtn');
         if (pauseBtn) {
             pauseBtn.addEventListener('click', () => {
                 this.togglePause();
             });
         }
+    }
+    
+    // Configurar todos os event listeners dos menus uma única vez
+    setupAllMenuListeners() {
+        console.log('Configurando listeners dos menus...');
         
+        // Menu Principal - Botão Novo Jogo
+        const startGameBtn = document.getElementById('startGameBtn');
+        if (startGameBtn) {
+            startGameBtn.addEventListener('click', (e) => {
+                console.log('Botão Novo Jogo clicado');
+                e.preventDefault();
+                this.hideAllMenus();
+                this.startGame();
+            });
+            console.log('Listener do botão Novo Jogo configurado');
+        } else {
+            console.error('Botão startGameBtn não encontrado');
+        }
+        
+        // Menu Principal - Botão Carregar Jogo
+        const loadGameBtn = document.getElementById('loadGameBtn');
+        if (loadGameBtn) {
+            loadGameBtn.addEventListener('click', (e) => {
+                console.log('Botão Carregar Jogo clicado');
+                e.preventDefault();
+                this.loadGame();
+                this.hideAllMenus();
+                this.startGame();
+            });
+            console.log('Listener do botão Carregar Jogo configurado');
+        }
+        
+        // Menu Principal - Botão Loja
+        const shopBtn = document.getElementById('shopBtn');
+        if (shopBtn) {
+            shopBtn.addEventListener('click', (e) => {
+                console.log('Botão Loja clicado');
+                e.preventDefault();
+                this.showShop();
+            });
+            console.log('Listener do botão Loja configurado');
+        } else {
+            console.error('Botão shopBtn não encontrado');
+        }
+        
+        // Menu Principal - Botão Ranking
+        const rankingBtn = document.getElementById('rankingBtn');
+        if (rankingBtn) {
+            rankingBtn.addEventListener('click', (e) => {
+                console.log('Botão Ranking clicado');
+                e.preventDefault();
+                this.showRanking();
+            });
+            console.log('Listener do botão Ranking configurado');
+        } else {
+            console.error('Botão rankingBtn não encontrado');
+        }
+        
+        // Menu Principal - Botão Configurações
+        const settingsBtn = document.getElementById('settingsBtn');
+        if (settingsBtn) {
+            settingsBtn.addEventListener('click', (e) => {
+                console.log('Botão Configurações clicado');
+                e.preventDefault();
+                this.showSettings();
+            });
+            console.log('Listener do botão Configurações configurado');
+        } else {
+            console.error('Botão settingsBtn não encontrado');
+        }
+        
+        // Menu de Pausa - Botão Continuar
         const resumeBtn = document.getElementById('resumeBtn');
         if (resumeBtn) {
-            resumeBtn.addEventListener('click', () => {
+            resumeBtn.addEventListener('click', (e) => {
+                console.log('Botão Continuar clicado');
+                e.preventDefault();
                 this.resumeGame();
             });
         }
         
+        // Menu de Pausa - Botão Reiniciar
         const restartBtn = document.getElementById('restartBtn');
         if (restartBtn) {
-            restartBtn.addEventListener('click', () => {
-                this.startNewGame();
+            restartBtn.addEventListener('click', (e) => {
+                console.log('Botão Reiniciar clicado');
+                e.preventDefault();
+                this.startGame();
             });
         }
         
+        // Menu de Pausa - Botão Menu Principal
         const mainMenuBtn = document.getElementById('mainMenuBtn');
         if (mainMenuBtn) {
-            mainMenuBtn.addEventListener('click', () => {
+            mainMenuBtn.addEventListener('click', (e) => {
+                console.log('Botão Menu Principal clicado');
+                e.preventDefault();
                 this.showMainMenu();
             });
+        }
+        
+        // Botões de fechar menus
+        const closeShopBtn = document.getElementById('closeShopBtn');
+        if (closeShopBtn) {
+            closeShopBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.hideShop();
+            });
+        }
+        
+        const closeRankingBtn = document.getElementById('closeRankingBtn');
+        if (closeRankingBtn) {
+            closeRankingBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.hideRanking();
+            });
+        }
+        
+        const closeSettingsBtn = document.getElementById('closeSettingsBtn');
+        if (closeSettingsBtn) {
+            closeSettingsBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.hideSettings();
+            });
+        }
+        
+        console.log('Todos os listeners dos menus foram configurados');
+    }
+    
+    // Métodos para lidar com input de teclado
+    handleKeyDown(key) {
+        if (!this.player || this.state !== 'playing') return;
+        
+        switch(key.toLowerCase()) {
+            case 'a':
+            case 'arrowleft':
+                this.player.setInput('left', true);
+                break;
+            case 'd':
+            case 'arrowright':
+                this.player.setInput('right', true);
+                break;
+            case 'w':
+            case 'arrowup':
+            case ' ':
+                this.player.setInput('jump', true);
+                break;
+            case 'escape':
+                this.togglePause();
+                break;
+        }
+    }
+    
+    handleKeyUp(key) {
+        if (!this.player || this.state !== 'playing') return;
+        
+        switch(key.toLowerCase()) {
+            case 'a':
+            case 'arrowleft':
+                this.player.setInput('left', false);
+                break;
+            case 'd':
+            case 'arrowright':
+                this.player.setInput('right', false);
+                break;
+            case 'w':
+            case 'arrowup':
+            case ' ':
+                this.player.setInput('jump', false);
+                break;
         }
     }
     
@@ -339,13 +543,17 @@ class Game extends EventEmitter {
             this.ui.showNewRecordPopup(position, entry);
         });
         
-        // Event listeners para loja
-        this.ui.on('buyItem', (category, itemId) => {
-            this.buyItem(category, itemId);
+        // Event listeners para loja - CONSOLIDADO (remove duplicação)
+        this.ui.on('buyItem', (data) => {
+            this.buyItem(data.type, data.itemId);
         });
         
-        this.ui.on('equipItem', (category, itemId) => {
-            this.equipItem(category, itemId);
+        this.ui.on('buyEquipment', (data) => {
+            this.buyItem(data.type, data.itemId);
+        });
+        
+        this.ui.on('equipItem', (data) => {
+            this.equipItem(data.type, data.itemId);
         });
         
         // Event listeners para configurações
@@ -411,13 +619,16 @@ class Game extends EventEmitter {
             alert('Configurações restauradas para o padrão!');
         });
         
-        // Event listeners para ranking e configurações
-        this.ui.on('showRanking', () => {
-            this.showRanking();
+        // Event listeners para ranking e configurações - REMOVIDOS (duplicação)
+        // Estes são acionados pelos botões do menu principal já configurados em setupAllMenuListeners()
+        
+        // Event listeners para Soul Orbs (debug)
+        this.ui.on('addSoulOrbs', (amount) => {
+            this.addSoulOrbs(amount);
         });
         
-        this.ui.on('showSettings', () => {
-            this.showSettings();
+        this.ui.on('removeSoulOrbs', (amount) => {
+            this.removeSoulOrbs(amount);
         });
     }
     
@@ -450,200 +661,244 @@ class Game extends EventEmitter {
         }
     }
     
-    showShop() {
-        console.log('Mostrando loja');
-        
-        // Garantir que o player existe
+    // Equipment and shop methods
+    buyItem(type, itemId) {
         if (!this.player) {
-            this.player = new Player(400, 300);
-        }
-        
-        const playerData = this.getPlayerData();
-        const equipmentData = this.equipmentManager.getAllEquipment();
-        
-        this.ui.showShopModal(playerData, equipmentData);
-        
-        // Pausar o jogo se estiver jogando
-        if (this.state === 'playing') {
-            this.pauseGame();
-        }
-    }
-    
-    buyEquipment({ type, itemId }) {
-        console.log('Comprando equipamento:', { type, itemId });
-        
-        if (!this.player) {
-            console.error('Player não existe');
-            return;
+            console.error('Player not found');
+            this.ui.showNotification('Player não encontrado!', 'error', 2000);
+            return false;
         }
         
         const equipment = this.equipmentManager.getEquipment(type, itemId);
         if (!equipment) {
-            console.error('Equipamento não encontrado:', { type, itemId });
-            return;
+            console.error('Equipment not found:', type, itemId);
+            this.ui.showNotification('Item não encontrado!', 'error', 2000);
+            return false;
         }
         
-        // Verificar se o jogador tem Soul Orbs suficientes
+        // Check if player has enough soul orbs
         if (this.player.soulOrbs < equipment.cost) {
-            console.log('Soul Orbs insuficientes para comprar:', equipment.name);
-            this.showMessage(`Soul Orbs insuficientes! Precisa de ${equipment.cost} orbs.`);
-            return;
+            this.ui.showNotification('Soul Orbs insuficientes!', 'error', 2000);
+            return false;
         }
         
-        // Verificar se o jogador já possui o item
-        if (this.player.ownedEquipment[type].includes(itemId)) {
-            console.log('Jogador já possui este equipamento:', equipment.name);
-            this.showMessage('Você já possui este equipamento!');
-            return;
+        // Check if player already owns this equipment
+        if (this.player.ownedEquipment[type] && this.player.ownedEquipment[type].includes(itemId)) {
+            this.ui.showNotification('Você já possui este item!', 'error', 2000);
+            return false;
         }
         
-        // Realizar a compra
+        // Purchase the item
         this.player.soulOrbs -= equipment.cost;
+        if (!this.player.ownedEquipment[type]) {
+            this.player.ownedEquipment[type] = [];
+        }
         this.player.ownedEquipment[type].push(itemId);
         
-        console.log('Equipamento comprado com sucesso:', equipment.name);
-        this.showMessage(`${equipment.name} comprado com sucesso!`);
-        
-        // Atualizar a interface da loja
-        const playerData = this.getPlayerData();
-        const equipmentData = this.equipmentManager.getAllEquipment();
-        this.ui.updateShop(playerData, equipmentData);
-        
-        // Salvar progresso
+        this.ui.showNotification(`${equipment.name} comprado com sucesso!`, 'success', 2000);
         this.saveGame();
+        return true;
     }
     
-    equipItem({ type, itemId }) {
-        console.log('Equipando item:', { type, itemId });
+    equipItem(data) {
+        const { type, itemId } = data;
         
         if (!this.player) {
-            console.error('Player não existe');
-            return;
+            console.error('Player not found');
+            this.ui.showNotification('Player não encontrado!', 'error', 2000);
+            return false;
         }
         
-        const equipment = this.equipmentManager.getEquipment(type, itemId);
-        if (!equipment) {
-            console.error('Equipamento não encontrado:', { type, itemId });
-            return;
+        // Check if player owns the item
+        if (!this.player.ownedEquipment[type] || !this.player.ownedEquipment[type].includes(itemId)) {
+            this.ui.showNotification('Você não possui este item!', 'error', 2000);
+            return false;
         }
         
-        // Verificar se o jogador possui o item
-        if (!this.player.ownedEquipment[type].includes(itemId)) {
-            console.log('Jogador não possui este equipamento:', equipment.name);
-            this.showMessage('Você não possui este equipamento!');
-            return;
+        // Equip the item
+        if (!this.player.equippedEquipment) {
+            this.player.equippedEquipment = {};
         }
-        
-        // Desequipar item atual se houver
-        const currentEquipped = this.player.equippedEquipment[type];
-        if (currentEquipped) {
-            this.equipmentManager.unapplyEquipmentEffects(this.player, type, currentEquipped);
-            console.log('Desequipando item anterior:', currentEquipped);
-        }
-        
-        // Equipar novo item
         this.player.equippedEquipment[type] = itemId;
-        this.equipmentManager.applyEquipmentEffects(this.player, type, itemId);
         
-        console.log('Equipamento equipado com sucesso:', equipment.name);
-        this.showMessage(`${equipment.name} equipado!`);
+        // Update player sprites if method exists
+        if (this.player.updateEquipmentSprites) {
+            this.player.updateEquipmentSprites();
+        }
         
-        // Recalcular stats do jogador
+        // Update player stats
         if (this.player.updateStats) {
             this.player.updateStats();
         }
         
-        // Atualizar a interface da loja
-        const playerData = this.getPlayerData();
-        const equipmentData = this.equipmentManager.getAllEquipment();
-        this.ui.updateShop(playerData, equipmentData);
-        
-        // Salvar progresso
+        const equipment = this.equipmentManager.getEquipment(type, itemId);
+        const equipmentName = equipment ? equipment.name : itemId;
+        this.ui.showNotification(`${equipmentName} equipado!`, 'success', 2000);
         this.saveGame();
+        return true;
     }
     
-    getPlayerData() {
-        if (!this.player) {
-            return {
-                soulOrbs: 0,
-                ownedEquipment: { hats: [], staffs: [] },
-                equippedEquipment: { hats: null, staffs: null },
-                level: 1,
-                experience: 0,
-                experienceToNext: 100,
-                stats: {
-                    damage: 15,
-                    defense: 0,
-                    speed: 200,
-                    maxHp: 100,
-                    hp: 100
-                }
-            };
-        }
-        
-        return {
-            soulOrbs: this.player.soulOrbs || 0,
-            ownedEquipment: this.player.ownedEquipment || { hats: [], staffs: [] },
-            equippedEquipment: this.player.equippedEquipment || { hats: null, staffs: null },
-            level: this.player.level || 1,
-            experience: this.player.exp || 0,
-            experienceToNext: this.player.expToNext || 100,
-            stats: {
-                damage: this.player.damage || 15,
-                defense: this.player.defense || 0,
-                speed: this.player.speed || 200,
-                maxHp: this.player.maxHp || 100,
-                hp: this.player.hp || 100
-            }
-        };
+    // Also add buyEquipment method as alias
+    buyEquipment(data) {
+        return this.buyItem(data.type, data.itemId);
     }
     
-    showMessage(message, duration = 3000) {
-        // Criar elemento de mensagem
-        const messageElement = document.createElement('div');
-        messageElement.className = 'game-message';
-        messageElement.textContent = message;
-        messageElement.style.cssText = `
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.8);
-            color: white;
-            padding: 12px 24px;
-            border-radius: 8px;
-            border: 2px solid #4CAF50;
-            font-size: 16px;
-            font-weight: bold;
-            z-index: 10000;
-            animation: fadeInOut ${duration}ms ease-in-out;
-        `;
+    // Método UNIFICADO para esconder todos os outros menus - Remove duplicação
+    hideAllOtherMenus() {
+        // Lista completa de todos os menus do sistema
+        const allMenus = [
+            'pauseMenu', 'shopMenu', 'rankingMenu', 'settingsMenu', 
+            'gameOverMenu', 'upgradeMenu'
+        ];
         
-        // Adicionar animação CSS se não existir
-        if (!document.getElementById('message-styles')) {
-            const style = document.createElement('style');
-            style.id = 'message-styles';
-            style.textContent = `
-                @keyframes fadeInOut {
-                    0% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
-                    10% { opacity: 1; transform: translateX(-50%) translateY(0); }
-                    90% { opacity: 1; transform: translateX(-50%) translateY(0); }
-                    100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
-                }
-            `;
-            document.head.appendChild(style);
-        }
-        
-        document.body.appendChild(messageElement);
-        
-        // Remover mensagem após duração
-        setTimeout(() => {
-            if (messageElement.parentNode) {
-                messageElement.parentNode.removeChild(messageElement);
+        allMenus.forEach(menuId => {
+            const menu = document.getElementById(menuId);
+            if (menu) {
+                menu.classList.add('hidden');
+                menu.style.display = 'none';
             }
-        }, duration);
+        });
+        
+        // Fechar modais também se estiver usando sistema moderno
+        if (this.ui && this.ui.closeAllModals) {
+            this.ui.closeAllModals();
+        }
     }
 
+    // Método UNIFICADO para esconder todos os menus - consolida hideAllMenus e hideAllOtherMenus
+    hideAllMenus() {
+        console.log('Escondendo todos os menus - versão unificada');
+        
+        // Esconder menu principal também
+        this.hideMainMenu();
+        
+        // Esconder todos os outros menus
+        this.hideAllOtherMenus();
+        
+        // Esconder controles móveis
+        const mobileControls = document.getElementById('mobileControls');
+        if (mobileControls) {
+            mobileControls.style.display = 'none';
+        }
+        
+        // Fechar menu de upgrades se estiver aberto
+        if (this.upgradeSystem && this.upgradeSystem.isUpgradeMenuOpen) {
+            this.upgradeSystem.hideUpgradeMenu();
+        }
+        
+        // Fechar menu de cartas se estiver aberto
+        if (this.cardSystem && this.cardSystem.isChoosingCard) {
+            this.cardSystem.cancelCardChoice();
+        }
+        
+        // Mostrar canvas do jogo
+        this.canvas.style.display = 'block';
+        
+        console.log('Todos os menus foram escondidos - versão unificada');
+    }
+    
+    // Método para mostrar loja - UNIFICADO
+    showShop() {
+        console.log('Mostrando loja - usando modal moderno...');
+        
+        // Verificar se devemos usar o sistema modal moderno ou menus estáticos
+        if (this.ui && this.ui.showShopModal && this.player) {
+            // Sistema moderno - usando modais
+            const playerData = {
+                soulOrbs: this.player.soulOrbs || 0,
+                ownedEquipment: this.player.ownedEquipment || { hats: [], staffs: [] },
+                equippedEquipment: this.player.equippedEquipment || { hats: null, staffs: null }
+            };
+            
+            const equipmentData = this.equipmentManager ? this.equipmentManager.getAllEquipment() : { hats: {}, staffs: {} };
+            
+            this.ui.showShopModal(playerData, equipmentData);
+        } else {
+            // Sistema legado - usando menus HTML estáticos
+            this.hideAllOtherMenus();
+            const mainMenu = document.getElementById('mainMenu');
+            if (mainMenu) {
+                mainMenu.classList.add('hidden');
+                mainMenu.style.display = 'none';
+            }
+            
+            const shopMenu = document.getElementById('shopMenu');
+            if (shopMenu) {
+                shopMenu.classList.remove('hidden');
+                shopMenu.style.display = 'flex';
+                console.log('Menu da loja mostrado (sistema legado)');
+            } else {
+                console.error('Elemento shopMenu não encontrado');
+            }
+        }
+    }
+    
+    // Método para esconder loja
+    hideShop() {
+        const shopMenu = document.getElementById('shopMenu');
+        if (shopMenu) {
+            shopMenu.classList.add('hidden');
+            shopMenu.style.display = 'none';
+        }
+        this.showMainMenu();
+    }
+    
+    // Método para esconder ranking
+    hideRanking() {
+        const rankingMenu = document.getElementById('rankingMenu');
+        if (rankingMenu) {
+            rankingMenu.classList.add('hidden');
+            rankingMenu.style.display = 'none';
+        }
+        this.showMainMenu();
+    }
+    
+    // Método para mostrar configurações - UNIFICADO
+    showSettings() {
+        console.log('Mostrando configurações - usando modal moderno...');
+        
+        // Verificar se devemos usar o sistema modal moderno ou menus estáticos
+        if (this.ui && this.ui.showSettingsModal) {
+            // Sistema moderno - usando modais
+            const currentSettings = {
+                playerName: this.player ? this.player.playerName : 'Player',
+                audioEnabled: this.audioSystem ? !this.audioSystem.isMuted() : true,
+                masterVolume: this.audioSystem ? this.audioSystem.masterVolume : 0.7,
+                sfxVolume: this.audioSystem ? this.audioSystem.sfxVolume : 0.8,
+                xpMultiplier: this.expMultiplier || 1.0
+            };
+            
+            this.ui.showSettingsModal(currentSettings);
+        } else {
+            // Sistema legado - usando menus HTML estáticos
+            this.hideAllOtherMenus();
+            const mainMenu = document.getElementById('mainMenu');
+            if (mainMenu) {
+                mainMenu.classList.add('hidden');
+                mainMenu.style.display = 'none';
+            }
+            
+            const settingsMenu = document.getElementById('settingsMenu');
+            if (settingsMenu) {
+                settingsMenu.classList.remove('hidden');
+                settingsMenu.style.display = 'flex';
+                console.log('Menu de configurações mostrado (sistema legado)');
+            } else {
+                console.error('Elemento settingsMenu não encontrado');
+            }
+        }
+    }
+    
+    // Método para esconder configurações
+    hideSettings() {
+        const settingsMenu = document.getElementById('settingsMenu');
+        if (settingsMenu) {
+            settingsMenu.classList.add('hidden');
+            settingsMenu.style.display = 'none';
+        }
+        this.showMainMenu();
+    }
+    
     gameLoop(currentTime = 0) {
         // Calcular delta time
         if (this.lastTime === 0) {
@@ -998,7 +1253,7 @@ class Game extends EventEmitter {
         }
         
         // Desabilitar controles mobile permanentemente em desktop
-        if (!DeviceUtils.isMobile() && this.player && this.player.disableMobileControls) {
+        if ((typeof DeviceUtils === 'undefined' || !DeviceUtils.isMobile()) && this.player && this.player.disableMobileControls) {
             this.player.disableMobileControls();
         }
         
@@ -1025,7 +1280,7 @@ class Game extends EventEmitter {
         }
         
         // Mostrar controles móveis se necessário
-        if (DeviceUtils.isMobile()) {
+        if (typeof DeviceUtils !== 'undefined' && DeviceUtils.isMobile()) {
             const mobileControls = document.getElementById('mobileControls');
             if (mobileControls) {
                 mobileControls.style.display = 'block';
@@ -1044,13 +1299,34 @@ class Game extends EventEmitter {
             this.player = new Player(spawnX, spawnY);
         }
         
+        // Garantir que o player tenha equipamentos iniciais
+        if (!this.player.ownedEquipment.hats.includes('wizardHat')) {
+            this.player.ownedEquipment.hats.push('wizardHat');
+        }
+        if (!this.player.ownedEquipment.staffs.includes('wizardStaff')) {
+            this.player.ownedEquipment.staffs.push('wizardStaff');
+        }
+        
+        // Equipar itens iniciais se não tiver nada equipado
+        if (!this.player.equippedEquipment.hats) {
+            this.player.equippedEquipment.hats = 'wizardHat';
+        }
+        if (!this.player.equippedEquipment.staffs) {
+            this.player.equippedEquipment.staffs = 'wizardStaff';
+        }
+        
+        // Atualizar sprites dos equipamentos
+        if (this.player.updateEquipmentSprites) {
+            this.player.updateEquipmentSprites();
+        }
+        
         // Limpar todos os inputs para garantir que não há movimento automático
         if (this.player.clearAllInputs) {
             this.player.clearAllInputs();
         }
         
         // Desabilitar controles mobile permanentemente em desktop
-        if (!DeviceUtils.isMobile() && this.player.disableMobileControls) {
+        if ((typeof DeviceUtils === 'undefined' || !DeviceUtils.isMobile()) && this.player.disableMobileControls) {
             this.player.disableMobileControls();
         }
         
@@ -1248,6 +1524,7 @@ class Game extends EventEmitter {
     }
     
     showMainMenu() {
+        console.log('Mostrando menu principal...');
         this.state = 'menu'; // Garantir que o estado seja menu
         this.currentScreen = 'mainMenu';
         
@@ -1264,8 +1541,18 @@ class Game extends EventEmitter {
             mobileControls.style.display = 'none';
         }
         
-        // Remover menu existente antes de criar um novo
-        this.hideMainMenu();
+        // Fechar todos os outros menus primeiro
+        this.hideAllOtherMenus();
+        
+        // Mostrar menu principal
+        const mainMenu = document.getElementById('mainMenu');
+        if (mainMenu) {
+            mainMenu.classList.remove('hidden');
+            mainMenu.style.display = 'flex';
+            console.log('Menu principal mostrado');
+        } else {
+            console.error('Elemento mainMenu não encontrado');
+        }
         
         // Inicializar player se não existir para mostrar stats
         if (!this.player) {
@@ -1278,82 +1565,17 @@ class Game extends EventEmitter {
         if (savedPlayerName && this.player) {
             this.player.setPlayerName(savedPlayerName);
         }
-        
-        const menu = document.createElement('div');
-        menu.id = 'main-menu';
-        menu.className = 'main-menu';
-        // Verificar se há save game para mostrar botão continuar
-        let continueButton = '';
-        try {
-            const saveData = localStorage.getItem('seraphsLastStandSave');
-            if (saveData) {
-                continueButton = '<button id="continueGameBtn" class="menu-btn">🔄 Continuar</button>';
-            }
-        } catch (error) {
-            console.log('Erro ao verificar save game:', error);
-        }
-        
-        menu.innerHTML = `
-            <div class="menu-container">
-                <h1 class="game-title">SERAPH'S LAST STAND</h1>
-                <div class="menu-buttons">
-                    <button id="startGameBtn" class="menu-btn">Iniciar Jogo</button>
-                    ${continueButton}
-                    <button id="shopBtn" class="menu-btn">🛒 Loja</button>
-                    <button id="rankingBtn" class="menu-btn">🏆 Ranking</button>
-                    <button id="settingsBtn" class="menu-btn">⚙️ Configurações</button>
-                </div>
-                <div class="menu-stats">
-                    <div class="stat-item">
-                        <span class="stat-label">Soul Orbs:</span>
-                        <span class="stat-value">${this.player.soulOrbs || 0}</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">Nível:</span>
-                        <span class="stat-value">${this.player.level || 1}</span>
-                    </div>
-                </div>
-            </div>
-        `;
-        
-        document.body.appendChild(menu);
-        this.addMainMenuStyles();
-        
-        // Event listeners
-        document.getElementById('startGameBtn').addEventListener('click', () => {
-            this.hideMainMenu();
-            this.startGame();
-        });
-        
-        // Botão continuar (se existir)
-        const continueBtn = document.getElementById('continueGameBtn');
-        if (continueBtn) {
-            continueBtn.addEventListener('click', () => {
-                this.hideMainMenu();
-                this.loadGame();
-                this.startGame();
-            });
-        }
-        
-        document.getElementById('shopBtn').addEventListener('click', () => {
-            this.showShop();
-        });
-        
-        document.getElementById('rankingBtn').addEventListener('click', () => {
-            this.showRanking();
-        });
-        
-        document.getElementById('settingsBtn').addEventListener('click', () => {
-            this.showSettings();
-        });
     }
     
     hideMainMenu() {
-        const menu = document.getElementById('main-menu');
-        if (menu) {
-            menu.remove();
+        const mainMenu = document.getElementById('mainMenu');
+        if (mainMenu) {
+            mainMenu.classList.add('hidden');
+            mainMenu.style.display = 'none';
         }
     }
+    
+    // Método removido - consolidado no hideAllMenus() acima para evitar duplicação
     
     addMainMenuStyles() {
         if (document.getElementById('main-menu-styles')) return;
@@ -1501,6 +1723,16 @@ class Game extends EventEmitter {
         console.log('Jogo salvo:', gameData);
     }
     
+    // Auto-save method
+    autoSave() {
+        try {
+            this.saveGame();
+            console.log('Auto-save concluído');
+        } catch (error) {
+            console.error('Erro no auto-save:', error);
+        }
+    }
+    
     loadGame() {
         try {
             const saveData = localStorage.getItem('seraphsLastStandSave');
@@ -1556,197 +1788,225 @@ class Game extends EventEmitter {
         }
     }
     
+    // Método para mostrar ranking - UNIFICADO
     showRanking() {
-        console.log('Mostrando ranking');
-        const rankings = this.rankingSystem.getRankings();
-        this.ui.showRankingModal(rankings);
+        console.log('Mostrando ranking - usando modal moderno...');
+        
+        // Verificar se devemos usar o sistema modal moderno ou menus estáticos
+        if (this.ui && this.ui.showRankingModal && this.rankingSystem) {
+            // Sistema moderno - usando modais
+            const rankings = this.rankingSystem.getRankings();
+            this.ui.showRankingModal(rankings);
+        } else {
+            // Sistema legado - usando menus HTML estáticos
+            this.hideAllOtherMenus();
+            const mainMenu = document.getElementById('mainMenu');
+            if (mainMenu) {
+                mainMenu.classList.add('hidden');
+                mainMenu.style.display = 'none';
+            }
+            
+            const rankingMenu = document.getElementById('rankingMenu');
+            if (rankingMenu) {
+                rankingMenu.classList.remove('hidden');
+                rankingMenu.style.display = 'flex';
+                console.log('Menu de ranking mostrado (sistema legado)');
+            } else {
+                console.error('Elemento rankingMenu não encontrado');
+            }
+        }
     }
     
-    showSettings() {
-        console.log('Mostrando configurações');
-        
-        // Carregar nome salvo do PlayerNamePrompt
-        const savedPlayerName = this.playerNamePrompt.loadPlayerName();
-        
-        const settings = {
-            playerName: savedPlayerName || (this.player ? this.player.playerName : 'Player'),
-            audioEnabled: this.audioSystem ? !this.audioSystem.isMuted() : true,
-            masterVolume: this.audioSystem ? this.audioSystem.masterVolume : 0.7,
-            sfxVolume: this.audioSystem ? this.audioSystem.sfxVolume : 0.8,
-            xpMultiplier: this.expMultiplier || 1.0
-        };
-        console.log('Settings object:', settings); // Debug
-        this.ui.showSettingsModal(settings);
-    }
+    // Método removido - duplicação da função em linha 728
     
     setXpMultiplier(multiplier) {
         this.expMultiplier = Math.max(0.5, Math.min(5.0, multiplier));
         console.log('XP Multiplier definido para:', this.expMultiplier);
     }
     
-    // Métodos de controle de input
-    handleKeyDown(key) {
-        if (!this.player) return;
+    // Métodos para adicionar/remover Soul Orbs (debug)
+    addSoulOrbs(amount) {
+        if (!this.player) {
+            console.warn('Player não existe, criando novo player');
+            this.player = new Player(400, 300);
+        }
         
-        // Controles específicos por estado do jogo
-        if (this.state === 'playing') {
-            switch (key) {
-                case 'a':
-                case 'A':
-                case 'ArrowLeft':
-                    this.player.setInput('left', true);
-                    break;
-                case 'd':
-                case 'D':
-                case 'ArrowRight':
-                    this.player.setInput('right', true);
-                    break;
-                case ' ':
-                case 'Space':
-                    this.player.setInput('jump', true);
-                    break;
-                case 'p':
-                case 'P':
-                case 'Escape':
-                    this.pauseGame();
-                    break;
-            }
-        } else if (this.state === 'paused') {
-            if (key === 'p' || key === 'P' || key === 'Escape') {
-                this.resumeGame();
-            }
-        } else if (this.state === 'menu') {
-            // Permitir navegação por teclado no menu se necessário
-            if (key === 'Enter') {
-                // Simular clique no botão de iniciar jogo se estiver no menu
-                const startBtn = document.getElementById('startGameBtn');
-                if (startBtn) {
-                    startBtn.click();
-                }
+        const finalAmount = Math.max(0, parseInt(amount) || 0);
+        this.player.soulOrbs = (this.player.soulOrbs || 0) + finalAmount;
+        
+        console.log(`Adicionados ${finalAmount} Soul Orbs. Total: ${this.player.soulOrbs}`);
+        this.ui.showNotification(`+${finalAmount} Soul Orbs adicionados! Total: ${this.player.soulOrbs}`, 'success', 2000);
+        
+        // Salvar mudanças
+        this.saveGame();
+        
+        // Atualizar menu principal se estiver aberto
+        if (this.state === 'menu') {
+            const soulOrbsValue = document.querySelector('.stat-value');
+            if (soulOrbsValue) {
+                soulOrbsValue.textContent = this.player.soulOrbs;
             }
         }
     }
     
-    handleKeyUp(key) {
-        if (!this.player) return;
+    removeSoulOrbs(amount) {
+        if (!this.player) {
+            console.warn('Player não existe');
+            this.ui.showNotification('Nenhum player encontrado!', 'error', 2000);
+            return;
+        }
         
-        // Apenas processar se o jogo estiver ativo
-        if (this.state === 'playing') {
-            switch (key) {
-                case 'a':
-                case 'A':
-                case 'ArrowLeft':
-                    this.player.setInput('left', false);
-                    break;
-                case 'd':
-                case 'D':
-                case 'ArrowRight':
-                    this.player.setInput('right', false);
-                    break;
-                case ' ':
-                case 'Space':
-                    this.player.setInput('jump', false);
-                    break;
+        const finalAmount = Math.max(0, parseInt(amount) || 0);
+        const oldAmount = this.player.soulOrbs || 0;
+        this.player.soulOrbs = Math.max(0, oldAmount - finalAmount);
+        const actualRemoved = oldAmount - this.player.soulOrbs;
+        
+        console.log(`Removidos ${actualRemoved} Soul Orbs. Total: ${this.player.soulOrbs}`);
+        this.ui.showNotification(`-${actualRemoved} Soul Orbs removidos! Total: ${this.player.soulOrbs}`, 'info', 2000);
+        
+        // Salvar mudanças
+        this.saveGame();
+        
+        // Atualizar menu principal se estiver aberto
+        if (this.state === 'menu') {
+            const soulOrbsValue = document.querySelector('.stat-value');
+            if (soulOrbsValue) {
+                soulOrbsValue.textContent = this.player.soulOrbs;
             }
         }
     }
     
     // Método para obter multiplicador de XP
     getXpMultiplier() {
-        let multiplier = 1.0;
-        
-        // Multiplicador baseado no tempo de jogo (fica mais difícil)
-        if (this.gameTime) {
-            const timeInMinutes = this.gameTime / (1000 * 60);
-            multiplier += timeInMinutes * 0.1; // 10% a mais a cada minuto
-        }
-        
-        // Multiplicador baseado no nível do jogador
-        if (this.player && this.player.level) {
-            multiplier += (this.player.level - 1) * 0.05; // 5% a mais por nível
-        }
-        
-        // Multiplicador baseado em equipamentos (se houver)
-        // TODO: Implementar multiplicadores de equipamentos
-        
-        return Math.max(multiplier, 1.0); // Nunca menor que 1.0
+        // Retorna o multiplicador de XP configurado ou padrão
+        return this.settings?.xpMultiplier || 1.0;
     }
     
-    // Salvar high score
+    // Método para salvar pontuação
     saveHighScore() {
         if (!this.player) return;
         
-        const currentScore = this.player.score;
-        let highScore = parseInt(localStorage.getItem('seraphsLastStand_highScore') || '0');
-        
-        if (currentScore > highScore) {
-            localStorage.setItem('seraphsLastStand_highScore', currentScore.toString());
-            console.log('Novo high score salvo:', currentScore);
+        try {
+            const score = this.calculateScore();
+            const entry = {
+                playerName: this.settings?.playerName || 'Player',
+                score: score,
+                level: this.player.level,
+                survivalTime: this.gameTime,
+                enemiesKilled: this.waveSystem?.enemiesKilled || 0,
+                build: this.player.selectedCards || [],
+                date: new Date().toLocaleDateString('pt-BR')
+            };
             
-            // Mostrar notificação de novo recorde
-            this.showMessage(`🏆 NOVO RECORDE: ${currentScore} pontos!`, 5000);
-            
-            return true; // Indica que foi um novo recorde
-        }
-        
-        return false;
-    }
-    
-    // Obter high score salvo
-    getHighScore() {
-        return parseInt(localStorage.getItem('seraphsLastStand_highScore') || '0');
-    }
-    
-    // Métodos auxiliares para controle de menus
-    hideAllMenus() {
-        // Esconder menus HTML que ainda existem
-        const menus = ['pauseMenu'];
-        menus.forEach(menuId => {
-            const menu = document.getElementById(menuId);
-            if (menu) {
-                menu.classList.add('hidden');
-                menu.style.display = 'none';
+            if (this.rankingSystem) {
+                this.rankingSystem.addScore(entry);
             }
-        });
-        
-        // Esconder menu dinâmico se existir
-        const mainMenu = document.getElementById('main-menu');
-        if (mainMenu) {
-            mainMenu.remove();
+        } catch (error) {
+            console.error('Erro ao salvar pontuação:', error);
         }
-        
-        // Mostrar canvas
-        this.canvas.style.display = 'block';
-        
-        // Mostrar UI do jogo
-        this.ui.showUI();
     }
     
-    autoSave() {
-        if (this.player) {
-            this.saveGame();
-            console.log('Auto-save realizado');
-        }
+    // Calcular pontuação final
+    calculateScore() {
+        if (!this.player) return 0;
+        
+        let score = 0;
+        score += this.player.level * 100;
+        score += (this.waveSystem?.enemiesKilled || 0) * 10;
+        score += Math.floor(this.gameTime / 1000) * 5;
+        score += this.player.soulOrbs;
+        
+        return score;
     }
 }
 
-// Inicializar o jogo quando a página carregar
+// Classe para pré-carregar todas as imagens do jogo
+class ImagePreloader {
+    constructor() {
+        this.images = {};
+        this.loadedCount = 0;
+        this.totalCount = 0;
+        this.onAllLoadedCallback = null;
+    }
+    
+    preloadImages(imagePaths, onAllLoaded) {
+        this.onAllLoadedCallback = onAllLoaded;
+        this.totalCount = imagePaths.length;
+        this.loadedCount = 0;
+        
+        imagePaths.forEach(imagePath => {
+            const img = new Image();
+            img.onload = () => {
+                this.loadedCount++;
+                console.log(`Imagem carregada: ${imagePath} (${this.loadedCount}/${this.totalCount})`);
+                if (this.loadedCount === this.totalCount && this.onAllLoadedCallback) {
+                    this.onAllLoadedCallback();
+                }
+            };
+            img.onerror = () => {
+                console.error(`Erro ao carregar imagem: ${imagePath}`);
+                this.loadedCount++;
+                if (this.loadedCount === this.totalCount && this.onAllLoadedCallback) {
+                    this.onAllLoadedCallback();
+                }
+            };
+            img.src = imagePath;
+            this.images[imagePath] = img;
+        });
+    }
+    
+    getImage(path) {
+        return this.images[path];
+    }
+}
+
+// Instância global do pré-carregador
+const imagePreloader = new ImagePreloader();
+
+// Pré-carregar todas as imagens de equipamentos ao carregar a página
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOM carregado - inicializando jogo...');
-    window.game = new Game();
-    console.log('Jogo inicializado:', window.game);
+    const equipmentImages = [
+        'img/player/mago.png',
+        'img/chapeus/1_ChapeudeMago.png',
+        'img/chapeus/2_Capacete.png',
+        'img/chapeus/3_GorroHelice.png',
+        'img/chapeus/4._ChapeuIncomum.png',
+        'img/chapeus/5_ChapeudoDesafiante.png',
+        'img/chapeus/6_Fedora.png',
+        'img/cajados/1_CajadodoMago.png',
+        'img/cajados/2_CajadodeEsmeralda.png',
+        'img/cajados/3_Tridente.png',
+        'img/cajados/4_Boomstaff.png',
+        'img/cajados/5_CajadodoTrovao.png',
+        'img/cajados/6_PontaCongelada.png',
+        'img/cajados/7_CajadoArco-Iris.png'
+    ];
+    
+    imagePreloader.preloadImages(equipmentImages, () => {
+        console.log('Todas as imagens de equipamentos foram carregadas!');
+    });
+});
+
+// Sistema de inicialização do jogo - UNIFICADO para evitar duplicação
+function initializeGame() {
+    if (!window.game) {
+        console.log('Inicializando jogo...');
+        window.game = new Game();
+        console.log('Jogo inicializado:', window.game);
+    }
+}
+
+// Inicializar jogo quando DOM estiver carregado
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM carregado');
+    initializeGame();
 });
 
 // Fallback para navegadores mais antigos
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-        if (!window.game) {
-            console.log('Fallback - inicializando jogo...');
-            window.game = new Game();
-        }
-    });
+    document.addEventListener('DOMContentLoaded', initializeGame);
 } else {
     // DOM já carregou
-    console.log('DOM já carregado - inicializando jogo imediatamente...');
-    window.game = new Game();
+    console.log('DOM já carregado - inicializando imediatamente');
+    initializeGame();
 }

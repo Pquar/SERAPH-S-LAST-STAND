@@ -1,5 +1,10 @@
 // player.js - Sistema do jogador com mecânicas de plataforma
 
+// Importar definições de equipamentos se não estiverem disponíveis globalmente
+if (typeof EQUIPMENT_DEFINITIONS === 'undefined') {
+    console.warn('EQUIPMENT_DEFINITIONS não está disponível. Sprites de equipamentos não funcionarão.');
+}
+
 class Player extends EventEmitter {
     constructor(x, y) {
         super();
@@ -48,6 +53,18 @@ class Player extends EventEmitter {
             staffs: null
         };
         
+        // Sistema de sprites
+        this.sprites = {
+            base: null,
+            hat: null,
+            staff: null
+        };
+        this.facingRight = true;
+        this.spriteSize = 64; // tamanho do sprite base
+        
+        // Carregar sprites
+        this.loadSprites();
+        
         // Sistema de pontuação e estatísticas
         this.score = 0;
         this.enemiesKilled = 0;
@@ -80,7 +97,6 @@ class Player extends EventEmitter {
         
         // Visual
         this.color = '#66ffff';
-        this.facingRight = true; // direção que está olhando
         
         // Input (apenas A/D/Space)
         this.input = {
@@ -559,23 +575,49 @@ class Player extends EventEmitter {
     
     renderBody(ctx) {
         const alpha = this.invulnerable ? 0.5 : 1.0;
-        const color = this.invulnerable ? '#ff6666' : this.color;
-        
-        // Corpo principal
         ctx.globalAlpha = alpha;
-        CanvasUtils.drawCircle(ctx, this.x, this.y, this.size, color);
         
-        // Borda
-        CanvasUtils.drawCircle(ctx, this.x, this.y, this.size, '#ffffff', false);
+        // Calcular posição e tamanho de renderização
+        const renderSize = this.spriteSize;
+        const renderX = this.x - renderSize / 2;
+        const renderY = this.y - renderSize / 2;
         
-        // Indicador de direção
-        const dirX = this.facingRight ? this.size * 0.8 : -this.size * 0.8;
-        ctx.strokeStyle = '#ffffff';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.moveTo(this.x, this.y);
-        ctx.lineTo(this.x + dirX, this.y);
-        ctx.stroke();
+        // Salvar contexto para flip horizontal
+        ctx.save();
+        
+        // Aplicar flip horizontal se necessário
+        if (!this.facingRight) {
+            ctx.scale(-1, 1);
+            ctx.translate(-this.x * 2, 0);
+        }
+        
+        // Renderizar sprite base do mago
+        if (this.sprites.base && this.sprites.base.complete) {
+            ctx.drawImage(this.sprites.base, renderX, renderY, renderSize, renderSize);
+        } else {
+            // Fallback para círculo se sprite não carregou
+            CanvasUtils.drawCircle(ctx, this.x, this.y, this.size, this.invulnerable ? '#ff6666' : '#4CAF50');
+        }
+        
+        // Renderizar chapéu equipado (acima da cabeça)
+        if (this.sprites.hat && this.sprites.hat.complete) {
+            // Posicionar chapéu no topo da cabeça
+            const hatX = renderX;
+            const hatY = renderY - renderSize * 0.1; // Ligeiramente acima
+            ctx.drawImage(this.sprites.hat, hatX, hatY, renderSize, renderSize);
+        }
+        
+        // Renderizar cajado equipado (ao lado esquerdo)
+        if (this.sprites.staff && this.sprites.staff.complete) {
+            // Posicionar cajado ao lado esquerdo do mago
+            const staffX = renderX - renderSize * 0.3;
+            const staffY = renderY + renderSize * 0.2;
+            const staffSize = renderSize * 0.8;
+            ctx.drawImage(this.sprites.staff, staffX, staffY, staffSize, staffSize);
+        }
+        
+        // Restaurar contexto
+        ctx.restore();
         
         // Reset alpha
         ctx.globalAlpha = 1.0;
@@ -1015,5 +1057,79 @@ class Player extends EventEmitter {
         if (window.game && window.game.audioSystem) {
             window.game.audioSystem.playSound('fragmentation');
         }
+    }
+    
+    // Sistema de Sprites e Renderização Visual
+    loadSprites() {
+        // Usar pré-carregador se disponível, senão carregar diretamente
+        if (typeof imagePreloader !== 'undefined') {
+            this.sprites.base = imagePreloader.getImage('img/player/mago.png');
+            if (!this.sprites.base) {
+                // Fallback se não estiver pré-carregado
+                this.sprites.base = new Image();
+                this.sprites.base.src = 'img/player/mago.png';
+            }
+        } else {
+            this.sprites.base = new Image();
+            this.sprites.base.src = 'img/player/mago.png';
+        }
+        
+        console.log('Sprite base do mago configurado');
+    }
+    
+    // Carregar sprite do chapéu equipado
+    loadHatSprite() {
+        if (!this.equippedEquipment.hats) {
+            this.sprites.hat = null;
+            return;
+        }
+        
+        const hatData = EQUIPMENT_DEFINITIONS[this.equippedEquipment.hats];
+        if (hatData && hatData.image) {
+            // Usar pré-carregador se disponível
+            if (typeof imagePreloader !== 'undefined') {
+                this.sprites.hat = imagePreloader.getImage(hatData.image);
+                if (!this.sprites.hat) {
+                    // Fallback se não estiver pré-carregado
+                    this.sprites.hat = new Image();
+                    this.sprites.hat.src = hatData.image;
+                }
+            } else {
+                this.sprites.hat = new Image();
+                this.sprites.hat.src = hatData.image;
+            }
+            console.log('Sprite do chapéu configurado:', hatData.name);
+        }
+    }
+    
+    // Carregar sprite do cajado equipado
+    loadStaffSprite() {
+        if (!this.equippedEquipment.staffs) {
+            this.sprites.staff = null;
+            return;
+        }
+        
+        const staffData = EQUIPMENT_DEFINITIONS[this.equippedEquipment.staffs];
+        if (staffData && staffData.image) {
+            // Usar pré-carregador se disponível
+            if (typeof imagePreloader !== 'undefined') {
+                this.sprites.staff = imagePreloader.getImage(staffData.image);
+                if (!this.sprites.staff) {
+                    // Fallback se não estiver pré-carregado
+                    this.sprites.staff = new Image();
+                    this.sprites.staff.src = staffData.image;
+                }
+            } else {
+                this.sprites.staff = new Image();
+                this.sprites.staff.src = staffData.image;
+            }
+            console.log('Sprite do cajado configurado:', staffData.name);
+        }
+    }
+    
+    // Atualizar sprites quando equipamentos mudarem
+    updateEquipmentSprites() {
+        this.loadHatSprite();
+        this.loadStaffSprite();
     }
 }

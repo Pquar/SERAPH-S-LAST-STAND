@@ -4,48 +4,70 @@ class UI extends EventEmitter {
     constructor() {
         super();
         
-        this.elements = {
-            gameHUD: document.getElementById('gameHUD'),
-            hpFill: document.getElementById('hpFill'),
-            hpText: document.getElementById('hpText'),
-            waveText: document.getElementById('waveText'),
-            timerText: document.getElementById('timerText'),
-            soulOrbsText: document.getElementById('soulOrbsText'),
-            
-            // Menus
-            mainMenu: document.getElementById('mainMenu'),
-            pauseMenu: document.getElementById('pauseMenu'),
-            
-            // Mobile controls
-            mobileControls: document.getElementById('mobileControls'),
-            joystick: document.getElementById('movementJoystick'),
-            joystickKnob: document.getElementById('joystickKnob')
+        // Verificar se os elementos básicos existem
+        const requiredElements = {
+            gameHUD: 'gameHUD',
+            hpText: 'hpText',
+            waveText: 'waveText',
+            timerText: 'timerText',
+            soulOrbsText: 'soulOrbsText'
         };
         
-        this.setupMobileControls();
-        this.setupAnimations();
+        this.elements = {};
+        
+        // Verificar elementos um por um
+        Object.entries(requiredElements).forEach(([key, id]) => {
+            const element = document.getElementById(id);
+            this.elements[key] = element;
+            if (!element) {
+                console.warn(`UI element not found: ${id}`);
+            }
+        });
+        
+        // Elementos opcionais
+        this.elements.hpFill = document.getElementById('hpFill');
+        this.elements.mainMenu = document.getElementById('mainMenu');
+        this.elements.pauseMenu = document.getElementById('pauseMenu');
+        this.elements.mobileControls = document.getElementById('mobileControls');
+        this.elements.joystick = document.getElementById('movementJoystick');
+        this.elements.joystickKnob = document.getElementById('joystickKnob');
+        
+        try {
+            this.setupMobileControls();
+            this.setupAnimations();
+        } catch (error) {
+            console.error('Error setting up UI:', error);
+        }
     }
     
     setupMobileControls() {
-        if (!DeviceUtils.hasTouch()) return;
-        
-        // Joystick virtual
-        this.setupVirtualJoystick();
-        
-        // Botões de ação
-        this.setupActionButtons();
+        try {
+            if (!DeviceUtils.hasTouch()) return;
+            
+            // Joystick virtual
+            this.setupVirtualJoystick();
+            
+            // Botões de ação
+            this.setupActionButtons();
+        } catch (error) {
+            console.error('Error setting up mobile controls:', error);
+        }
     }
     
     setupVirtualJoystick() {
         const joystick = this.elements.joystick;
         const knob = this.elements.joystickKnob;
         
+        // Verificar se os elementos existem antes de prosseguir
+        if (!joystick || !knob) {
+            console.log('Joystick elements not found - skipping setup');
+            return;
+        }
+        
         // APENAS ativar o joystick em dispositivos móveis
         if (!DeviceUtils.isMobile()) {
             console.log('Desktop detected - disabling virtual joystick');
-            if (joystick) {
-                joystick.style.display = 'none';
-            }
+            joystick.style.display = 'none';
             return; // Sair completamente se não for mobile
         }
         
@@ -55,9 +77,24 @@ class UI extends EventEmitter {
         const maxDistance = 50; // Raio máximo do joystick
         
         const updateJoystickRect = () => {
-            joystickRect = joystick.getBoundingClientRect();
-            centerX = joystickRect.width / 2;
-            centerY = joystickRect.height / 2;
+            try {
+                if (joystick && joystick.getBoundingClientRect) {
+                    joystickRect = joystick.getBoundingClientRect();
+                    centerX = joystickRect.width / 2;
+                    centerY = joystickRect.height / 2;
+                } else {
+                    // Valores padrão se não conseguir obter o rect
+                    joystickRect = { left: 0, top: 0, width: 100, height: 100 };
+                    centerX = 50;
+                    centerY = 50;
+                }
+            } catch (error) {
+                console.warn('Error getting joystick rect:', error);
+                // Valores padrão em caso de erro
+                joystickRect = { left: 0, top: 0, width: 100, height: 100 };
+                centerX = 50;
+                centerY = 50;
+            }
         };
         
         const handleStart = (e) => {
@@ -136,39 +173,40 @@ class UI extends EventEmitter {
     }
     
     setupActionButtons() {
-        const shootBtn = document.getElementById('shootBtn');
-        const jumpBtn = document.getElementById('jumpBtn');
-        const pauseBtn = document.getElementById('pauseBtn');
-        
-        // Botão de tiro
-        if (shootBtn) {
-            const handleShootPress = (e) => {
-                console.log('Shoot button pressed');
-                e.preventDefault();
-                e.stopPropagation();
-                this.emit('mobileShootStart');
-                shootBtn.style.transform = 'scale(0.9)';
-                shootBtn.style.background = 'linear-gradient(135deg, #ff4444 0%, #ff6666 100%)';
-                shootBtn.style.boxShadow = '0 0 20px rgba(255, 68, 68, 0.6)';
-            };
+        try {
+            const shootBtn = document.getElementById('shootBtn');
+            const jumpBtn = document.getElementById('jumpBtn');
+            const pauseBtn = document.getElementById('pauseBtn');
             
-            const handleShootRelease = (e) => {
-                console.log('Shoot button released');
-                e.preventDefault();
-                e.stopPropagation();
-                this.emit('mobileShootStop');
-                shootBtn.style.transform = 'scale(1)';
-                shootBtn.style.background = '';
-                shootBtn.style.boxShadow = '';
-            };
-            
-            shootBtn.addEventListener('touchstart', handleShootPress, { passive: false });
-            shootBtn.addEventListener('touchend', handleShootRelease, { passive: false });
-            shootBtn.addEventListener('touchcancel', handleShootRelease, { passive: false });
-            shootBtn.addEventListener('mousedown', handleShootPress);
-            shootBtn.addEventListener('mouseup', handleShootRelease);
-            shootBtn.addEventListener('mouseleave', handleShootRelease);
-        }
+            // Botão de tiro
+            if (shootBtn) {
+                const handleShootPress = (e) => {
+                    console.log('Shoot button pressed');
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.emit('mobileShootStart');
+                    shootBtn.style.transform = 'scale(0.9)';
+                    shootBtn.style.background = 'linear-gradient(135deg, #ff4444 0%, #ff6666 100%)';
+                    shootBtn.style.boxShadow = '0 0 20px rgba(255, 68, 68, 0.6)';
+                };
+                
+                const handleShootRelease = (e) => {
+                    console.log('Shoot button released');
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.emit('mobileShootStop');
+                    shootBtn.style.transform = 'scale(1)';
+                    shootBtn.style.background = '';
+                    shootBtn.style.boxShadow = '';
+                };
+                
+                shootBtn.addEventListener('touchstart', handleShootPress, { passive: false });
+                shootBtn.addEventListener('touchend', handleShootRelease, { passive: false });
+                shootBtn.addEventListener('touchcancel', handleShootRelease, { passive: false });
+                shootBtn.addEventListener('mousedown', handleShootPress);
+                shootBtn.addEventListener('mouseup', handleShootRelease);
+                shootBtn.addEventListener('mouseleave', handleShootRelease);
+            }
         
         // Botão de pulo
         if (jumpBtn) {
@@ -205,6 +243,9 @@ class UI extends EventEmitter {
                 this.emit('pausePress');
             });
         }
+        } catch (error) {
+            console.error('Error setting up action buttons:', error);
+        }
     }
     
     setupAnimations() {
@@ -223,14 +264,16 @@ class UI extends EventEmitter {
         let lastCount = 0;
         
         this.on('soulOrbCollected', (count) => {
-            if (count > lastCount) {
+            if (count > lastCount && soulOrbsElement && soulOrbsElement.style) {
                 // Animação de pulso
                 soulOrbsElement.style.transform = 'scale(1.2)';
                 soulOrbsElement.style.color = '#66ffff';
                 
                 setTimeout(() => {
-                    soulOrbsElement.style.transform = 'scale(1)';
-                    soulOrbsElement.style.color = '';
+                    if (soulOrbsElement && soulOrbsElement.style) {
+                        soulOrbsElement.style.transform = 'scale(1)';
+                        soulOrbsElement.style.color = '';
+                    }
                 }, 200);
             }
             lastCount = count;
@@ -241,12 +284,16 @@ class UI extends EventEmitter {
         const hudElement = this.elements.gameHUD;
         
         this.on('playerDamaged', () => {
-            // Shake effect
-            hudElement.style.animation = 'shake 0.5s ease-in-out';
-            
-            setTimeout(() => {
-                hudElement.style.animation = '';
-            }, 500);
+            // Shake effect - verificar se elemento existe
+            if (hudElement && hudElement.style) {
+                hudElement.style.animation = 'shake 0.5s ease-in-out';
+                
+                setTimeout(() => {
+                    if (hudElement && hudElement.style) {
+                        hudElement.style.animation = '';
+                    }
+                }, 500);
+            }
         });
     }
     
@@ -255,27 +302,32 @@ class UI extends EventEmitter {
         const hpFill = this.elements.hpFill;
         const hpText = this.elements.hpText;
         
-        // Animação suave da barra de HP
-        hpFill.style.transition = 'width 0.3s ease';
-        hpFill.style.width = percentage + '%';
+        // Verificar se elementos existem antes de usar
+        if (hpFill && hpFill.style) {
+            // Animação suave da barra de HP
+            hpFill.style.transition = 'width 0.3s ease';
+            hpFill.style.width = percentage + '%';
+            
+            // Cores baseadas na porcentagem
+            if (percentage > 60) {
+                hpFill.style.background = 'linear-gradient(90deg, #4CAF50 0%, #66BB6A 50%, #4CAF50 100%)';
+            } else if (percentage > 30) {
+                hpFill.style.background = 'linear-gradient(90deg, #FF9800 0%, #FFB74D 50%, #FF9800 100%)';
+            } else {
+                hpFill.style.background = 'linear-gradient(90deg, #F44336 0%, #EF5350 50%, #F44336 100%)';
+                
+                // Piscar quando HP baixo
+                if (percentage < 20) {
+                    hpFill.style.animation = 'pulse 1s infinite';
+                } else {
+                    hpFill.style.animation = '';
+                }
+            }
+        }
         
         // Atualizar texto
-        hpText.textContent = `${Math.ceil(hp)}/${maxHp}`;
-        
-        // Cores baseadas na porcentagem
-        if (percentage > 60) {
-            hpFill.style.background = 'linear-gradient(90deg, #4CAF50 0%, #66BB6A 50%, #4CAF50 100%)';
-        } else if (percentage > 30) {
-            hpFill.style.background = 'linear-gradient(90deg, #FF9800 0%, #FFB74D 50%, #FF9800 100%)';
-        } else {
-            hpFill.style.background = 'linear-gradient(90deg, #F44336 0%, #EF5350 50%, #F44336 100%)';
-            
-            // Piscar quando HP baixo
-            if (percentage < 20) {
-                hpFill.style.animation = 'pulse 1s infinite';
-            } else {
-                hpFill.style.animation = '';
-            }
+        if (hpText) {
+            hpText.textContent = `${Math.ceil(hp)}/${maxHp}`;
         }
         
         // Trigger shake se HP diminuiu significativamente
@@ -288,31 +340,44 @@ class UI extends EventEmitter {
     
     updateWave(wave) {
         const waveText = this.elements.waveText;
-        waveText.textContent = `Onda: ${wave}`;
-        
-        // Animação ao trocar de onda
-        waveText.style.transform = 'scale(1.3)';
-        waveText.style.color = '#66ffff';
-        
-        setTimeout(() => {
-            waveText.style.transform = 'scale(1)';
-            waveText.style.color = '';
-        }, 1000);
+        if (waveText) {
+            waveText.textContent = `Onda: ${wave}`;
+            
+            // Animação ao trocar de onda
+            waveText.style.transform = 'scale(1.3)';
+            waveText.style.color = '#66ffff';
+            
+            setTimeout(() => {
+                if (waveText && waveText.style) {
+                    waveText.style.transform = 'scale(1)';
+                    waveText.style.color = '';
+                }
+            }, 1000);
+        }
     }
     
     updateTimer(gameTime) {
         const timerText = this.elements.timerText;
-        timerText.textContent = TimeUtils.formatTime(gameTime);
+        if (timerText && typeof TimeUtils !== 'undefined' && TimeUtils.formatTime) {
+            timerText.textContent = TimeUtils.formatTime(gameTime);
+        } else if (timerText) {
+            // Fallback se TimeUtils não estiver disponível
+            const minutes = Math.floor(gameTime / 60000);
+            const seconds = Math.floor((gameTime % 60000) / 1000);
+            timerText.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
     }
     
     updateSoulOrbs(count) {
         const soulOrbsText = this.elements.soulOrbsText;
-        const oldCount = parseInt(soulOrbsText.textContent.replace('Orbes: ', '')) || 0;
-        
-        soulOrbsText.textContent = `Orbes: ${count}`;
-        
-        if (count > oldCount) {
-            this.emit('soulOrbCollected', count);
+        if (soulOrbsText) {
+            const oldCount = parseInt(soulOrbsText.textContent.replace('Orbes: ', '')) || 0;
+            
+            soulOrbsText.textContent = `Orbes: ${count}`;
+            
+            if (count > oldCount) {
+                this.emit('soulOrbCollected', count);
+            }
         }
     }
     
@@ -430,28 +495,40 @@ class UI extends EventEmitter {
     
     // Responsividade
     updateForMobile() {
-        if (DeviceUtils.isMobile()) {
-            this.show('mobileControls');
-            
-            // Ajustar tamanhos para mobile
-            const hud = this.elements.gameHUD;
-            hud.style.fontSize = '0.9em';
-            
-            // Reorganizar elementos para landscape/portrait
-            this.adjustForOrientation();
-        } else {
-            this.hide('mobileControls');
+        try {
+            if (DeviceUtils && DeviceUtils.isMobile && DeviceUtils.isMobile()) {
+                this.show('mobileControls');
+                
+                // Ajustar tamanhos para mobile
+                const hud = this.elements.gameHUD;
+                if (hud && hud.style) {
+                    hud.style.fontSize = '0.9em';
+                }
+                
+                // Reorganizar elementos para landscape/portrait
+                this.adjustForOrientation();
+            } else {
+                this.hide('mobileControls');
+            }
+        } catch (error) {
+            console.warn('Error in updateForMobile:', error);
         }
     }
     
     adjustForOrientation() {
-        const isLandscape = window.innerWidth > window.innerHeight;
-        const mobileControls = this.elements.mobileControls;
-        
-        if (isLandscape) {
-            mobileControls.classList.add('landscape');
-        } else {
-            mobileControls.classList.remove('landscape');
+        try {
+            const isLandscape = window.innerWidth > window.innerHeight;
+            const mobileControls = this.elements.mobileControls;
+            
+            if (mobileControls) {
+                if (isLandscape) {
+                    mobileControls.classList.add('landscape');
+                } else {
+                    mobileControls.classList.remove('landscape');
+                }
+            }
+        } catch (error) {
+            console.warn('Error in adjustForOrientation:', error);
         }
     }
     
@@ -606,6 +683,31 @@ class UI extends EventEmitter {
         if (modal) {
             modal.remove();
         }
+    }
+    
+    // Fechar todos os modais
+    closeAllModals() {
+        // Lista de todos os modais possíveis
+        const modals = ['ranking-modal', 'settings-modal', 'shop-modal'];
+        modals.forEach(modalId => {
+            this.closeModal(modalId);
+        });
+        
+        // Também remover qualquer modal genérico que possa existir
+        const allModals = document.querySelectorAll('.modal-overlay');
+        allModals.forEach(modal => {
+            if (modal && modal.parentNode) {
+                modal.parentNode.removeChild(modal);
+            }
+        });
+        
+        // Fechar quaisquer overlays ou elementos flutuantes
+        const overlays = document.querySelectorAll('[class*="overlay"]');
+        overlays.forEach(overlay => {
+            if (overlay && overlay.parentNode && overlay.id !== 'gameCanvas') {
+                overlay.style.display = 'none';
+            }
+        });
     }
     
     // Sistema de Ranking
@@ -795,6 +897,34 @@ class UI extends EventEmitter {
                 </div>
                 <small class="setting-help">Aumenta a velocidade de ganho de experiência</small>
             </div>
+            
+            <div class="setting-group">
+                <label>Soul Orbs (Debug):</label>
+                <div class="soul-orbs-controls">
+                    <input type="number" id="soulOrbsInput" min="0" max="99999" step="1" value="100" 
+                           placeholder="Quantidade" style="width: 100px; margin-right: 10px;" />
+                    <button id="addSoulOrbsBtn" class="btn-primary" style="
+                        padding: 8px 16px;
+                        border: none;
+                        border-radius: 5px;
+                        cursor: pointer;
+                        font-size: 14px;
+                        background: #2196F3;
+                        color: white;
+                    ">Adicionar</button>
+                    <button id="removeSoulOrbsBtn" class="btn-secondary" style="
+                        padding: 8px 16px;
+                        border: none;
+                        border-radius: 5px;
+                        cursor: pointer;
+                        font-size: 14px;
+                        background: #f44336;
+                        color: white;
+                        margin-left: 5px;
+                    ">Remover</button>
+                </div>
+                <small class="setting-help">Para testes e desenvolvimento</small>
+            </div>
         `;
         
         // Botões
@@ -925,6 +1055,17 @@ class UI extends EventEmitter {
                 this.emit('resetSettings');
                 this.closeModal('settings-modal');
             }
+        });
+        
+        // Botões de Soul Orbs
+        document.getElementById('addSoulOrbsBtn').addEventListener('click', () => {
+            const amount = parseInt(document.getElementById('soulOrbsInput').value) || 100;
+            this.emit('addSoulOrbs', amount);
+        });
+        
+        document.getElementById('removeSoulOrbsBtn').addEventListener('click', () => {
+            const amount = parseInt(document.getElementById('soulOrbsInput').value) || 100;
+            this.emit('removeSoulOrbs', amount);
         });
 
         document.getElementById('saveSettingsBtn').addEventListener('click', () => {
@@ -1313,6 +1454,37 @@ class UI extends EventEmitter {
                 color: #888;
                 font-size: 12px;
                 margin-top: 4px;
+            }
+            
+            .soul-orbs-controls {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                flex-wrap: wrap;
+            }
+            
+            .soul-orbs-controls input[type="number"] {
+                padding: 8px 12px;
+                border: 2px solid #333;
+                border-radius: 5px;
+                background: #222;
+                color: white;
+                font-size: 14px;
+                min-width: 100px;
+            }
+            
+            .soul-orbs-controls input[type="number"]:focus {
+                outline: none;
+                border-color: #2196F3;
+            }
+            
+            .soul-orbs-controls button {
+                transition: all 0.3s ease;
+            }
+            
+            .soul-orbs-controls button:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
             }
             
             @media (max-width: 600px) {

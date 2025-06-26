@@ -53,6 +53,20 @@
             </div>
         </div>
 
+        <!-- Menu principal -->
+        <div id="mainMenu" class="menu">
+            <div class="menu-content">
+                <h1>SERAPH'S LAST STAND</h1>
+                <div class="menu-buttons">
+                    <button class="menu-btn" id="startGameBtn">NOVO JOGO</button>
+                    <button class="menu-btn" id="loadGameBtn">CARREGAR JOGO</button>
+                    <button class="menu-btn" id="shopBtn">LOJA</button>
+                    <button class="menu-btn" id="rankingBtn">RANKING</button>
+                    <button class="menu-btn" id="settingsBtn">CONFIGURAÇÕES</button>
+                </div>
+            </div>
+        </div>
+
         <!-- Menu de pausa -->
         <div id="pauseMenu" class="menu hidden">
             <div class="menu-content">
@@ -62,6 +76,85 @@
                 <button class="menu-btn" id="mainMenuBtn">MENU PRINCIPAL</button>
             </div>
         </div>
+
+        <!-- Menu da loja -->
+        <div id="shopMenu" class="menu hidden">
+            <div class="menu-content">
+                <h2>LOJA DE EQUIPAMENTOS</h2>
+                <div id="shopContent" class="shop-content">
+                    <!-- Conteúdo da loja será gerado dinamicamente -->
+                </div>
+                <button class="menu-btn" id="closeShopBtn">FECHAR</button>
+            </div>
+        </div>
+
+        <!-- Menu de ranking -->
+        <div id="rankingMenu" class="menu hidden">
+            <div class="menu-content">
+                <h2>RANKING</h2>
+                <div id="rankingContent" class="ranking-content">
+                    <!-- Conteúdo do ranking será gerado dinamicamente -->
+                </div>
+                <button class="menu-btn" id="closeRankingBtn">FECHAR</button>
+            </div>
+        </div>
+
+        <!-- Menu de configurações -->
+        <div id="settingsMenu" class="menu hidden">
+            <div class="menu-content">
+                <h2>CONFIGURAÇÕES</h2>
+                <div id="settingsContent" class="settings-content">
+                    <div class="setting-item">
+                        <label>Nome do Jogador:</label>
+                        <input type="text" id="playerNameInput" maxlength="20" />
+                    </div>
+                    <div class="setting-item">
+                        <label>Volume Master:</label>
+                        <input type="range" id="masterVolumeSlider" min="0" max="100" value="70" />
+                        <span id="masterVolumeValue">70%</span>
+                    </div>
+                    <div class="setting-item">
+                        <label>Volume SFX:</label>
+                        <input type="range" id="sfxVolumeSlider" min="0" max="100" value="80" />
+                        <span id="sfxVolumeValue">80%</span>
+                    </div>
+                    <div class="setting-item">
+                        <label>
+                            <input type="checkbox" id="audioEnabledCheckbox" checked />
+                            Áudio Habilitado
+                        </label>
+                    </div>
+                </div>
+                <div class="menu-buttons">
+                    <button class="menu-btn" id="saveSettingsBtn">SALVAR</button>
+                    <button class="menu-btn" id="closeSettingsBtn">FECHAR</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Menu de game over -->
+        <div id="gameOverMenu" class="menu hidden">
+            <div class="menu-content">
+                <h2>GAME OVER</h2>
+                <div id="gameOverStats" class="game-over-stats">
+                    <!-- Estatísticas serão preenchidas dinamicamente -->
+                </div>
+                <div class="menu-buttons">
+                    <button class="menu-btn" id="playAgainBtn">JOGAR NOVAMENTE</button>
+                    <button class="menu-btn" id="backToMenuBtn">MENU PRINCIPAL</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Menu de upgrades -->
+        <div id="upgradeMenu" class="menu hidden">
+            <div class="menu-content">
+                <h2>ESCOLHA UM UPGRADE</h2>
+                <div id="upgradeOptions" class="upgrade-options">
+                    <!-- Opções de upgrade serão geradas dinamicamente -->
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Scripts do jogo -->
@@ -69,10 +162,10 @@
     <script src="js/audio.js"></script>
     <script src="js/ranking.js"></script>
     <script src="js/terrain.js"></script>
+    <script src="js/equipment.js"></script>
     <script src="js/player.js"></script>
     <script src="js/enemies.js"></script>
     <script src="js/types-card.js"></script>
-    <script src="js/equipment.js"></script>
     <script src="js/upgrades.js"></script>
     <script src="js/cards.js"></script>
     <script src="js/ui.js"></script>
