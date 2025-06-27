@@ -665,105 +665,653 @@
                 <rect x="36" y="52" width="8" height="4" fill="#fbbf24"/>
             </g>
 
-            <!-- Chapéus -->
+            <!-- Chapéus Aprimorados -->
             <g id="chapeu-mago">
-                <path d="M16 20 L32 4 L48 20 L32 16 Z" fill="#7c3aed" stroke="#8b5cf6" stroke-width="1"/>
-                <circle cx="32" cy="18" r="3" fill="#fbbf24"/>
-                <rect x="28" y="20" width="8" height="4" fill="#6366f1"/>
+                <!-- Base do chapéu com gradiente -->
+                <defs>
+                    <linearGradient id="wizardHatGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#8b5cf6;stop-opacity:1" />
+                        <stop offset="50%" style="stop-color:#7c3aed;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#5b21b6;stop-opacity:1" />
+                    </linearGradient>
+                    <radialGradient id="wizardStarGrad" cx="50%" cy="50%" r="50%">
+                        <stop offset="0%" style="stop-color:#fbbf24;stop-opacity:1" />
+                        <stop offset="70%" style="stop-color:#f59e0b;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#d97706;stop-opacity:1" />
+                    </radialGradient>
+                </defs>
+                <!-- Sombra do chapéu -->
+                <path d="M17 21 L33 5 L49 21 L33 17 Z" fill="#4c1d95" opacity="0.3"/>
+                <!-- Chapéu principal -->
+                <path d="M16 20 L32 4 L48 20 L32 16 Z" fill="url(#wizardHatGrad)" stroke="#6d28d9" stroke-width="1.5"/>
+                <!-- Borda decorativa -->
+                <rect x="14" y="19" width="36" height="3" fill="#6366f1" rx="1"/>
+                <rect x="15" y="20" width="34" height="1" fill="#a855f7" opacity="0.7"/>
+                <!-- Estrela mágica -->
+                <polygon points="32,14 33.5,17.5 37,17.5 34.25,19.75 35.75,23.25 32,21 28.25,23.25 29.75,19.75 27,17.5 30.5,17.5" 
+                         fill="url(#wizardStarGrad)" stroke="#92400e" stroke-width="0.5"/>
+                <!-- Brilhos mágicos -->
+                <circle cx="28" cy="12" r="1" fill="#fbbf24" opacity="0.8"/>
+                <circle cx="36" cy="10" r="0.5" fill="#fbbf24" opacity="0.6"/>
+                <circle cx="25" cy="18" r="0.8" fill="#c084fc" opacity="0.7"/>
             </g>
 
             <g id="capacete">
-                <ellipse cx="32" cy="20" rx="18" ry="12" fill="#6b7280" stroke="#4b5563" stroke-width="2"/>
-                <rect x="24" y="16" width="16" height="8" fill="#9ca3af"/>
-                <circle cx="26" cy="20" r="2" fill="#ef4444"/>
-                <circle cx="38" cy="20" r="2" fill="#ef4444"/>
-                <rect x="14" y="18" width="8" height="4" fill="#374151"/>
-                <rect x="42" y="18" width="8" height="4" fill="#374151"/>
+                <defs>
+                    <linearGradient id="helmetGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#9ca3af;stop-opacity:1" />
+                        <stop offset="50%" style="stop-color:#6b7280;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#374151;stop-opacity:1" />
+                    </linearGradient>
+                    <radialGradient id="helmetVisorGrad" cx="50%" cy="30%" r="60%">
+                        <stop offset="0%" style="stop-color:#1f2937;stop-opacity:0.3" />
+                        <stop offset="100%" style="stop-color:#111827;stop-opacity:0.8" />
+                    </radialGradient>
+                </defs>
+                <!-- Sombra -->
+                <ellipse cx="33" cy="21" rx="18" ry="12" fill="#1f2937" opacity="0.2"/>
+                <!-- Capacete principal -->
+                <ellipse cx="32" cy="20" rx="18" ry="12" fill="url(#helmetGrad)" stroke="#4b5563" stroke-width="2"/>
+                <!-- Detalhes de metal -->
+                <rect x="22" y="15" width="20" height="2" fill="#d1d5db" rx="1"/>
+                <rect x="24" y="18" width="16" height="1" fill="#d1d5db" opacity="0.8"/>
+                <!-- Visor -->
+                <rect x="24" y="16" width="16" height="8" fill="url(#helmetVisorGrad)" rx="2"/>
+                <!-- Olhos vermelhos -->
+                <circle cx="27" cy="20" r="2.5" fill="#ef4444" opacity="0.9"/>
+                <circle cx="37" cy="20" r="2.5" fill="#ef4444" opacity="0.9"/>
+                <circle cx="27" cy="19.5" r="1" fill="#fca5a5"/>
+                <circle cx="37" cy="19.5" r="1" fill="#fca5a5"/>
+                <!-- Proteções laterais -->
+                <rect x="12" y="17" width="10" height="6" fill="#4b5563" rx="2"/>
+                <rect x="42" y="17" width="10" height="6" fill="#4b5563" rx="2"/>
+                <!-- Detalhes das proteções -->
+                <rect x="14" y="18" width="6" height="1" fill="#6b7280"/>
+                <rect x="44" y="18" width="6" height="1" fill="#6b7280"/>
+                <!-- Respirador central -->
+                <rect x="30" y="22" width="4" height="3" fill="#374151" rx="1"/>
+                <circle cx="31" cy="23" r="0.5" fill="#6b7280"/>
+                <circle cx="33" cy="23" r="0.5" fill="#6b7280"/>
             </g>
 
             <g id="gorro-helice">
-                <ellipse cx="32" cy="20" rx="16" ry="10" fill="#22c55e" stroke="#16a34a" stroke-width="1"/>
-                <rect x="30" y="8" width="4" height="8" fill="#dc2626"/>
-                <ellipse cx="20" cy="8" rx="8" ry="2" fill="#fbbf24" transform="rotate(-30 20 8)"/>
-                <ellipse cx="44" cy="8" rx="8" ry="2" fill="#fbbf24" transform="rotate(30 44 8)"/>
+                <defs>
+                    <linearGradient id="beanieGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#34d399;stop-opacity:1" />
+                        <stop offset="50%" style="stop-color:#22c55e;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#16a34a;stop-opacity:1" />
+                    </linearGradient>
+                    <linearGradient id="propellerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#fbbf24;stop-opacity:1" />
+                        <stop offset="50%" style="stop-color:#f59e0b;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#d97706;stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+                <!-- Sombra -->
+                <ellipse cx="33" cy="21" rx="16" ry="10" fill="#047857" opacity="0.2"/>
+                <!-- Gorro principal -->
+                <ellipse cx="32" cy="20" rx="16" ry="10" fill="url(#beanieGrad)" stroke="#16a34a" stroke-width="1"/>
+                <!-- Textura do gorro -->
+                <ellipse cx="32" cy="18" rx="14" ry="8" fill="none" stroke="#10b981" stroke-width="0.5" opacity="0.6"/>
+                <ellipse cx="32" cy="19" rx="12" ry="7" fill="none" stroke="#10b981" stroke-width="0.3" opacity="0.4"/>
+                <!-- Haste da hélice -->
+                <rect x="30" y="6" width="4" height="10" fill="#dc2626" rx="2"/>
+                <circle cx="32" cy="11" r="2" fill="#b91c1c"/>
+                <circle cx="32" cy="11" r="1" fill="#ef4444"/>
+                <!-- Hélices com movimento implícito -->
+                <g transform="rotate(15 32 8)">
+                    <ellipse cx="20" cy="8" rx="10" ry="3" fill="url(#propellerGrad)" stroke="#d97706" stroke-width="0.5"/>
+                    <ellipse cx="44" cy="8" rx="10" ry="3" fill="url(#propellerGrad)" stroke="#d97706" stroke-width="0.5"/>
+                    <!-- Efeito de brilho nas hélices -->
+                    <ellipse cx="20" cy="7" rx="8" ry="1" fill="#fef3c7" opacity="0.7"/>
+                    <ellipse cx="44" cy="7" rx="8" ry="1" fill="#fef3c7" opacity="0.7"/>
+                </g>
+                <!-- Partículas de vento -->
+                <circle cx="18" cy="12" r="0.5" fill="#a7f3d0" opacity="0.8"/>
+                <circle cx="46" cy="10" r="0.3" fill="#a7f3d0" opacity="0.6"/>
+                <circle cx="15" cy="15" r="0.4" fill="#a7f3d0" opacity="0.5"/>
+                <circle cx="49" cy="13" r="0.6" fill="#a7f3d0" opacity="0.7"/>
             </g>
 
             <g id="chapeu-incomum">
-                <path d="M20 24 L32 8 L44 24 L40 20 L32 12 L24 20 Z" fill="#8b5cf6" stroke="#7c3aed" stroke-width="1"/>
-                <circle cx="32" cy="20" r="4" fill="#06b6d4"/>
-                <path d="M28 24 L36 24" stroke="#fbbf24" stroke-width="2"/>
+                <defs>
+                    <linearGradient id="luckyHatGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#a855f7;stop-opacity:1" />
+                        <stop offset="50%" style="stop-color:#8b5cf6;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#7c3aed;stop-opacity:1" />
+                    </linearGradient>
+                    <radialGradient id="luckyGemGrad" cx="50%" cy="50%" r="50%">
+                        <stop offset="0%" style="stop-color:#67e8f9;stop-opacity:1" />
+                        <stop offset="70%" style="stop-color:#06b6d4;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#0891b2;stop-opacity:1" />
+                    </radialGradient>
+                </defs>
+                <!-- Sombra -->
+                <path d="M21 25 L33 9 L45 25 L41 21 L33 13 L25 21 Z" fill="#581c87" opacity="0.3"/>
+                <!-- Chapéu principal com forma única -->
+                <path d="M20 24 L32 8 L44 24 L40 20 L32 12 L24 20 Z" fill="url(#luckyHatGrad)" stroke="#7c3aed" stroke-width="1.5"/>
+                <!-- Detalhes decorativos -->
+                <path d="M22 22 L32 10 L42 22" fill="none" stroke="#c084fc" stroke-width="1" opacity="0.7"/>
+                <!-- Gema central da sorte -->
+                <circle cx="32" cy="20" r="4.5" fill="url(#luckyGemGrad)" stroke="#0891b2" stroke-width="1"/>
+                <circle cx="32" cy="19" r="2" fill="#67e8f9" opacity="0.8"/>
+                <circle cx="31" cy="18" r="1" fill="#cffafe"/>
+                <!-- Borda dourada -->
+                <path d="M28 24 L36 24" stroke="#fbbf24" stroke-width="3" stroke-linecap="round"/>
+                <circle cx="26" cy="24" r="1" fill="#fbbf24"/>
+                <circle cx="38" cy="24" r="1" fill="#fbbf24"/>
+                <!-- Efeitos mágicos de sorte -->
+                <g opacity="0.8">
+                    <polygon points="25,16 26,17.5 27.5,17.5 26.25,18.75 26.75,20.25 25,19.25 23.25,20.25 23.75,18.75 22.5,17.5 24,17.5" 
+                             fill="#fbbf24"/>
+                    <polygon points="39,14 39.7,15.2 41,15.2 40.15,16.15 40.5,17.5 39,16.75 37.5,17.5 37.85,16.15 37,15.2 38.3,15.2" 
+                             fill="#fbbf24"/>
+                    <polygon points="28,11 28.5,12 29.5,12 28.75,12.75 29,13.75 28,13.25 27,13.75 27.25,12.75 26.5,12 27.5,12" 
+                             fill="#fbbf24"/>
+                </g>
             </g>
 
             <g id="chapeu-desafiante">
-                <ellipse cx="32" cy="20" rx="20" ry="8" fill="#dc2626" stroke="#b91c1c" stroke-width="2"/>
-                <rect x="16" y="16" width="32" height="8" fill="#ef4444"/>
-                <circle cx="22" cy="20" r="3" fill="#fbbf24"/>
-                <circle cx="32" cy="20" r="3" fill="#fbbf24"/>
-                <circle cx="42" cy="20" r="3" fill="#fbbf24"/>
+                <defs>
+                    <linearGradient id="challengerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#ef4444;stop-opacity:1" />
+                        <stop offset="30%" style="stop-color:#dc2626;stop-opacity:1" />
+                        <stop offset="70%" style="stop-color:#b91c1c;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#7f1d1d;stop-opacity:1" />
+                    </linearGradient>
+                    <radialGradient id="skullGrad" cx="50%" cy="50%" r="50%">
+                        <stop offset="0%" style="stop-color:#f9fafb;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#e5e7eb;stop-opacity:1" />
+                    </radialGradient>
+                </defs>
+                <!-- Sombra -->
+                <ellipse cx="33" cy="22" rx="20" ry="8" fill="#7f1d1d" opacity="0.3"/>
+                <!-- Chapéu principal (estilo pirata/desafiante) -->
+                <ellipse cx="32" cy="20" rx="19" ry="7" fill="url(#challengerGrad)" stroke="#991b1b" stroke-width="2"/>
+                <!-- Dobra do chapéu -->
+                <ellipse cx="32" cy="18" rx="17" ry="6" fill="none" stroke="#dc2626" stroke-width="1" opacity="0.7"/>
+                <!-- Caveira central -->
+                <ellipse cx="32" cy="16" rx="6" ry="5" fill="url(#skullGrad)" stroke="#9ca3af" stroke-width="1"/>
+                <!-- Olhos da caveira -->
+                <circle cx="29" cy="15" r="1.5" fill="#1f2937"/>
+                <circle cx="35" cy="15" r="1.5" fill="#1f2937"/>
+                <!-- Nariz da caveira -->
+                <polygon points="32,16.5 31,17.5 33,17.5" fill="#1f2937"/>
+                <!-- Boca da caveira -->
+                <rect x="30" y="18" width="4" height="0.5" fill="#1f2937" rx="0.25"/>
+                <rect x="30.5" y="18.8" width="0.5" height="1" fill="#1f2937"/>
+                <rect x="31.5" y="18.8" width="0.5" height="1.2" fill="#1f2937"/>
+                <rect x="32.5" y="18.8" width="0.5" height="1" fill="#1f2937"/>
+                <rect x="33.5" y="18.8" width="0.5" height="1" fill="#1f2937"/>
+                <!-- Ossos cruzados -->
+                <g transform="rotate(45 32 16)">
+                    <rect x="26" y="15.5" width="12" height="1" fill="#e5e7eb" rx="0.5"/>
+                </g>
+                <g transform="rotate(-45 32 16)">
+                    <rect x="26" y="15.5" width="12" height="1" fill="#e5e7eb" rx="0.5"/>
+                </g>
+                <!-- Detalhes dourados do desafiante -->
+                <circle cx="18" cy="18" r="2" fill="#fbbf24" stroke="#d97706" stroke-width="1"/>
+                <circle cx="46" cy="18" r="2" fill="#fbbf24" stroke="#d97706" stroke-width="1"/>
+                <polygon points="18,16.5 19,17.5 18,18.5 17,17.5" fill="#f59e0b"/>
+                <polygon points="46,16.5 47,17.5 46,18.5 45,17.5" fill="#f59e0b"/>
+                <!-- Plumas -->
+                <g opacity="0.9">
+                    <ellipse cx="14" cy="15" rx="3" ry="8" fill="#065f46" stroke="#047857" stroke-width="0.5" transform="rotate(-30 14 15)"/>
+                    <ellipse cx="50" cy="15" rx="3" ry="8" fill="#065f46" stroke="#047857" stroke-width="0.5" transform="rotate(30 50 15)"/>
+                    <ellipse cx="12" cy="13" rx="2" ry="6" fill="#064e3b" stroke="#047857" stroke-width="0.3" transform="rotate(-45 12 13)"/>
+                    <ellipse cx="52" cy="13" rx="2" ry="6" fill="#064e3b" stroke="#047857" stroke-width="0.3" transform="rotate(45 52 13)"/>
+                </g>
             </g>
 
             <g id="fedora">
-                <ellipse cx="32" cy="22" rx="18" ry="6" fill="#1f2937" stroke="#374151" stroke-width="1"/>
-                <ellipse cx="32" cy="16" rx="14" ry="8" fill="#374151" stroke="#1f2937" stroke-width="1"/>
-                <rect x="30" y="20" width="4" height="4" fill="#fbbf24"/>
+                <defs>
+                    <linearGradient id="fedoraGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#4b5563;stop-opacity:1" />
+                        <stop offset="50%" style="stop-color:#374151;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#1f2937;stop-opacity:1" />
+                    </linearGradient>
+                    <linearGradient id="fedoraBandGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#7c2d12;stop-opacity:1" />
+                        <stop offset="50%" style="stop-color:#92400e;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#a16207;stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+                <!-- Sombra -->
+                <ellipse cx="33" cy="25" rx="22" ry="3" fill="#111827" opacity="0.4"/>
+                <!-- Aba do chapéu -->
+                <ellipse cx="32" cy="22" rx="20" ry="5" fill="url(#fedoraGrad)" stroke="#1f2937" stroke-width="1"/>
+                <!-- Copa do chapéu -->
+                <ellipse cx="32" cy="15" rx="12" ry="9" fill="url(#fedoraGrad)" stroke="#374151" stroke-width="1"/>
+                <!-- Vinco central -->
+                <ellipse cx="32" cy="13" rx="8" ry="6" fill="none" stroke="#6b7280" stroke-width="0.5" opacity="0.6"/>
+                <line x1="32" y1="8" x2="32" y2="18" stroke="#6b7280" stroke-width="0.8" opacity="0.7"/>
+                <!-- Faixa decorativa -->
+                <rect x="22" y="16" width="20" height="3" fill="url(#fedoraBandGrad)" rx="1.5"/>
+                <rect x="23" y="16.5" width="18" height="2" fill="#b45309" opacity="0.7" rx="1"/>
+                <!-- Detalhes da faixa -->
+                <rect x="25" y="17" width="2" height="1" fill="#fbbf24" rx="0.5"/>
+                <rect x="29" y="17" width="2" height="1" fill="#fbbf24" rx="0.5"/>
+                <rect x="33" y="17" width="2" height="1" fill="#fbbf24" rx="0.5"/>
+                <rect x="37" y="17" width="2" height="1" fill="#fbbf24" rx="0.5"/>
+                <!-- Pluma elegante -->
+                <ellipse cx="38" cy="12" rx="2" ry="7" fill="#7c3aed" stroke="#6d28d9" stroke-width="0.5" transform="rotate(20 38 12)"/>
+                <ellipse cx="39" cy="10" rx="1.5" ry="5" fill="#8b5cf6" stroke="#7c3aed" stroke-width="0.3" transform="rotate(25 39 10)"/>
+                <!-- Brilho sutil -->
+                <ellipse cx="28" cy="12" rx="6" ry="4" fill="#6b7280" opacity="0.3" transform="rotate(-15 28 12)"/>
+                <!-- Reroll symbol (dado) -->
+                <rect x="40" y="18" width="4" height="4" fill="#1f2937" stroke="#6b7280" stroke-width="0.5" rx="0.5"/>
+                <circle cx="41" cy="19" r="0.3" fill="#d1d5db"/>
+                <circle cx="43" cy="19" r="0.3" fill="#d1d5db"/>
+                <circle cx="41" cy="21" r="0.3" fill="#d1d5db"/>
+                <circle cx="43" cy="21" r="0.3" fill="#d1d5db"/>
+                <circle cx="42" cy="20" r="0.3" fill="#d1d5db"/>
             </g>
 
-            <!-- Cajados -->
+            <!-- Cajados Aprimorados -->
             <g id="cajado-mago">
-                <rect x="30" y="8" width="4" height="48" fill="#92400e" stroke="#78350f" stroke-width="1"/>
-                <circle cx="32" cy="12" r="6" fill="#3b82f6" stroke="#1d4ed8" stroke-width="2"/>
-                <circle cx="32" cy="12" r="3" fill="#60a5fa"/>
-                <path d="M26 52 L32 60 L38 52" fill="#78350f"/>
+                <defs>
+                    <linearGradient id="staffWoodGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#a16207;stop-opacity:1" />
+                        <stop offset="50%" style="stop-color:#92400e;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#78350f;stop-opacity:1" />
+                    </linearGradient>
+                    <radialGradient id="wizardOrbGrad" cx="50%" cy="50%" r="50%">
+                        <stop offset="0%" style="stop-color:#93c5fd;stop-opacity:1" />
+                        <stop offset="30%" style="stop-color:#60a5fa;stop-opacity:1" />
+                        <stop offset="70%" style="stop-color:#3b82f6;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#1d4ed8;stop-opacity:1" />
+                    </radialGradient>
+                </defs>
+                <!-- Sombra do cajado -->
+                <rect x="31" y="9" width="4" height="48" fill="#451a03" opacity="0.3"/>
+                <!-- Haste do cajado com textura -->
+                <rect x="30" y="8" width="4" height="48" fill="url(#staffWoodGrad)" stroke="#78350f" stroke-width="1" rx="2"/>
+                <!-- Detalhes de madeira -->
+                <rect x="30.5" y="16" width="3" height="1" fill="#a16207" opacity="0.7"/>
+                <rect x="30.5" y="24" width="3" height="1" fill="#a16207" opacity="0.7"/>
+                <rect x="30.5" y="32" width="3" height="1" fill="#a16207" opacity="0.7"/>
+                <rect x="30.5" y="40" width="3" height="1" fill="#a16207" opacity="0.7"/>
+                <rect x="30.5" y="48" width="3" height="1" fill="#a16207" opacity="0.7"/>
+                <!-- Orbe mágico principal -->
+                <circle cx="32" cy="12" r="7" fill="url(#wizardOrbGrad)" stroke="#1d4ed8" stroke-width="2"/>
+                <circle cx="32" cy="12" r="4" fill="#60a5fa" opacity="0.8"/>
+                <circle cx="32" cy="10" r="2" fill="#93c5fd"/>
+                <circle cx="31" cy="9" r="1" fill="#dbeafe"/>
+                <!-- Runas mágicas ao redor -->
+                <g opacity="0.7">
+                    <text x="26" y="8" font-family="serif" font-size="4" fill="#3b82f6">✦</text>
+                    <text x="38" y="8" font-family="serif" font-size="4" fill="#3b82f6">✦</text>
+                    <text x="24" y="16" font-family="serif" font-size="3" fill="#60a5fa">◊</text>
+                    <text x="40" y="16" font-family="serif" font-size="3" fill="#60a5fa">◊</text>
+                </g>
+                <!-- Base do cajado -->
+                <path d="M26 52 L32 60 L38 52" fill="url(#staffWoodGrad)" stroke="#78350f" stroke-width="1"/>
+                <circle cx="32" cy="54" r="1" fill="#92400e"/>
             </g>
 
             <g id="cajado-esmeralda">
-                <rect x="30" y="8" width="4" height="48" fill="#065f46" stroke="#047857" stroke-width="1"/>
-                <polygon points="32,4 28,12 36,12" fill="#10b981" stroke="#059669" stroke-width="2"/>
-                <circle cx="32" cy="10" r="2" fill="#6ee7b7"/>
-                <path d="M26 52 L32 60 L38 52" fill="#065f46"/>
+                <defs>
+                    <linearGradient id="emeraldStaffGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#047857;stop-opacity:1" />
+                        <stop offset="50%" style="stop-color:#065f46;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#064e3b;stop-opacity:1" />
+                    </linearGradient>
+                    <linearGradient id="emeraldGemGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#6ee7b7;stop-opacity:1" />
+                        <stop offset="50%" style="stop-color:#10b981;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#059669;stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+                <!-- Sombra -->
+                <rect x="31" y="9" width="4" height="48" fill="#022c22" opacity="0.3"/>
+                <!-- Haste esmeralda -->
+                <rect x="30" y="8" width="4" height="48" fill="url(#emeraldStaffGrad)" stroke="#047857" stroke-width="1" rx="2"/>
+                <!-- Veios de esmeralda na haste -->
+                <line x1="31" y1="16" x2="31" y2="48" stroke="#10b981" stroke-width="0.5" opacity="0.7"/>
+                <line x1="33" y1="16" x2="33" y2="48" stroke="#10b981" stroke-width="0.5" opacity="0.7"/>
+                <!-- Gema esmeralda no topo -->
+                <polygon points="32,4 28,8 30,12 32,10 34,12 36,8" fill="url(#emeraldGemGrad)" stroke="#059669" stroke-width="1.5"/>
+                <!-- Facetas da gema -->
+                <polygon points="32,5 30,7 32,9 34,7" fill="#6ee7b7" opacity="0.8"/>
+                <polygon points="32,6 31,7 32,8 33,7" fill="#a7f3d0"/>
+                <!-- Cristais menores -->
+                <circle cx="29" cy="10" r="1.5" fill="#10b981" opacity="0.8"/>
+                <circle cx="35" cy="10" r="1.5" fill="#10b981" opacity="0.8"/>
+                <circle cx="32" cy="7" r="1" fill="#6ee7b7"/>
+                <!-- Partículas mágicas -->
+                <g opacity="0.6">
+                    <circle cx="26" cy="12" r="0.5" fill="#34d399"/>
+                    <circle cx="38" cy="14" r="0.3" fill="#34d399"/>
+                    <circle cx="28" cy="16" r="0.4" fill="#6ee7b7"/>
+                    <circle cx="36" cy="18" r="0.6" fill="#6ee7b7"/>
+                    <circle cx="24" cy="20" r="0.3" fill="#10b981"/>
+                    <circle cx="40" cy="22" r="0.4" fill="#10b981"/>
+                </g>
+                <!-- Base -->
+                <path d="M26 52 L32 60 L38 52" fill="url(#emeraldStaffGrad)" stroke="#047857" stroke-width="1"/>
+                <circle cx="32" cy="54" r="1" fill="#10b981"/>
             </g>
 
             <g id="tridente">
-                <rect x="30" y="16" width="4" height="44" fill="#92400e" stroke="#78350f" stroke-width="1"/>
-                <path d="M24 8 L28 16 L32 14 L36 16 L40 8" stroke="#6b7280" stroke-width="3" fill="none"/>
-                <circle cx="24" cy="8" r="2" fill="#ef4444"/>
-                <circle cx="32" cy="8" r="2" fill="#ef4444"/>
-                <circle cx="40" cy="8" r="2" fill="#ef4444"/>
-                <path d="M26 56 L32 64 L38 56" fill="#78350f"/>
+                <defs>
+                    <linearGradient id="tridentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#0ea5e9;stop-opacity:1" />
+                        <stop offset="50%" style="stop-color:#0284c7;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#0369a1;stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+                <!-- Sombra -->
+                <rect x="31" y="17" width="4" height="44" fill="#0c4a6e" opacity="0.3"/>
+                <!-- Haste aquática -->
+                <rect x="30" y="16" width="4" height="44" fill="url(#tridentGrad)" stroke="#0369a1" stroke-width="1" rx="2"/>
+                <!-- Detalhes aquáticos na haste -->
+                <g opacity="0.7">
+                    <ellipse cx="32" cy="24" rx="3" ry="1" fill="#38bdf8"/>
+                    <ellipse cx="32" cy="32" rx="3" ry="1" fill="#38bdf8"/>
+                    <ellipse cx="32" cy="40" rx="3" ry="1" fill="#38bdf8"/>
+                    <ellipse cx="32" cy="48" rx="3" ry="1" fill="#38bdf8"/>
+                </g>
+                <!-- Pontas do tridente -->
+                <!-- Ponta central -->
+                <polygon points="32,4 30,14 34,14" fill="url(#tridentGrad)" stroke="#0369a1" stroke-width="1"/>
+                <polygon points="32,6 31,12 33,12" fill="#7dd3fc"/>
+                <!-- Ponta esquerda -->
+                <polygon points="24,8 26,16 28,14" fill="url(#tridentGrad)" stroke="#0369a1" stroke-width="1"/>
+                <polygon points="24,9 26,14 27,13" fill="#7dd3fc" opacity="0.8"/>
+                <!-- Ponta direita -->
+                <polygon points="40,8 38,16 36,14" fill="url(#tridentGrad)" stroke="#0369a1" stroke-width="1"/>
+                <polygon points="40,9 38,14 37,13" fill="#7dd3fc" opacity="0.8"/>
+                <!-- Conectores -->
+                <line x1="28" y1="14" x2="30" y2="14" stroke="#0369a1" stroke-width="2"/>
+                <line x1="34" y1="14" x2="36" y2="14" stroke="#0369a1" stroke-width="2"/>
+                <!-- Efeitos aquáticos -->
+                <g opacity="0.5">
+                    <circle cx="24" cy="12" r="1" fill="#67e8f9"/>
+                    <circle cx="40" cy="12" r="1" fill="#67e8f9"/>
+                    <circle cx="32" cy="8" r="1" fill="#67e8f9"/>
+                    <circle cx="32" cy="6" r="0.5" fill="#a5f3fc"/>
+                </g>
+                <!-- Base -->
+                <path d="M26 56 L32 64 L38 56" fill="url(#tridentGrad)" stroke="#0369a1" stroke-width="1"/>
+                <circle cx="32" cy="58" r="1" fill="#38bdf8"/>
             </g>
 
             <g id="boomstaff">
-                <rect x="30" y="8" width="4" height="48" fill="#7c2d12" stroke="#92400e" stroke-width="1"/>
-                <circle cx="32" cy="12" r="8" fill="#dc2626" stroke="#b91c1c" stroke-width="2"/>
-                <circle cx="32" cy="12" r="4" fill="#fbbf24"/>
-                <rect x="28" y="8" width="8" height="4" fill="#374151"/>
-                <path d="M26 52 L32 60 L38 52" fill="#7c2d12"/>
+                <defs>
+                    <linearGradient id="boomStaffGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#dc2626;stop-opacity:1" />
+                        <stop offset="50%" style="stop-color:#b91c1c;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#7f1d1d;stop-opacity:1" />
+                    </linearGradient>
+                    <radialGradient id="explosiveOrbGrad" cx="50%" cy="50%" r="50%">
+                        <stop offset="0%" style="stop-color:#fde047;stop-opacity:1" />
+                        <stop offset="30%" style="stop-color:#fbbf24;stop-opacity:1" />
+                        <stop offset="70%" style="stop-color:#f59e0b;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#d97706;stop-opacity:1" />
+                    </radialGradient>
+                </defs>
+                <!-- Sombra -->
+                <rect x="31" y="9" width="4" height="48" fill="#450a0a" opacity="0.3"/>
+                <!-- Haste explosiva -->
+                <rect x="30" y="8" width="4" height="48" fill="url(#boomStaffGrad)" stroke="#92400e" stroke-width="1" rx="2"/>
+                <!-- Detalhes explosivos na haste -->
+                <g opacity="0.6">
+                    <rect x="29" y="20" width="6" height="2" fill="#f59e0b" rx="1"/>
+                    <rect x="29" y="28" width="6" height="2" fill="#f59e0b" rx="1"/>
+                    <rect x="29" y="36" width="6" height="2" fill="#f59e0b" rx="1"/>
+                    <rect x="29" y="44" width="6" height="2" fill="#f59e0b" rx="1"/>
+                </g>
+                <!-- Orbe explosivo principal -->
+                <circle cx="32" cy="12" r="9" fill="url(#explosiveOrbGrad)" stroke="#b91c1c" stroke-width="2"/>
+                <circle cx="32" cy="12" r="6" fill="#fbbf24" opacity="0.8"/>
+                <circle cx="32" cy="11" r="3" fill="#fde047"/>
+                <circle cx="31" cy="10" r="1.5" fill="#fef3c7"/>
+                <!-- Mecânica explosiva no topo -->
+                <rect x="28" y="6" width="8" height="6" fill="#374151" stroke="#1f2937" stroke-width="1" rx="1"/>
+                <rect x="29" y="7" width="6" height="4" fill="#4b5563" rx="0.5"/>
+                <!-- Botão detonador -->
+                <circle cx="32" cy="9" r="1.5" fill="#ef4444" stroke="#dc2626" stroke-width="0.5"/>
+                <circle cx="32" cy="9" r="0.8" fill="#fca5a5"/>
+                <!-- Luzes de aviso -->
+                <circle cx="29" cy="8" r="0.5" fill="#ef4444" opacity="0.8"/>
+                <circle cx="35" cy="8" r="0.5" fill="#ef4444" opacity="0.8"/>
+                <!-- Fagulhas -->
+                <g opacity="0.7">
+                    <circle cx="26" cy="10" r="0.3" fill="#fde047"/>
+                    <circle cx="38" cy="14" r="0.4" fill="#f59e0b"/>
+                    <circle cx="24" cy="16" r="0.2" fill="#fbbf24"/>
+                    <circle cx="40" cy="18" r="0.5" fill="#fde047"/>
+                    <circle cx="22" cy="20" r="0.3" fill="#f59e0b"/>
+                    <circle cx="42" cy="22" r="0.2" fill="#fbbf24"/>
+                </g>
+                <!-- Base -->
+                <path d="M26 52 L32 60 L38 52" fill="url(#boomStaffGrad)" stroke="#7c2d12" stroke-width="1"/>
+                <circle cx="32" cy="54" r="1" fill="#f59e0b"/>
             </g>
 
             <g id="cajado-trovao">
-                <rect x="30" y="8" width="4" height="48" fill="#1e40af" stroke="#1d4ed8" stroke-width="1"/>
-                <path d="M28 4 L36 12 L30 12 L34 20 L26 12 L32 12 Z" fill="#fbbf24" stroke="#f59e0b" stroke-width="1"/>
-                <circle cx="32" cy="12" r="2" fill="#ffffff"/>
-                <path d="M26 52 L32 60 L38 52" fill="#1e40af"/>
+                <defs>
+                    <linearGradient id="thunderStaffGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
+                        <stop offset="50%" style="stop-color:#1e40af;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#1e3a8a;stop-opacity:1" />
+                    </linearGradient>
+                    <linearGradient id="lightningGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#fef3c7;stop-opacity:1" />
+                        <stop offset="30%" style="stop-color:#fde047;stop-opacity:1" />
+                        <stop offset="70%" style="stop-color:#fbbf24;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#f59e0b;stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+                <!-- Sombra -->
+                <rect x="31" y="9" width="4" height="48" fill="#1e3a8a" opacity="0.3"/>
+                <!-- Haste elétrica -->
+                <rect x="30" y="8" width="4" height="48" fill="url(#thunderStaffGrad)" stroke="#1d4ed8" stroke-width="1" rx="2"/>
+                <!-- Circuitos elétricos -->
+                <g opacity="0.7">
+                    <line x1="29" y1="18" x2="35" y2="18" stroke="#60a5fa" stroke-width="0.5"/>
+                    <line x1="29" y1="26" x2="35" y2="26" stroke="#60a5fa" stroke-width="0.5"/>
+                    <line x1="29" y1="34" x2="35" y2="34" stroke="#60a5fa" stroke-width="0.5"/>
+                    <line x1="29" y1="42" x2="35" y2="42" stroke="#60a5fa" stroke-width="0.5"/>
+                    <circle cx="29" cy="18" r="1" fill="#93c5fd"/>
+                    <circle cx="35" cy="26" r="1" fill="#93c5fd"/>
+                    <circle cx="29" cy="34" r="1" fill="#93c5fd"/>
+                    <circle cx="35" cy="42" r="1" fill="#93c5fd"/>
+                </g>
+                <!-- Raio principal -->
+                <path d="M28 4 L36 12 L30 12 L34 20 L26 12 L32 12 Z" fill="url(#lightningGrad)" stroke="#f59e0b" stroke-width="1.5"/>
+                <!-- Detalhes do raio -->
+                <path d="M29 6 L34 10 L31 10 L33 16 L28 10 L31 10 Z" fill="#fef3c7" opacity="0.8"/>
+                <!-- Centro energético -->
+                <circle cx="32" cy="12" r="3" fill="#ffffff" opacity="0.9"/>
+                <circle cx="32" cy="12" r="2" fill="#fde047"/>
+                <circle cx="32" cy="11.5" r="1" fill="#fef3c7"/>
+                <!-- Descargas elétricas -->
+                <g opacity="0.6">
+                    <line x1="26" y1="8" x2="24" y2="6" stroke="#fbbf24" stroke-width="1"/>
+                    <line x1="38" y1="8" x2="40" y2="6" stroke="#fbbf24" stroke-width="1"/>
+                    <line x1="26" y1="16" x2="22" y2="14" stroke="#fbbf24" stroke-width="0.8"/>
+                    <line x1="38" y1="16" x2="42" y2="14" stroke="#fbbf24" stroke-width="0.8"/>
+                    <circle cx="24" cy="6" r="0.5" fill="#fde047"/>
+                    <circle cx="40" cy="6" r="0.5" fill="#fde047"/>
+                    <circle cx="22" cy="14" r="0.3" fill="#fbbf24"/>
+                    <circle cx="42" cy="14" r="0.3" fill="#fbbf24"/>
+                </g>
+                <!-- Base -->
+                <path d="M26 52 L32 60 L38 52" fill="url(#thunderStaffGrad)" stroke="#1e40af" stroke-width="1"/>
+                <circle cx="32" cy="54" r="1" fill="#60a5fa"/>
             </g>
 
             <g id="ponta-congelada">
-                <rect x="30" y="8" width="4" height="48" fill="#0f766e" stroke="#0d9488" stroke-width="1"/>
-                <path d="M32 4 L28 8 L30 12 L32 10 L34 12 L36 8 Z" fill="#06b6d4" stroke="#0891b2" stroke-width="1"/>
-                <circle cx="32" cy="8" r="3" fill="#67e8f9"/>
-                <circle cx="29" cy="10" r="1" fill="#ffffff"/>
-                <circle cx="35" cy="10" r="1" fill="#ffffff"/>
-                <path d="M26 52 L32 60 L38 52" fill="#0f766e"/>
+                <defs>
+                    <linearGradient id="iceStaffGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#22d3ee;stop-opacity:1" />
+                        <stop offset="50%" style="stop-color:#0891b2;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#0e7490;stop-opacity:1" />
+                    </linearGradient>
+                    <radialGradient id="iceGemGrad" cx="50%" cy="50%" r="50%">
+                        <stop offset="0%" style="stop-color:#cffafe;stop-opacity:1" />
+                        <stop offset="50%" style="stop-color:#67e8f9;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#06b6d4;stop-opacity:1" />
+                    </radialGradient>
+                </defs>
+                <!-- Sombra -->
+                <rect x="31" y="9" width="4" height="48" fill="#164e63" opacity="0.3"/>
+                <!-- Haste gelada -->
+                <rect x="30" y="8" width="4" height="48" fill="url(#iceStaffGrad)" stroke="#0d9488" stroke-width="1" rx="2"/>
+                <!-- Cristais de gelo na haste -->
+                <g opacity="0.7">
+                    <polygon points="29,20 31,18 33,20 31,22" fill="#a5f3fc"/>
+                    <polygon points="33,28 35,26 35,30 33,32" fill="#a5f3fc"/>
+                    <polygon points="29,36 31,34 33,36 31,38" fill="#a5f3fc"/>
+                    <polygon points="33,44 35,42 35,46 33,48" fill="#a5f3fc"/>
+                </g>
+                <!-- Cristal de gelo principal -->
+                <path d="M32 4 L28 8 L30 12 L32 10 L34 12 L36 8 Z" fill="url(#iceGemGrad)" stroke="#0891b2" stroke-width="1.5"/>
+                <!-- Facetas internas -->
+                <path d="M32 5 L29 8 L31 10 L32 9 L33 10 L35 8 Z" fill="#cffafe" opacity="0.8"/>
+                <path d="M32 6 L30 8 L32 9 L34 8 Z" fill="#ffffff" opacity="0.9"/>
+                <!-- Núcleo gelado -->
+                <circle cx="32" cy="8" r="3.5" fill="url(#iceGemGrad)" opacity="0.8"/>
+                <circle cx="32" cy="8" r="2" fill="#67e8f9"/>
+                <circle cx="32" cy="7.5" r="1" fill="#cffafe"/>
+                <!-- Cristais flutuantes -->
+                <circle cx="29" cy="10" r="1.5" fill="#67e8f9" opacity="0.8"/>
+                <circle cx="35" cy="10" r="1.5" fill="#67e8f9" opacity="0.8"/>
+                <polygon points="29,9 30,8 29,7 28,8" fill="#cffafe"/>
+                <polygon points="35,9 36,8 35,7 34,8" fill="#cffafe"/>
+                <!-- Partículas de neve -->
+                <g opacity="0.6">
+                    <circle cx="26" cy="12" r="0.3" fill="#ffffff"/>
+                    <circle cx="38" cy="14" r="0.4" fill="#ffffff"/>
+                    <circle cx="24" cy="16" r="0.2" fill="#cffafe"/>
+                    <circle cx="40" cy="18" r="0.5" fill="#ffffff"/>
+                    <circle cx="22" cy="20" r="0.3" fill="#cffafe"/>
+                    <circle cx="42" cy="22" r="0.2" fill="#ffffff"/>
+                    <polygon points="25,14 25.5,14.5 25,15 24.5,14.5" fill="#cffafe"/>
+                    <polygon points="39,16 39.5,16.5 39,17 38.5,16.5" fill="#cffafe"/>
+                </g>
+                <!-- Base -->
+                <path d="M26 52 L32 60 L38 52" fill="url(#iceStaffGrad)" stroke="#0f766e" stroke-width="1"/>
+                <circle cx="32" cy="54" r="1" fill="#67e8f9"/>
             </g>
 
             <g id="cajado-arco-iris">
-                <rect x="30" y="8" width="4" height="48" fill="#7c3aed" stroke="#8b5cf6" stroke-width="1"/>
-                <circle cx="32" cy="12" r="6" fill="#ef4444" stroke="#dc2626" stroke-width="1"/>
-                <circle cx="32" cy="12" r="4" fill="#f97316"/>
-                <circle cx="32" cy="12" r="2" fill="#eab308"/>
-                <circle cx="32" cy="11" r="1" fill="#22c55e"/>
-                <circle cx="32" cy="13" r="1" fill="#3b82f6"/>
-                <path d="M26 52 L32 60 L38 52" fill="#7c3aed"/>
+                <defs>
+                    <linearGradient id="rainbowStaffGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#fbbf24;stop-opacity:1" />
+                        <stop offset="16%" style="stop-color:#f59e0b;stop-opacity:1" />
+                        <stop offset="33%" style="stop-color:#ef4444;stop-opacity:1" />
+                        <stop offset="50%" style="stop-color:#8b5cf6;stop-opacity:1" />
+                        <stop offset="66%" style="stop-color:#3b82f6;stop-opacity:1" />
+                        <stop offset="83%" style="stop-color:#10b981;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#22c55e;stop-opacity:1" />
+                    </linearGradient>
+                    <linearGradient id="rainbowHandleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#a855f7;stop-opacity:1" />
+                        <stop offset="50%" style="stop-color:#7c3aed;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#5b21b6;stop-opacity:1" />
+                    </linearGradient>
+                    <radialGradient id="rainbowOrbGrad" cx="50%" cy="50%" r="50%">
+                        <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+                        <stop offset="20%" style="stop-color:#fde047;stop-opacity:1" />
+                        <stop offset="40%" style="stop-color:#f97316;stop-opacity:1" />
+                        <stop offset="60%" style="stop-color:#ef4444;stop-opacity:1" />
+                        <stop offset="80%" style="stop-color:#8b5cf6;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#3b82f6;stop-opacity:1" />
+                    </radialGradient>
+                    <linearGradient id="rainbowSpiralGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#ef4444;stop-opacity:0.8" />
+                        <stop offset="25%" style="stop-color:#f97316;stop-opacity:0.8" />
+                        <stop offset="50%" style="stop-color:#22c55e;stop-opacity:0.8" />
+                        <stop offset="75%" style="stop-color:#3b82f6;stop-opacity:0.8" />
+                        <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:0.8" />
+                    </linearGradient>
+                </defs>
+                <!-- Sombra mágica -->
+                <rect x="31" y="9" width="4" height="48" fill="#581c87" opacity="0.4"/>
+                <circle cx="33" cy="13" r="10" fill="#1e1b4b" opacity="0.3"/>
+                
+                <!-- Haste cristalina com cores do arco-íris -->
+                <rect x="30" y="8" width="4" height="48" fill="url(#rainbowHandleGrad)" stroke="#4c1d95" stroke-width="1" rx="2"/>
+                
+                <!-- Segmentos coloridos na haste -->
+                <rect x="29" y="16" width="6" height="4" fill="#ef4444" opacity="0.6" rx="1"/>
+                <rect x="29" y="22" width="6" height="4" fill="#f97316" opacity="0.6" rx="1"/>
+                <rect x="29" y="28" width="6" height="4" fill="#eab308" opacity="0.6" rx="1"/>
+                <rect x="29" y="34" width="6" height="4" fill="#22c55e" opacity="0.6" rx="1"/>
+                <rect x="29" y="40" width="6" height="4" fill="#3b82f6" opacity="0.6" rx="1"/>
+                <rect x="29" y="46" width="6" height="4" fill="#8b5cf6" opacity="0.6" rx="1"/>
+                
+                <!-- Orbe principal do arco-íris -->
+                <circle cx="32" cy="12" r="11" fill="url(#rainbowOrbGrad)" stroke="#fbbf24" stroke-width="2"/>
+                <circle cx="32" cy="12" r="8" fill="url(#rainbowSpiralGrad)" opacity="0.9"/>
+                <circle cx="32" cy="12" r="5" fill="#ffffff" opacity="0.9"/>
+                <circle cx="32" cy="11" r="2" fill="#fde047"/>
+                
+                <!-- Cristais arco-íris flutuantes -->
+                <g opacity="0.8">
+                    <polygon points="22,8 24,10 22,12 20,10" fill="#ef4444"/>
+                    <polygon points="42,8 44,10 42,12 40,10" fill="#f97316"/>
+                    <polygon points="18,14 20,16 18,18 16,16" fill="#eab308"/>
+                    <polygon points="46,14 48,16 46,18 44,16" fill="#22c55e"/>
+                    <polygon points="20,20 22,22 20,24 18,22" fill="#3b82f6"/>
+                    <polygon points="44,20 46,22 44,24 42,22" fill="#8b5cf6"/>
+                </g>
+                
+                <!-- Espiral mágica ao redor do orbe -->
+                <g opacity="0.7">
+                    <circle cx="32" cy="12" r="14" fill="none" stroke="url(#rainbowStaffGrad)" stroke-width="1.5" stroke-dasharray="2,2"/>
+                    <circle cx="32" cy="12" r="16" fill="none" stroke="url(#rainbowStaffGrad)" stroke-width="1" stroke-dasharray="3,3" opacity="0.6"/>
+                    <circle cx="32" cy="12" r="18" fill="none" stroke="url(#rainbowStaffGrad)" stroke-width="0.5" stroke-dasharray="4,4" opacity="0.4"/>
+                </g>
+                
+                <!-- Anéis mágicos coloridos -->
+                <g transform="rotate(15 32 12)" opacity="0.6">
+                    <ellipse cx="32" cy="4" rx="20" ry="4" fill="none" stroke="#ef4444" stroke-width="1.5" opacity="0.7"/>
+                    <ellipse cx="32" cy="20" rx="20" ry="4" fill="none" stroke="#3b82f6" stroke-width="1.5" opacity="0.7"/>
+                </g>
+                <g transform="rotate(-15 32 12)" opacity="0.6">
+                    <ellipse cx="12" cy="12" rx="4" ry="16" fill="none" stroke="#22c55e" stroke-width="1.5" opacity="0.7"/>
+                    <ellipse cx="52" cy="12" rx="4" ry="16" fill="none" stroke="#8b5cf6" stroke-width="1.5" opacity="0.7"/>
+                </g>
+                
+                <!-- Pontos de luz mágica flutuantes -->
+                <g opacity="0.8">
+                    <circle cx="26" cy="6" r="1" fill="#fde047"/>
+                    <circle cx="38" cy="6" r="0.8" fill="#ef4444"/>
+                    <circle cx="24" cy="18" r="1.2" fill="#22c55e"/>
+                    <circle cx="40" cy="18" r="0.6" fill="#3b82f6"/>
+                    <circle cx="22" cy="12" r="0.7" fill="#f97316"/>
+                    <circle cx="42" cy="12" r="1.1" fill="#8b5cf6"/>
+                    <circle cx="26" cy="24" r="0.5" fill="#eab308"/>
+                    <circle cx="38" cy="24" r="0.9" fill="#10b981"/>
+                </g>
+                
+                <!-- Trilhos de energia colorida -->
+                <g opacity="0.5">
+                    <line x1="32" y1="23" x2="28" y2="30" stroke="#ef4444" stroke-width="2" stroke-linecap="round"/>
+                    <line x1="32" y1="23" x2="36" y2="30" stroke="#3b82f6" stroke-width="2" stroke-linecap="round"/>
+                    <line x1="32" y1="23" x2="32" y2="35" stroke="#22c55e" stroke-width="2" stroke-linecap="round"/>
+                    <line x1="32" y1="23" x2="25" y2="28" stroke="#f97316" stroke-width="1.5" stroke-linecap="round"/>
+                    <line x1="32" y1="23" x2="39" y2="28" stroke="#8b5cf6" stroke-width="1.5" stroke-linecap="round"/>
+                </g>
+                
+                <!-- Runas místicas do arco-íris -->
+                <g opacity="0.7" font-family="serif" font-size="3">
+                    <text x="28" y="3" fill="#ef4444">✦</text>
+                    <text x="36" y="3" fill="#f97316">✧</text>
+                    <text x="22" y="10" fill="#eab308">◈</text>
+                    <text x="42" y="10" fill="#22c55e">◇</text>
+                    <text x="26" y="26" fill="#3b82f6">✧</text>
+                    <text x="38" y="26" fill="#8b5cf6">✦</text>
+                </g>
+                
+                <!-- Base com cristal arco-íris -->
+                <path d="M26 52 L32 60 L38 52" fill="url(#rainbowHandleGrad)" stroke="#4c1d95" stroke-width="1"/>
+                <polygon points="32,54 30,56 32,58 34,56" fill="url(#rainbowOrbGrad)" stroke="#fbbf24" stroke-width="0.5"/>
+                <circle cx="32" cy="56" r="1.5" fill="#fde047"/>
             </g>
 
             <!-- Cards/Upgrade Icons -->
@@ -1115,15 +1663,30 @@
         </div>
 
         <!-- Menu principal -->
-        <div id="mainMenu" class="menu">
-            <div class="menu-content">
-                <h1>SERAPH'S LAST STAND</h1>
+        <div id="mainMenu" class="main-menu">
+            <div class="menu-container">
+                <h1 class="game-title">SERAPH'S LAST STAND</h1>
+                <div class="game-subtitle">Wizard's Final Battle</div>
                 <div class="menu-buttons">
-                    <button class="menu-btn" id="startGameBtn">NOVO JOGO</button>
-                    <button class="menu-btn" id="loadGameBtn">CARREGAR JOGO</button>
-                    <button class="menu-btn" id="shopBtn">LOJA</button>
-                    <button class="menu-btn" id="rankingBtn">RANKING</button>
-                    <button class="menu-btn" id="settingsBtn">CONFIGURAÇÕES</button>
+                    <button class="menu-btn start-game" id="startGameBtn">🎮 Novo Jogo</button>
+                    <button class="menu-btn start-game" id="loadGameBtn">💾 Carregar Jogo</button>
+                    <button class="menu-btn shop" id="shopBtn">🛒 Loja</button>
+                    <button class="menu-btn ranking" id="rankingBtn">🏆 Ranking</button>
+                    <button class="menu-btn settings" id="settingsBtn">⚙️ Configurações</button>
+                </div>
+                <div class="menu-stats">
+                    <div class="stat-item">
+                        <div class="stat-label">Soul Orbs</div>
+                        <div class="stat-value" id="menuSoulOrbs">0</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Melhor Score</div>
+                        <div class="stat-value" id="menuBestScore">0</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Jogadas</div>
+                        <div class="stat-value" id="menuGamesPlayed">0</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1318,6 +1881,170 @@
                 ctx.strokeStyle = color;
                 ctx.lineWidth = width;
                 ctx.stroke();
+            },
+
+            // Desenhar projétil mágico aprimorado
+            drawMagicalProjectile(ctx, x, y, radius, color, type = 'basic') {
+                const time = Date.now() * 0.005;
+                ctx.save();
+                
+                switch(type) {
+                    case 'basic':
+                        // Núcleo brilhante
+                        const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius * 2);
+                        gradient.addColorStop(0, color);
+                        gradient.addColorStop(0.4, color + '80');
+                        gradient.addColorStop(1, color + '00');
+                        
+                        ctx.fillStyle = gradient;
+                        ctx.beginPath();
+                        ctx.arc(x, y, radius * 2, 0, Math.PI * 2);
+                        ctx.fill();
+                        
+                        // Núcleo sólido
+                        ctx.fillStyle = color;
+                        ctx.beginPath();
+                        ctx.arc(x, y, radius * 0.6, 0, Math.PI * 2);
+                        ctx.fill();
+                        
+                        // Brilho central
+                        ctx.fillStyle = '#ffffff80';
+                        ctx.beginPath();
+                        ctx.arc(x - radius * 0.2, y - radius * 0.2, radius * 0.3, 0, Math.PI * 2);
+                        ctx.fill();
+                        break;
+                        
+                    case 'homing':
+                        // Projétil teleguiado com trilha
+                        const trailGrad = ctx.createLinearGradient(x - radius, y, x + radius, y);
+                        trailGrad.addColorStop(0, '#10b98100');
+                        trailGrad.addColorStop(0.5, '#10b981');
+                        trailGrad.addColorStop(1, '#10b98100');
+                        
+                        ctx.fillStyle = trailGrad;
+                        ctx.fillRect(x - radius * 2, y - radius * 0.3, radius * 4, radius * 0.6);
+                        
+                        // Núcleo esmeralda
+                        ctx.fillStyle = '#10b981';
+                        ctx.beginPath();
+                        ctx.arc(x, y, radius, 0, Math.PI * 2);
+                        ctx.fill();
+                        
+                        // Brilho esmeralda
+                        ctx.fillStyle = '#6ee7b780';
+                        ctx.beginPath();
+                        ctx.arc(x, y, radius * 1.5, 0, Math.PI * 2);
+                        ctx.fill();
+                        break;
+                        
+                    case 'explosive':
+                        // Projétil explosivo com faíscas
+                        ctx.fillStyle = '#f59e0b';
+                        ctx.beginPath();
+                        ctx.arc(x, y, radius, 0, Math.PI * 2);
+                        ctx.fill();
+                        
+                        // Faíscas rotativas
+                        for (let i = 0; i < 6; i++) {
+                            const angle = (i * Math.PI / 3) + time;
+                            const sparkX = x + Math.cos(angle) * radius * 1.8;
+                            const sparkY = y + Math.sin(angle) * radius * 1.8;
+                            
+                            ctx.fillStyle = '#fde047';
+                            ctx.beginPath();
+                            ctx.arc(sparkX, sparkY, radius * 0.3, 0, Math.PI * 2);
+                            ctx.fill();
+                        }
+                        
+                        // Núcleo quente
+                        ctx.fillStyle = '#fef3c7';
+                        ctx.beginPath();
+                        ctx.arc(x, y, radius * 0.5, 0, Math.PI * 2);
+                        ctx.fill();
+                        break;
+                        
+                    case 'lightning':
+                        // Projétil elétrico
+                        ctx.strokeStyle = '#fbbf24';
+                        ctx.lineWidth = radius * 0.5;
+                        ctx.lineCap = 'round';
+                        
+                        // Raios aleatórios
+                        for (let i = 0; i < 4; i++) {
+                            const angle = (i * Math.PI / 2) + time * 2;
+                            const length = radius * (1.5 + Math.sin(time * 5 + i) * 0.5);
+                            
+                            ctx.beginPath();
+                            ctx.moveTo(x, y);
+                            ctx.lineTo(x + Math.cos(angle) * length, y + Math.sin(angle) * length);
+                            ctx.stroke();
+                        }
+                        
+                        // Núcleo elétrico
+                        ctx.fillStyle = '#fef3c7';
+                        ctx.beginPath();
+                        ctx.arc(x, y, radius * 0.8, 0, Math.PI * 2);
+                        ctx.fill();
+                        break;
+                        
+                    case 'piercing':
+                        // Projétil perfurante
+                        ctx.fillStyle = '#67e8f9';
+                        ctx.beginPath();
+                        ctx.arc(x, y, radius, 0, Math.PI * 2);
+                        ctx.fill();
+                        
+                        // Trilha de gelo
+                        const iceGrad = ctx.createLinearGradient(x - radius * 3, y, x, y);
+                        iceGrad.addColorStop(0, '#cffafe00');
+                        iceGrad.addColorStop(1, '#67e8f980');
+                        
+                        ctx.fillStyle = iceGrad;
+                        ctx.fillRect(x - radius * 3, y - radius * 0.5, radius * 3, radius);
+                        
+                        // Cristais de gelo
+                        for (let i = 0; i < 3; i++) {
+                            const offset = (i - 1) * radius * 0.8;
+                            ctx.fillStyle = '#ffffff';
+                            ctx.fillRect(x + offset - 1, y - radius * 0.3, 2, radius * 0.6);
+                            ctx.fillRect(x + offset - radius * 0.3, y - 1, radius * 0.6, 2);
+                        }
+                        break;
+                        
+                    case 'random':
+                        // Projétil arco-íris
+                        const rainbowGrad = ctx.createRadialGradient(x, y, 0, x, y, radius * 2);
+                        const hue = (time * 100) % 360;
+                        rainbowGrad.addColorStop(0, `hsl(${hue}, 100%, 70%)`);
+                        rainbowGrad.addColorStop(0.5, `hsl(${(hue + 60) % 360}, 100%, 60%)`);
+                        rainbowGrad.addColorStop(1, `hsl(${(hue + 120) % 360}, 100%, 50%)`);
+                        
+                        ctx.fillStyle = rainbowGrad;
+                        ctx.beginPath();
+                        ctx.arc(x, y, radius * 1.5, 0, Math.PI * 2);
+                        ctx.fill();
+                        
+                        // Partículas arco-íris
+                        for (let i = 0; i < 8; i++) {
+                            const angle = (i * Math.PI / 4) + time;
+                            const sparkX = x + Math.cos(angle) * radius * 2;
+                            const sparkY = y + Math.sin(angle) * radius * 2;
+                            
+                            ctx.fillStyle = `hsl(${(hue + i * 45) % 360}, 100%, 80%)`;
+                            ctx.beginPath();
+                            ctx.arc(sparkX, sparkY, radius * 0.2, 0, Math.PI * 2);
+                            ctx.fill();
+                        }
+                        
+                        // Núcleo branco
+                        ctx.fillStyle = '#ffffff';
+                        ctx.beginPath();
+                        ctx.arc(x, y, radius * 0.4, 0, Math.PI * 2);
+                        ctx.fill();
+                        break;
+                }
+                
+                ctx.restore();
             },
 
             // Desenhar texto
@@ -3477,6 +4204,7 @@
                 this.updateInvulnerability(deltaTime);
                 this.updateCardEffects(deltaTime, enemies, canvas);
                 this.updateCastingParticles(deltaTime); // Atualizar partículas mágicas
+                this.updateLevelUpParticles(deltaTime); // Atualizar partículas de level up
 
                 // Manter dentro do canvas horizontalmente
                 this.constrainToCanvas(canvas);
@@ -3646,6 +4374,20 @@
 
             shootAt(targetX, targetY) {
                 const angle = Math.atan2(targetY - this.y, targetX - this.x);
+                
+                // Determinar tipo de projétil baseado no padrão de tiro
+                let projectileType = 'basic';
+                if (this.shootingPattern) {
+                    switch(this.shootingPattern) {
+                        case 'homing': projectileType = 'homing'; break;
+                        case 'explosive': projectileType = 'explosive'; break;
+                        case 'lightning': projectileType = 'lightning'; break;
+                        case 'piercing': projectileType = 'piercing'; break;
+                        case 'random': projectileType = 'random'; break;
+                        default: projectileType = 'basic'; break;
+                    }
+                }
+                
                 const projectile = {
                     x: this.x,
                     y: this.y - this.size / 2, // sair do centro do player
@@ -3655,7 +4397,8 @@
                     damage: this.calculateDamage(),
                     lifetime: 3000, // 3 segundos
                     createdAt: Date.now(),
-                    color: this.color
+                    color: this.color,
+                    type: projectileType
                 };
 
                 this.projectiles.push(projectile);
@@ -3723,21 +4466,81 @@
             renderCastingParticles(ctx) {
                 if (!this.castingParticles) return;
                 
+                ctx.save();
+                
                 this.castingParticles.forEach(particle => {
                     ctx.globalAlpha = particle.alpha;
+                    
+                    // Criar efeito de brilho mágico
+                    const gradient = ctx.createRadialGradient(
+                        particle.x, particle.y, 0,
+                        particle.x, particle.y, particle.size * 3
+                    );
+                    
+                    // Converter cor para formato que aceita alpha
+                    const baseColor = particle.color;
+                    let colorWithAlpha50, colorWithAlpha0;
+                    
+                    if (baseColor.startsWith('hsl')) {
+                        // Para cores HSL, converter para hsla
+                        const hslMatch = baseColor.match(/hsl\(([^)]+)\)/);
+                        if (hslMatch) {
+                            colorWithAlpha50 = `hsla(${hslMatch[1]}, 0.5)`;
+                            colorWithAlpha0 = `hsla(${hslMatch[1]}, 0)`;
+                        } else {
+                            colorWithAlpha50 = 'rgba(102, 204, 255, 0.5)';
+                            colorWithAlpha0 = 'rgba(102, 204, 255, 0)';
+                        }
+                    } else if (baseColor.startsWith('#')) {
+                        // Para cores hex, adicionar alpha
+                        colorWithAlpha50 = baseColor + '80';
+                        colorWithAlpha0 = baseColor + '00';
+                    } else {
+                        // Fallback para cores nomeadas
+                        colorWithAlpha50 = 'rgba(102, 204, 255, 0.5)';
+                        colorWithAlpha0 = 'rgba(102, 204, 255, 0)';
+                    }
+                    
+                    gradient.addColorStop(0, baseColor);
+                    gradient.addColorStop(0.5, colorWithAlpha50);
+                    gradient.addColorStop(1, colorWithAlpha0);
+                    
+                    // Brilho externo
+                    ctx.fillStyle = gradient;
+                    ctx.beginPath();
+                    ctx.arc(particle.x, particle.y, particle.size * 3, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    // Núcleo da partícula
                     ctx.fillStyle = particle.color;
                     ctx.beginPath();
                     ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
                     ctx.fill();
                     
-                    // Brilho adicional
-                    ctx.fillStyle = `rgba(255, 255, 255, ${particle.alpha * 0.5})`;
+                    // Brilho central
+                    ctx.fillStyle = `rgba(255, 255, 255, ${particle.alpha * 0.8})`;
                     ctx.beginPath();
-                    ctx.arc(particle.x, particle.y, particle.size * 0.5, 0, Math.PI * 2);
+                    ctx.arc(particle.x - particle.size * 0.2, particle.y - particle.size * 0.2, particle.size * 0.4, 0, Math.PI * 2);
                     ctx.fill();
+                    
+                    // Efeito de trilha cintilante
+                    if (particle.alpha > 0.5) {
+                        for (let i = 1; i <= 3; i++) {
+                            const trailX = particle.x - particle.vx * 0.01 * i;
+                            const trailY = particle.y - particle.vy * 0.01 * i;
+                            const trailAlpha = particle.alpha * (1 - i * 0.3);
+                            const trailSize = particle.size * (1 - i * 0.2);
+                            
+                            ctx.globalAlpha = trailAlpha;
+                            ctx.fillStyle = particle.color;
+                            ctx.beginPath();
+                            ctx.arc(trailX, trailY, trailSize, 0, Math.PI * 2);
+                            ctx.fill();
+                        }
+                    }
                 });
                 
-                ctx.globalAlpha = 1.0;
+                ctx.restore();
             }
 
             // Métodos para controle de mira
@@ -3781,7 +4584,175 @@
                 // Curar um pouco ao subir de nível
                 this.hp = Math.min(this.maxHp, this.hp + Math.floor(this.maxHp * 0.1));
 
+                // Criar efeito visual de level up
+                this.createLevelUpEffect();
+
                 this.emit('levelUp', this.level);
+            }
+            
+            createLevelUpEffect() {
+                if (!this.levelUpParticles) {
+                    this.levelUpParticles = [];
+                }
+                
+                // Criar partículas douradas em círculo
+                const particleCount = 20;
+                for (let i = 0; i < particleCount; i++) {
+                    const angle = (i * Math.PI * 2) / particleCount;
+                    const speed = 150 + Math.random() * 100;
+                    const lifetime = 1500 + Math.random() * 500;
+                    
+                    const particle = {
+                        x: this.x,
+                        y: this.y,
+                        vx: Math.cos(angle) * speed,
+                        vy: Math.sin(angle) * speed - 100, // Impulso para cima
+                        size: 3 + Math.random() * 3,
+                        color: `hsl(${45 + Math.random() * 30}, 90%, ${70 + Math.random() * 20}%)`,
+                        alpha: 1.0,
+                        lifetime: lifetime,
+                        maxLifetime: lifetime,
+                        createdAt: Date.now(),
+                        type: 'levelUp'
+                    };
+                    
+                    this.levelUpParticles.push(particle);
+                }
+                
+                // Adicionar algumas estrelas especiais
+                for (let i = 0; i < 5; i++) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const distance = 20 + Math.random() * 30;
+                    const particle = {
+                        x: this.x + Math.cos(angle) * distance,
+                        y: this.y + Math.sin(angle) * distance,
+                        vx: 0,
+                        vy: -50 - Math.random() * 50,
+                        size: 4 + Math.random() * 4,
+                        color: `hsl(${Math.random() * 60}, 100%, 85%)`,
+                        alpha: 1.0,
+                        lifetime: 2000,
+                        maxLifetime: 2000,
+                        createdAt: Date.now(),
+                        type: 'star'
+                    };
+                    
+                    this.levelUpParticles.push(particle);
+                }
+            }
+            
+            updateLevelUpParticles(deltaTime) {
+                if (!this.levelUpParticles) return;
+                
+                const dt = deltaTime / 1000;
+                const now = Date.now();
+                
+                this.levelUpParticles = this.levelUpParticles.filter(particle => {
+                    // Atualizar posição
+                    particle.x += particle.vx * dt;
+                    particle.y += particle.vy * dt;
+                    
+                    // Aplicar gravidade leve
+                    particle.vy += 50 * dt;
+                    
+                    // Aplicar fricção
+                    particle.vx *= 0.98;
+                    particle.vy *= 0.98;
+                    
+                    // Fade out baseado no tempo de vida
+                    const age = now - particle.createdAt;
+                    particle.alpha = Math.max(0, 1 - (age / particle.lifetime));
+                    
+                    // Remover se expirou
+                    return age < particle.lifetime;
+                });
+            }
+            
+            renderLevelUpParticles(ctx) {
+                if (!this.levelUpParticles) return;
+                
+                ctx.save();
+                
+                this.levelUpParticles.forEach(particle => {
+                    ctx.globalAlpha = particle.alpha;
+                    
+                    // Helper function to convert color to RGBA with alpha
+                    const getColorWithAlpha = (color, alpha) => {
+                        if (color.startsWith('hsl(')) {
+                            // Convert HSL to HSLA by replacing the closing parenthesis
+                            return color.replace(')', `, ${alpha})`).replace('hsl(', 'hsla(');
+                        } else if (color.startsWith('rgb(')) {
+                            // Convert RGB to RGBA
+                            return color.replace(')', `, ${alpha})`).replace('rgb(', 'rgba(');
+                        } else if (color.startsWith('#')) {
+                            // Convert hex to rgba (simplified)
+                            return `rgba(255, 255, 255, ${alpha})`; // Fallback to white
+                        } else {
+                            // Already has alpha or is a named color
+                            return color;
+                        }
+                    };
+                    
+                    if (particle.type === 'star') {
+                        // Desenhar estrela
+                        ctx.fillStyle = particle.color;
+                        ctx.beginPath();
+                        
+                        const spikes = 5;
+                        const outerRadius = particle.size;
+                        const innerRadius = outerRadius * 0.4;
+                        
+                        for (let i = 0; i < spikes * 2; i++) {
+                            const angle = (i * Math.PI) / spikes;
+                            const radius = i % 2 === 0 ? outerRadius : innerRadius;
+                            const x = particle.x + Math.cos(angle) * radius;
+                            const y = particle.y + Math.sin(angle) * radius;
+                            
+                            if (i === 0) {
+                                ctx.moveTo(x, y);
+                            } else {
+                                ctx.lineTo(x, y);
+                            }
+                        }
+                        ctx.closePath();
+                        ctx.fill();
+                        
+                        // Brilho da estrela
+                        const gradient = ctx.createRadialGradient(
+                            particle.x, particle.y, 0,
+                            particle.x, particle.y, outerRadius * 3
+                        );
+                        gradient.addColorStop(0, getColorWithAlpha(particle.color, 0.6));
+                        gradient.addColorStop(1, getColorWithAlpha(particle.color, 0));
+                        
+                        ctx.fillStyle = gradient;
+                        ctx.beginPath();
+                        ctx.arc(particle.x, particle.y, outerRadius * 3, 0, Math.PI * 2);
+                        ctx.fill();
+                    } else {
+                        // Partícula normal com brilho
+                        const gradient = ctx.createRadialGradient(
+                            particle.x, particle.y, 0,
+                            particle.x, particle.y, particle.size * 3
+                        );
+                        gradient.addColorStop(0, particle.color);
+                        gradient.addColorStop(0.5, getColorWithAlpha(particle.color, 0.5));
+                        gradient.addColorStop(1, getColorWithAlpha(particle.color, 0));
+                        
+                        ctx.fillStyle = gradient;
+                        ctx.beginPath();
+                        ctx.arc(particle.x, particle.y, particle.size * 3, 0, Math.PI * 2);
+                        ctx.fill();
+                        
+                        // Núcleo da partícula
+                        ctx.fillStyle = particle.color;
+                        ctx.beginPath();
+                        ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                });
+                
+                ctx.restore();
             }
 
             // Calcular dano com chance de crítico
@@ -4002,6 +4973,9 @@
                 
                 // Desenhar partículas mágicas
                 this.renderCastingParticles(ctx);
+                
+                // Desenhar partículas de level up
+                this.renderLevelUpParticles(ctx);
             }
 
             renderBody(ctx) {
@@ -5355,7 +6329,7 @@
 
             renderProjectiles(ctx) {
                 for (let projectile of this.projectiles) {
-                    CanvasUtils.drawCircle(ctx, projectile.x, projectile.y, projectile.size, projectile.color);
+                    CanvasUtils.drawMagicalProjectile(ctx, projectile.x, projectile.y, projectile.size, projectile.color, projectile.type || 'basic');
                 }
             }
 
@@ -5380,9 +6354,82 @@
                 const alpha = 1 - progress;
                 const scale = 1 + progress * 2;
 
+                ctx.save();
                 ctx.globalAlpha = alpha;
-                CanvasUtils.drawCircle(ctx, this.x, this.y, this.size * scale, this.color);
-                ctx.globalAlpha = 1.0;
+                
+                // Explosão principal
+                const explosionGradient = ctx.createRadialGradient(
+                    this.x, this.y, 0,
+                    this.x, this.y, this.size * scale * 3
+                );
+                explosionGradient.addColorStop(0, `rgba(255, 255, 255, ${alpha})`);
+                explosionGradient.addColorStop(0.3, `rgba(255, 200, 100, ${alpha * 0.8})`);
+                explosionGradient.addColorStop(0.6, `rgba(255, 100, 100, ${alpha * 0.6})`);
+                explosionGradient.addColorStop(1, `rgba(255, 50, 50, 0)`);
+                
+                ctx.fillStyle = explosionGradient;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size * scale * 3, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Fragmentos voadores
+                const fragmentCount = 12;
+                for (let i = 0; i < fragmentCount; i++) {
+                    const angle = (i * Math.PI * 2) / fragmentCount;
+                    const distance = this.size * progress * 3;
+                    const fragX = this.x + Math.cos(angle) * distance;
+                    const fragY = this.y + Math.sin(angle) * distance;
+                    const fragSize = this.size * 0.3 * (1 - progress);
+                    
+                    // Gradiente para cada fragmento
+                    const fragGradient = ctx.createRadialGradient(
+                        fragX, fragY, 0,
+                        fragX, fragY, fragSize * 2
+                    );
+                    fragGradient.addColorStop(0, this.color);
+                    fragGradient.addColorStop(1, this.color + '00');
+                    
+                    ctx.fillStyle = fragGradient;
+                    ctx.beginPath();
+                    ctx.arc(fragX, fragY, fragSize, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                
+                // Faíscas brilhantes
+                const sparkCount = 20;
+                for (let i = 0; i < sparkCount; i++) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const distance = this.size * progress * (2 + Math.random() * 2);
+                    const sparkX = this.x + Math.cos(angle) * distance;
+                    const sparkY = this.y + Math.sin(angle) * distance;
+                    const sparkSize = (1 - progress) * (1 + Math.random() * 2);
+                    
+                    ctx.fillStyle = `rgba(255, 255, 200, ${alpha * (0.5 + Math.random() * 0.5)})`;
+                    ctx.beginPath();
+                    ctx.arc(sparkX, sparkY, sparkSize, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    // Trilha da faísca
+                    if (progress > 0.3) {
+                        ctx.strokeStyle = `rgba(255, 200, 100, ${alpha * 0.3})`;
+                        ctx.lineWidth = sparkSize * 0.5;
+                        ctx.beginPath();
+                        ctx.moveTo(this.x, this.y);
+                        ctx.lineTo(sparkX, sparkY);
+                        ctx.stroke();
+                    }
+                }
+                
+                // Núcleo residual
+                if (progress < 0.7) {
+                    ctx.fillStyle = this.color;
+                    ctx.globalAlpha = alpha * 1.5;
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size * (1 - progress * 0.5), 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                
+                ctx.restore();
             }
         }
 
@@ -5581,9 +6628,9 @@
                     enemy.render(ctx);
                 }
 
-                // Renderizar projéteis inimigos
+                // Renderizar projéteis inimigos com efeitos mágicos
                 for (let projectile of this.enemyProjectiles) {
-                    CanvasUtils.drawCircle(ctx, projectile.x, projectile.y, projectile.size, projectile.color);
+                    CanvasUtils.drawMagicalProjectile(ctx, projectile.x, projectile.y, projectile.size, projectile.color, 'basic');
                 }
             }
 
@@ -8399,66 +9446,421 @@
                 }
             }
 
-            // Renderizar HUD diretamente no canvas
-            renderHUD(ctx, player) {
+            // Renderizar HUD diretamente no canvas com visual aprimorado
+            renderHUD(ctx, player, gameInstance = null) {
                 if (!player) return;
 
-                const margin = 20;
-                const barWidth = 200;
-                const barHeight = 20;
-                const spacing = 5;
+                const time = Date.now() * 0.001;
+                const margin = 25;
+                const barWidth = 250;
+                const barHeight = 30;
+                const spacing = 15;
+                const cornerRadius = 15;
 
-                // Barra de HP
+                // Configurar sombra para todo o HUD
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+                ctx.shadowBlur = 10;
+                ctx.shadowOffsetX = 2;
+                ctx.shadowOffsetY = 2;
+
+                // ====== BARRA DE HP ======
                 const hpX = margin;
                 const hpY = margin;
-
-                // Background da barra de HP
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-                ctx.fillRect(hpX - 2, hpY - 2, barWidth + 4, barHeight + 4);
-
-                // Fundo da barra
-                ctx.fillStyle = 'rgba(60, 60, 60, 0.8)';
-                ctx.fillRect(hpX, hpY, barWidth, barHeight);
-
-                // Preenchimento da barra de HP
                 const hpPercent = player.hp / player.maxHp;
                 const hpFillWidth = barWidth * hpPercent;
-                const hpColor = hpPercent > 0.6 ? '#4CAF50' : hpPercent > 0.3 ? '#FF9800' : '#F44336';
 
-                ctx.fillStyle = hpColor;
-                ctx.fillRect(hpX, hpY, hpFillWidth, barHeight);
+                // Container principal da barra de HP
+                this.drawRoundedRect(ctx, hpX - 3, hpY - 3, barWidth + 6, barHeight + 6, cornerRadius + 3);
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+                ctx.fill();
 
-                // Texto da HP
+                // Fundo da barra com gradiente
+                this.drawRoundedRect(ctx, hpX, hpY, barWidth, barHeight, cornerRadius);
+                const bgGradient = ctx.createLinearGradient(hpX, hpY, hpX, hpY + barHeight);
+                bgGradient.addColorStop(0, 'rgba(40, 40, 40, 0.9)');
+                bgGradient.addColorStop(0.5, 'rgba(60, 60, 60, 0.9)');
+                bgGradient.addColorStop(1, 'rgba(30, 30, 30, 0.9)');
+                ctx.fillStyle = bgGradient;
+                ctx.fill();
+
+                // Preenchimento da barra de HP com gradiente animado
+                if (hpFillWidth > 0) {
+                    this.drawRoundedRect(ctx, hpX, hpY, hpFillWidth, barHeight, cornerRadius);
+                    
+                    const hpGradient = ctx.createLinearGradient(hpX, hpY, hpX, hpY + barHeight);
+                    if (hpPercent > 0.6) {
+                        // Verde saudável
+                        hpGradient.addColorStop(0, '#66ff66');
+                        hpGradient.addColorStop(0.5, '#44cc44');
+                        hpGradient.addColorStop(1, '#22aa22');
+                    } else if (hpPercent > 0.3) {
+                        // Amarelo/laranja de alerta
+                        hpGradient.addColorStop(0, '#ffcc33');
+                        hpGradient.addColorStop(0.5, '#ff9900');
+                        hpGradient.addColorStop(1, '#cc6600');
+                    } else {
+                        // Vermelho crítico
+                        hpGradient.addColorStop(0, '#ff6666');
+                        hpGradient.addColorStop(0.5, '#ff3333');
+                        hpGradient.addColorStop(1, '#cc0000');
+                    }
+                    ctx.fillStyle = hpGradient;
+                    ctx.fill();
+
+                    // Efeito de brilho pulsante se HP baixo
+                    if (hpPercent <= 0.3) {
+                        const pulse = Math.sin(time * 8) * 0.5 + 0.5;
+                        ctx.globalAlpha = 0.3 + pulse * 0.4;
+                        ctx.fillStyle = '#ff0000';
+                        ctx.fill();
+                        ctx.globalAlpha = 1;
+                    }
+
+                    // Efeito de luz no topo da barra
+                    const lightGradient = ctx.createLinearGradient(hpX, hpY, hpX, hpY + barHeight * 0.3);
+                    lightGradient.addColorStop(0, 'rgba(255, 255, 255, 0.6)');
+                    lightGradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+                    ctx.fillStyle = lightGradient;
+                    ctx.fill();
+                }
+
+                // Borda da barra de HP
+                this.drawRoundedRect(ctx, hpX, hpY, barWidth, barHeight, cornerRadius);
+                ctx.strokeStyle = 'rgba(200, 200, 200, 0.8)';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                // Ícone de coração para HP
+                this.drawHeartIcon(ctx, hpX - 25, hpY + barHeight / 2 - 8, 16);
+
+                // Texto da HP com sombra
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+                ctx.shadowBlur = 3;
                 ctx.fillStyle = '#ffffff';
-                ctx.font = '14px Arial';
+                ctx.font = 'bold 16px Arial';
                 ctx.textAlign = 'center';
-                ctx.fillText(`HP: ${player.hp}/${player.maxHp}`, hpX + barWidth / 2, hpY + barHeight / 2 + 5);
+                ctx.fillText(`${player.hp} / ${player.maxHp}`, hpX + barWidth / 2, hpY + barHeight / 2 + 6);
 
-                // Barra de EXP
+                // ====== BARRA DE EXP ======
                 const expX = margin;
                 const expY = hpY + barHeight + spacing;
-
-                // Background da barra de EXP
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-                ctx.fillRect(expX - 2, expY - 2, barWidth + 4, barHeight + 4);
-
-                // Fundo da barra
-                ctx.fillStyle = 'rgba(60, 60, 60, 0.8)';
-                ctx.fillRect(expX, expY, barWidth, barHeight);
-
-                // Preenchimento da barra de EXP
                 const expPercent = player.exp / player.expToNext;
                 const expFillWidth = barWidth * expPercent;
 
-                ctx.fillStyle = '#66ccff';
-                ctx.fillRect(expX, expY, expFillWidth, barHeight);
+                // Container principal da barra de EXP
+                this.drawRoundedRect(ctx, expX - 3, expY - 3, barWidth + 6, barHeight + 6, cornerRadius + 3);
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+                ctx.fill();
+
+                // Fundo da barra com gradiente
+                this.drawRoundedRect(ctx, expX, expY, barWidth, barHeight, cornerRadius);
+                const expBgGradient = ctx.createLinearGradient(expX, expY, expX, expY + barHeight);
+                expBgGradient.addColorStop(0, 'rgba(20, 20, 60, 0.9)');
+                expBgGradient.addColorStop(0.5, 'rgba(30, 30, 80, 0.9)');
+                expBgGradient.addColorStop(1, 'rgba(15, 15, 50, 0.9)');
+                ctx.fillStyle = expBgGradient;
+                ctx.fill();
+
+                // Preenchimento da barra de EXP com gradiente animado
+                if (expFillWidth > 0) {
+                    this.drawRoundedRect(ctx, expX, expY, expFillWidth, barHeight, cornerRadius);
+                    
+                    const expGradient = ctx.createLinearGradient(expX, expY, expX, expY + barHeight);
+                    expGradient.addColorStop(0, '#66ddff');
+                    expGradient.addColorStop(0.5, '#3399cc');
+                    expGradient.addColorStop(1, '#006699');
+                    ctx.fillStyle = expGradient;
+                    ctx.fill();
+
+                    // Efeito de animação na barra de EXP
+                    const shimmer = Math.sin(time * 3) * 0.3 + 0.7;
+                    ctx.globalAlpha = shimmer;
+                    const shimmerGradient = ctx.createLinearGradient(expX, expY, expX + expFillWidth, expY);
+                    shimmerGradient.addColorStop(0, 'rgba(255, 255, 255, 0)');
+                    shimmerGradient.addColorStop(0.5, 'rgba(255, 255, 255, 0.3)');
+                    shimmerGradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+                    ctx.fillStyle = shimmerGradient;
+                    ctx.fill();
+                    ctx.globalAlpha = 1;
+
+                    // Efeito de luz no topo da barra
+                    const expLightGradient = ctx.createLinearGradient(expX, expY, expX, expY + barHeight * 0.3);
+                    expLightGradient.addColorStop(0, 'rgba(255, 255, 255, 0.5)');
+                    expLightGradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+                    ctx.fillStyle = expLightGradient;
+                    ctx.fill();
+                }
+
+                // Borda da barra de EXP
+                this.drawRoundedRect(ctx, expX, expY, barWidth, barHeight, cornerRadius);
+                ctx.strokeStyle = 'rgba(100, 180, 255, 0.8)';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                // Ícone de estrela para EXP
+                this.drawStarIcon(ctx, expX - 25, expY + barHeight / 2 - 8, 16);
+
+                // Texto do level em destaque
+                ctx.fillStyle = '#ffdd44';
+                ctx.font = 'bold 18px Arial';
+                ctx.textAlign = 'left';
+                ctx.fillText(`LVL ${player.level}`, expX + 10, expY + barHeight / 2 + 6);
 
                 // Texto da EXP
                 ctx.fillStyle = '#ffffff';
-                ctx.fillText(`LVL ${player.level} - EXP: ${player.exp}/${player.expToNext}`, expX + barWidth / 2, expY + barHeight / 2 + 5);
+                ctx.font = 'bold 14px Arial';
+                ctx.textAlign = 'right';
+                ctx.fillText(`${player.exp} / ${player.expToNext}`, expX + barWidth - 10, expY + barHeight / 2 + 5);
 
-                // Reset text align
+                // ====== INFORMAÇÕES ADICIONAIS (Direita) ======
+                const infoX = ctx.canvas.width - 280;
+                const infoY = margin;
+                const infoSpacing = 35;
+                const infoBoxWidth = 250;
+                const infoBoxHeight = 25;
+
+                // Soul Orbs
+                const soulOrbY = infoY;
+                this.drawInfoBox(ctx, infoX, soulOrbY, infoBoxWidth, infoBoxHeight, '#663399', '#9966cc');
+                this.drawSoulOrbIcon(ctx, infoX + 10, soulOrbY + infoBoxHeight / 2 - 8, 16);
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 16px Arial';
                 ctx.textAlign = 'left';
+                ctx.fillText(`Soul Orbs: ${player.soulOrbs || 0}`, infoX + 35, soulOrbY + infoBoxHeight / 2 + 6);
+
+                // Tempo de Jogo
+                const timeY = soulOrbY + infoSpacing;
+                const gameTime = gameInstance ? gameInstance.gameTime : 0;
+                const minutes = Math.floor(gameTime / 60000);
+                const seconds = Math.floor((gameTime % 60000) / 1000);
+                const timeText = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                
+                this.drawInfoBox(ctx, infoX, timeY, infoBoxWidth, infoBoxHeight, '#336633', '#66cc66');
+                this.drawClockIcon(ctx, infoX + 10, timeY + infoBoxHeight / 2 - 8, 16);
+                ctx.fillStyle = '#ffffff';
+                ctx.fillText(`Time: ${timeText}`, infoX + 35, timeY + infoBoxHeight / 2 + 6);
+
+                // Onda Atual
+                const waveY = timeY + infoSpacing;
+                const currentWave = (gameInstance && gameInstance.enemySpawner) ? gameInstance.enemySpawner.currentWave : 1;
+                
+                this.drawInfoBox(ctx, infoX, waveY, infoBoxWidth, infoBoxHeight, '#cc3333', '#ff6666');
+                this.drawWaveIcon(ctx, infoX + 10, waveY + infoBoxHeight / 2 - 8, 16);
+                ctx.fillStyle = '#ffffff';
+                ctx.fillText(`Wave: ${currentWave}`, infoX + 35, waveY + infoBoxHeight / 2 + 6);
+
+                // Resetar configurações
+                ctx.shadowColor = 'transparent';
+                ctx.shadowBlur = 0;
+                ctx.shadowOffsetX = 0;
+                ctx.shadowOffsetY = 0;
+                ctx.textAlign = 'left';
+                ctx.globalAlpha = 1;
+            }
+
+            // Método auxiliar para desenhar caixas de informação
+            drawInfoBox(ctx, x, y, width, height, darkColor, lightColor) {
+                const cornerRadius = 12;
+                
+                // Container com sombra
+                this.drawRoundedRect(ctx, x - 2, y - 2, width + 4, height + 4, cornerRadius + 2);
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+                ctx.fill();
+                
+                // Fundo com gradiente
+                this.drawRoundedRect(ctx, x, y, width, height, cornerRadius);
+                const gradient = ctx.createLinearGradient(x, y, x, y + height);
+                gradient.addColorStop(0, lightColor);
+                gradient.addColorStop(0.5, darkColor);
+                gradient.addColorStop(1, darkColor);
+                ctx.fillStyle = gradient;
+                ctx.fill();
+                
+                // Borda
+                this.drawRoundedRect(ctx, x, y, width, height, cornerRadius);
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+                
+                // Efeito de luz no topo
+                const lightGradient = ctx.createLinearGradient(x, y, x, y + height * 0.3);
+                lightGradient.addColorStop(0, 'rgba(255, 255, 255, 0.4)');
+                lightGradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+                ctx.fillStyle = lightGradient;
+                ctx.fill();
+            }
+
+            // Método auxiliar para desenhar retângulos com bordas arredondadas
+            drawRoundedRect(ctx, x, y, width, height, radius) {
+                ctx.beginPath();
+                ctx.moveTo(x + radius, y);
+                ctx.lineTo(x + width - radius, y);
+                ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+                ctx.lineTo(x + width, y + height - radius);
+                ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+                ctx.lineTo(x + radius, y + height);
+                ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+                ctx.lineTo(x, y + radius);
+                ctx.quadraticCurveTo(x, y, x + radius, y);
+                ctx.closePath();
+            }
+
+            // Ícone de coração para HP
+            drawHeartIcon(ctx, x, y, size) {
+                ctx.save();
+                ctx.fillStyle = '#ff4444';
+                
+                const scale = size / 16;
+                ctx.translate(x, y);
+                ctx.scale(scale, scale);
+                
+                ctx.beginPath();
+                ctx.moveTo(8, 16);
+                ctx.bezierCurveTo(8, 16, 0, 8, 0, 4);
+                ctx.bezierCurveTo(0, 0, 4, 0, 8, 4);
+                ctx.bezierCurveTo(12, 0, 16, 0, 16, 4);
+                ctx.bezierCurveTo(16, 8, 8, 16, 8, 16);
+                ctx.fill();
+                
+                // Brilho no coração
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+                ctx.beginPath();
+                ctx.moveTo(6, 6);
+                ctx.bezierCurveTo(4, 4, 2, 4, 2, 6);
+                ctx.bezierCurveTo(2, 8, 6, 12, 6, 12);
+                ctx.fill();
+                
+                ctx.restore();
+            }
+
+            // Ícone de estrela para EXP
+            drawStarIcon(ctx, x, y, size) {
+                ctx.save();
+                ctx.fillStyle = '#ffdd44';
+                
+                const scale = size / 16;
+                ctx.translate(x + size/2, y + size/2);
+                ctx.scale(scale, scale);
+                
+                ctx.beginPath();
+                for (let i = 0; i < 5; i++) {
+                    const angle = (i * 144 - 90) * Math.PI / 180;
+                    const outerRadius = 8;
+                    const innerRadius = 3;
+                    
+                    const outerX = Math.cos(angle) * outerRadius;
+                    const outerY = Math.sin(angle) * outerRadius;
+                    
+                    const innerAngle = angle + (72 * Math.PI / 180);
+                    const innerX = Math.cos(innerAngle) * innerRadius;
+                    const innerY = Math.sin(innerAngle) * innerRadius;
+                    
+                    if (i === 0) {
+                        ctx.moveTo(outerX, outerY);
+                    } else {
+                        ctx.lineTo(outerX, outerY);
+                    }
+                    ctx.lineTo(innerX, innerY);
+                }
+                ctx.closePath();
+                ctx.fill();
+                
+                // Brilho na estrela
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+                ctx.beginPath();
+                ctx.moveTo(0, -6);
+                ctx.lineTo(-2, -2);
+                ctx.lineTo(-6, -2);
+                ctx.lineTo(-3, 1);
+                ctx.lineTo(-4, 5);
+                ctx.lineTo(0, 3);
+                ctx.fill();
+                
+                ctx.restore();
+            }
+
+            // Ícone de Soul Orb
+            drawSoulOrbIcon(ctx, x, y, size) {
+                ctx.save();
+                const scale = size / 16;
+                ctx.translate(x + size/2, y + size/2);
+                ctx.scale(scale, scale);
+                
+                // Orbe principal
+                const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, 8);
+                gradient.addColorStop(0, '#bb88ff');
+                gradient.addColorStop(0.7, '#7755cc');
+                gradient.addColorStop(1, '#443388');
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(0, 0, 8, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Brilho
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+                ctx.beginPath();
+                ctx.arc(-3, -3, 3, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.restore();
+            }
+
+            // Ícone de relógio
+            drawClockIcon(ctx, x, y, size) {
+                ctx.save();
+                const scale = size / 16;
+                ctx.translate(x + size/2, y + size/2);
+                ctx.scale(scale, scale);
+                
+                // Corpo do relógio
+                ctx.fillStyle = '#666666';
+                ctx.beginPath();
+                ctx.arc(0, 0, 8, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Borda
+                ctx.strokeStyle = '#cccccc';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+                
+                // Ponteiros
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.lineTo(0, -5); // Ponteiro das horas
+                ctx.moveTo(0, 0);
+                ctx.lineTo(3, -3); // Ponteiro dos minutos
+                ctx.stroke();
+                
+                ctx.restore();
+            }
+
+            // Ícone de onda
+            drawWaveIcon(ctx, x, y, size) {
+                ctx.save();
+                const scale = size / 16;
+                ctx.translate(x + size/2, y + size/2);
+                ctx.scale(scale, scale);
+                
+                // Ondas
+                ctx.strokeStyle = '#ff6666';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                
+                // Primeira onda
+                ctx.moveTo(-8, 0);
+                ctx.quadraticCurveTo(-4, -4, 0, 0);
+                ctx.quadraticCurveTo(4, 4, 8, 0);
+                
+                // Segunda onda
+                ctx.moveTo(-8, 3);
+                ctx.quadraticCurveTo(-4, -1, 0, 3);
+                ctx.quadraticCurveTo(4, 7, 8, 3);
+                
+                ctx.stroke();
+                
+                ctx.restore();
             }
 
             // Criar modal base
@@ -9394,6 +10796,22 @@
                     return;
                 }
 
+                // Garantir que equipamentos padrão apareçam como equipados
+                if (!playerData.equippedEquipment.hats) {
+                    playerData.equippedEquipment.hats = 'wizardHat';
+                }
+                if (!playerData.equippedEquipment.staffs) {
+                    playerData.equippedEquipment.staffs = 'wizardStaff';
+                }
+
+                // Garantir que equipamentos padrão apareçam como possuídos
+                if (!playerData.ownedEquipment.hats.includes('wizardHat')) {
+                    playerData.ownedEquipment.hats.push('wizardHat');
+                }
+                if (!playerData.ownedEquipment.staffs.includes('wizardStaff')) {
+                    playerData.ownedEquipment.staffs.push('wizardStaff');
+                }
+
                 // CSS para a loja PRIMEIRO
                 this.addShopStyles();
 
@@ -9642,13 +11060,18 @@
             }
 
             setupShopControls(playerData, equipmentData) {
+                console.log('setupShopControls chamado com:', { playerData, equipmentData }); // Debug
+                
                 // Controle das abas
                 const tabButtons = document.querySelectorAll('.shop-tab');
                 const tabContents = document.querySelectorAll('.shop-tab-content');
 
+                console.log('Configurando', tabButtons.length, 'botões de aba'); // Debug
+                
                 tabButtons.forEach(button => {
                     button.addEventListener('click', () => {
                         const tabId = button.dataset.tab;
+                        console.log('Aba clicada:', tabId); // Debug
 
                         // Remover classe active de todas as abas
                         tabButtons.forEach(btn => btn.classList.remove('active'));
@@ -9662,11 +11085,15 @@
 
                 // Controles de compra e equipar
                 const equipmentButtons = document.querySelectorAll('.equipment-btn');
+                console.log('Configurando', equipmentButtons.length, 'botões de equipamento'); // Debug
+                
                 equipmentButtons.forEach(button => {
                     button.addEventListener('click', (e) => {
                         const action = e.target.dataset.action;
                         const type = e.target.dataset.type;
                         const itemId = e.target.dataset.id;
+
+                        console.log('Botão de equipamento clicado:', { action, type, itemId }); // Debug
 
                         if (action === 'buy') {
                             this.emit('buyEquipment', { type, itemId });
@@ -9677,19 +11104,29 @@
                 });
 
                 // Botão fechar
-                document.getElementById('closeShopBtn').addEventListener('click', () => {
-                    this.closeModal('shop-modal');
-                });
+                const closeBtn = document.getElementById('closeShopBtn');
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', () => {
+                        console.log('Botão fechar loja clicado'); // Debug
+                        this.closeModal('shop-modal');
+                    });
+                }
             }
 
             // Atualizar loja após compra ou equipar
             updateShop(playerData, equipmentData) {
+                console.log('updateShop chamado com:', { playerData, equipmentData }); // Debug
+                
                 const shopModal = document.getElementById('shop-modal');
-                if (!shopModal) return;
+                if (!shopModal) {
+                    console.log('shopModal não encontrado'); // Debug
+                    return;
+                }
 
                 // Atualizar contador de Soul Orbs
                 const soulOrbsCount = shopModal.querySelector('.soul-orbs-count');
                 if (soulOrbsCount) {
+                    console.log('Atualizando Soul Orbs de', soulOrbsCount.textContent, 'para', playerData.soulOrbs); // Debug
                     soulOrbsCount.textContent = playerData.soulOrbs || 0;
                 }
 
@@ -9698,17 +11135,59 @@
                 const staffsTab = document.getElementById('staffs-tab');
 
                 if (hatsTab) {
+                    console.log('Atualizando aba de chapéus'); // Debug
                     hatsTab.innerHTML = '';
                     hatsTab.appendChild(this.createEquipmentGrid('hats', equipmentData.hats, playerData));
                 }
 
                 if (staffsTab) {
+                    console.log('Atualizando aba de cajados'); // Debug
                     staffsTab.innerHTML = '';
                     staffsTab.appendChild(this.createEquipmentGrid('staffs', equipmentData.staffs, playerData));
                 }
 
                 // Reconfigurar event listeners
+                console.log('Reconfigurando event listeners da loja'); // Debug
                 this.setupShopControls(playerData, equipmentData);
+            }
+
+            // Método para atualizar a loja dinamicamente após compra/equipar
+            updateShopDisplay() {
+                // Verificar se a loja está aberta
+                const shopModal = document.getElementById('shop-modal');
+                if (!shopModal) return;
+
+                // Obter player do game instance global
+                if (!window.game || !window.game.player) {
+                    console.warn('Game ou player não existe durante updateShopDisplay');
+                    return;
+                }
+                
+                const player = window.game.player;
+
+                // Garantir estruturas de equipamentos do player
+                if (!player.ownedEquipment) {
+                    player.ownedEquipment = { hats: ['wizardHat'], staffs: ['wizardStaff'] };
+                }
+                if (!player.equippedEquipment) {
+                    player.equippedEquipment = { hats: 'wizardHat', staffs: 'wizardStaff' };
+                }
+
+                // Preparar dados atualizados do player
+                const playerData = {
+                    soulOrbs: player.soulOrbs || 0,
+                    ownedEquipment: player.ownedEquipment,
+                    equippedEquipment: player.equippedEquipment
+                };
+
+                // Obter dados dos equipamentos
+                const equipmentData = {
+                    hats: HAT_DEFINITIONS,
+                    staffs: STAFF_DEFINITIONS
+                };
+
+                // Chamar o método updateShop existente
+                this.updateShop(playerData, equipmentData);
             }
 
             // Adicionar estilos da loja
@@ -11390,9 +12869,9 @@
             }
 
             setupUI() {
-                this.ui.on('hpUpdate', (hp, maxHp) => {
-                    this.updateHPBar(hp, maxHp);
-                });
+                // this.ui.on('hpUpdate', (hp, maxHp) => {
+                //     this.updateHPBar(hp, maxHp);
+                // });
 
                 this.ui.on('soulOrbsUpdate', (count) => {
                     this.updateSoulOrbsDisplay(count);
@@ -11417,15 +12896,30 @@
 
                 // Event listeners para loja - CONSOLIDADO (remove duplicação)
                 this.ui.on('buyItem', (data) => {
-                    this.buyItem(data.type, data.itemId);
+                    console.log('Event buyItem recebido:', data); // Debug
+                    const success = this.buyItem(data.type, data.itemId);
+                    if (success) {
+                        console.log('Compra bem-sucedida, atualizando loja'); // Debug
+                        this.ui.updateShopDisplay();
+                    }
                 });
 
                 this.ui.on('buyEquipment', (data) => {
-                    this.buyItem(data.type, data.itemId);
+                    console.log('Event buyEquipment recebido:', data); // Debug
+                    const success = this.buyItem(data.type, data.itemId);
+                    if (success) {
+                        console.log('Compra de equipamento bem-sucedida, atualizando loja'); // Debug
+                        this.ui.updateShopDisplay();
+                    }
                 });
 
                 this.ui.on('equipItem', (data) => {
-                    this.equipItem(data.type, data.itemId);
+                    console.log('Event equipItem recebido:', data); // Debug
+                    const success = this.equipItem(data);
+                    if (success) {
+                        console.log('Equipamento bem-sucedido, atualizando loja'); // Debug
+                        this.ui.updateShopDisplay();
+                    }
                 });
 
                 // Event listeners para configurações
@@ -11548,9 +13042,8 @@
             initializeShop() {
                 console.log('Inicializando sistema de loja');
 
-                // Event listeners para ações da loja
-                this.ui.on('buyEquipment', (data) => this.buyEquipment(data));
-                this.ui.on('equipItem', (data) => this.equipItem(data));
+                // Event listeners para ações da loja são configurados em setupUI()
+                // Não duplicar aqui para evitar conflitos
 
                 // Inicializar player com equipamentos básicos se não existir
                 if (!this.player) {
@@ -11575,6 +13068,13 @@
 
             // Equipment and shop methods
             buyItem(type, itemId) {
+                console.log('buyItem chamado:', { type, itemId }); // Debug
+                console.log('Estado do player antes da compra:', {
+                    soulOrbs: this.player?.soulOrbs,
+                    ownedEquipment: this.player?.ownedEquipment,
+                    equippedEquipment: this.player?.equippedEquipment
+                }); // Debug
+                
                 if (!this.player) {
                     console.error('Player not found');
                     this.ui.showNotification('Player não encontrado!', 'error', 2000);
@@ -11590,12 +13090,14 @@
 
                 // Check if player has enough soul orbs
                 if (this.player.soulOrbs < equipment.cost) {
+                    console.log('Soul Orbs insuficientes:', this.player.soulOrbs, '<', equipment.cost); // Debug
                     this.ui.showNotification('Soul Orbs insuficientes!', 'error', 2000);
                     return false;
                 }
 
                 // Check if player already owns this equipment
                 if (this.player.ownedEquipment[type] && this.player.ownedEquipment[type].includes(itemId)) {
+                    console.log('Player já possui este item:', itemId); // Debug
                     this.ui.showNotification('Você já possui este item!', 'error', 2000);
                     return false;
                 }
@@ -11607,6 +13109,12 @@
                 }
                 this.player.ownedEquipment[type].push(itemId);
 
+                console.log('Estado do player após a compra:', {
+                    soulOrbs: this.player.soulOrbs,
+                    ownedEquipment: this.player.ownedEquipment,
+                    equippedEquipment: this.player.equippedEquipment
+                }); // Debug
+
                 this.ui.showNotification(`${equipment.name} comprado com sucesso!`, 'success', 2000);
                 this.saveGame();
                 return true;
@@ -11614,6 +13122,12 @@
 
             equipItem(data) {
                 const { type, itemId } = data;
+
+                console.log('equipItem chamado:', { type, itemId }); // Debug
+                console.log('Estado do player antes de equipar:', {
+                    ownedEquipment: this.player?.ownedEquipment,
+                    equippedEquipment: this.player?.equippedEquipment
+                }); // Debug
 
                 if (!this.player) {
                     console.error('Player not found');
@@ -11623,6 +13137,7 @@
 
                 // Check if player owns the item
                 if (!this.player.ownedEquipment[type] || !this.player.ownedEquipment[type].includes(itemId)) {
+                    console.log('Player não possui este item:', itemId, 'em', this.player.ownedEquipment[type]); // Debug
                     this.ui.showNotification('Você não possui este item!', 'error', 2000);
                     return false;
                 }
@@ -11632,6 +13147,11 @@
                     this.player.equippedEquipment = {};
                 }
                 this.player.equippedEquipment[type] = itemId;
+
+                console.log('Estado do player após equipar:', {
+                    ownedEquipment: this.player.ownedEquipment,
+                    equippedEquipment: this.player.equippedEquipment
+                }); // Debug
 
                 // Update player sprites if method exists
                 if (this.player.updateEquipmentSprites) {
@@ -11712,6 +13232,34 @@
             // Método para mostrar loja - UNIFICADO
             showShop() {
                 console.log('Mostrando loja - usando modal moderno...');
+
+                // Garantir que o player existe e tem equipamentos iniciais configurados
+                if (!this.player) {
+                    // Criar player temporário apenas para a loja
+                    this.player = new Player(400, 300);
+                }
+
+                // Garantir que o player tem estruturas de equipamentos
+                if (!this.player.ownedEquipment) {
+                    this.player.ownedEquipment = { hats: [], staffs: [] };
+                }
+                if (!this.player.equippedEquipment) {
+                    this.player.equippedEquipment = { hats: null, staffs: null };
+                }
+
+                // Garantir que equipamentos padrão estão configurados
+                if (!this.player.ownedEquipment.hats.includes('wizardHat')) {
+                    this.player.ownedEquipment.hats.push('wizardHat');
+                }
+                if (!this.player.ownedEquipment.staffs.includes('wizardStaff')) {
+                    this.player.ownedEquipment.staffs.push('wizardStaff');
+                }
+                if (!this.player.equippedEquipment.hats) {
+                    this.player.equippedEquipment.hats = 'wizardHat';
+                }
+                if (!this.player.equippedEquipment.staffs) {
+                    this.player.equippedEquipment.staffs = 'wizardStaff';
+                }
 
                 // Verificar se devemos usar o sistema modal moderno ou menus estáticos
                 if (this.ui && this.ui.showShopModal && this.player) {
@@ -11921,7 +13469,7 @@
 
                 // Renderizar HUD
                 if (this.player) {
-                    this.ui.renderHUD(this.ctx, this.player);
+                    this.ui.renderHUD(this.ctx, this.player, this);
                 }
 
                 // Renderizar menu de upgrade se estiver aberto
@@ -12053,19 +13601,76 @@
                     const intensity = (Math.sin(time + i) + 1) * 0.5;
                     const alpha = intensity * (0.3 + waveCount * 0.02);
                     
-                    // Cor muda com as ondas
-                    const hue = (180 + waveCount * 20 + i * 10) % 360;
+                    // Cor muda com as ondas - mais variedade
+                    const hue = (180 + waveCount * 20 + i * 15 + time * 10) % 360;
+                    const baseSize = 1 + intensity * 2;
                     
-                    this.ctx.fillStyle = `hsla(${hue}, 70%, 60%, ${alpha})`;
+                    // Criar gradiente radial para cada partícula
+                    const gradient = this.ctx.createRadialGradient(x, y, 0, x, y, baseSize * 4);
+                    gradient.addColorStop(0, `hsla(${hue}, 80%, 70%, ${alpha})`);
+                    gradient.addColorStop(0.5, `hsla(${hue}, 70%, 60%, ${alpha * 0.6})`);
+                    gradient.addColorStop(1, `hsla(${hue}, 60%, 50%, 0)`);
+                    
+                    // Partícula principal com brilho
+                    this.ctx.fillStyle = gradient;
                     this.ctx.beginPath();
-                    this.ctx.arc(x, y, 1 + intensity * 2, 0, Math.PI * 2);
+                    this.ctx.arc(x, y, baseSize * 4, 0, Math.PI * 2);
                     this.ctx.fill();
                     
-                    // Brilho adicional para partículas brilhantes
+                    // Núcleo brilhante
+                    this.ctx.fillStyle = `hsla(${hue}, 70%, 60%, ${alpha})`;
+                    this.ctx.beginPath();
+                    this.ctx.arc(x, y, baseSize, 0, Math.PI * 2);
+                    this.ctx.fill();
+                    
+                    // Brilho central
+                    this.ctx.fillStyle = `hsla(${hue}, 50%, 90%, ${alpha * 0.8})`;
+                    this.ctx.beginPath();
+                    this.ctx.arc(x - baseSize * 0.3, y - baseSize * 0.3, baseSize * 0.5, 0, Math.PI * 2);
+                    this.ctx.fill();
+                    
+                    // Para partículas especialmente brilhantes, adicionar efeitos extras
                     if (intensity > 0.8) {
-                        this.ctx.fillStyle = `hsla(${hue}, 70%, 80%, ${alpha * 0.5})`;
+                        // Raios de luz
+                        this.ctx.strokeStyle = `hsla(${hue}, 80%, 70%, ${alpha * 0.4})`;
+                        this.ctx.lineWidth = 1;
                         this.ctx.beginPath();
-                        this.ctx.arc(x, y, 3 + intensity * 2, 0, Math.PI * 2);
+                        
+                        for (let ray = 0; ray < 6; ray++) {
+                            const angle = (ray * Math.PI / 3) + time + i;
+                            const rayLength = baseSize * (3 + Math.sin(time * 2 + i) * 2);
+                            const startX = x + Math.cos(angle) * baseSize;
+                            const startY = y + Math.sin(angle) * baseSize;
+                            const endX = x + Math.cos(angle) * rayLength;
+                            const endY = y + Math.sin(angle) * rayLength;
+                            
+                            this.ctx.moveTo(startX, startY);
+                            this.ctx.lineTo(endX, endY);
+                        }
+                        this.ctx.stroke();
+                        
+                        // Halo externo pulsante
+                        const pulseSize = baseSize * (4 + Math.sin(time * 3 + i) * 2);
+                        const pulseGradient = this.ctx.createRadialGradient(x, y, 0, x, y, pulseSize);
+                        pulseGradient.addColorStop(0, `hsla(${hue}, 60%, 80%, 0)`);
+                        pulseGradient.addColorStop(0.7, `hsla(${hue}, 70%, 70%, ${alpha * 0.1})`);
+                        pulseGradient.addColorStop(1, `hsla(${hue}, 80%, 60%, 0)`);
+                        
+                        this.ctx.fillStyle = pulseGradient;
+                        this.ctx.beginPath();
+                        this.ctx.arc(x, y, pulseSize, 0, Math.PI * 2);
+                        this.ctx.fill();
+                    }
+                    
+                    // Partículas cintilantes menores
+                    if (i % 3 === 0) {
+                        const sparkleX = x + Math.sin(time * 2 + i) * 20;
+                        const sparkleY = y + Math.cos(time * 2 + i) * 20;
+                        const sparkleAlpha = alpha * 0.6 * (Math.sin(time * 4 + i) + 1) * 0.5;
+                        
+                        this.ctx.fillStyle = `hsla(${(hue + 60) % 360}, 90%, 80%, ${sparkleAlpha})`;
+                        this.ctx.beginPath();
+                        this.ctx.arc(sparkleX, sparkleY, 0.5, 0, Math.PI * 2);
                         this.ctx.fill();
                     }
                 }
@@ -12317,23 +13922,24 @@
                 this.ui.emit('timeUpdate', this.gameTime);
             }
 
-            updateHPBar(hp, maxHp) {
-                const hpFill = document.getElementById('hpFill');
-                const hpText = document.getElementById('hpText');
+            // updateHPBar - DESABILITADO (usando HUD no canvas)
+            // updateHPBar(hp, maxHp) {
+            //     const hpFill = document.getElementById('hpFill');
+            //     const hpText = document.getElementById('hpText');
 
-                const percentage = (hp / maxHp) * 100;
-                hpFill.style.width = percentage + '%';
-                hpText.textContent = `${Math.ceil(hp)}/${maxHp}`;
+            //     const percentage = (hp / maxHp) * 100;
+            //     hpFill.style.width = percentage + '%';
+            //     hpText.textContent = `${Math.ceil(hp)}/${maxHp}`;
 
-                // Cor baseada na porcentagem
-                if (percentage > 60) {
-                    hpFill.style.background = 'linear-gradient(90deg, #4CAF50 0%, #66BB6A 50%, #4CAF50 100%)';
-                } else if (percentage > 30) {
-                    hpFill.style.background = 'linear-gradient(90deg, #FF9800 0%, #FFB74D 50%, #FF9800 100%)';
-                } else {
-                    hpFill.style.background = 'linear-gradient(90deg, #F44336 0%, #EF5350 50%, #F44336 100%)';
-                }
-            }
+            //     // Cor baseada na porcentagem
+            //     if (percentage > 60) {
+            //         hpFill.style.background = 'linear-gradient(90deg, #4CAF50 0%, #66BB6A 50%, #4CAF50 100%)';
+            //     } else if (percentage > 30) {
+            //         hpFill.style.background = 'linear-gradient(90deg, #FF9800 0%, #FFB74D 50%, #FF9800 100%)';
+            //     } else {
+            //         hpFill.style.background = 'linear-gradient(90deg, #F44336 0%, #EF5350 50%, #F44336 100%)';
+            //     }
+            // }
 
             updateSoulOrbsDisplay(count) {
                 document.getElementById('soulOrbsText').textContent = `Orbes: ${count}`;
@@ -12352,6 +13958,9 @@
                 this.state = 'playing';
                 this.gameStartTime = Date.now();
                 this.gameTime = 0;
+
+                // Incrementar contador de jogadas
+                this.incrementGamesPlayed();
 
                 // Criar terreno
                 this.terrain = new Terrain(this.canvas.width, this.canvas.height);
@@ -12448,11 +14057,11 @@
                 // Esconder menu
                 this.hideAllMenus();
 
-                // Mostrar canvas e HUD do jogo
+                // Mostrar canvas e ocultar HUD HTML (usamos HUD no canvas)
                 this.canvas.style.display = 'block';
                 const gameHUD = document.getElementById('gameHUD');
                 if (gameHUD) {
-                    gameHUD.style.display = 'block';
+                    gameHUD.style.display = 'none';
                 }
 
                 // Mostrar controles móveis se necessário
@@ -12740,6 +14349,9 @@
                 // Fechar todos os outros menus primeiro
                 this.hideAllOtherMenus();
 
+                // Adicionar estilos do menu moderno
+                this.addMainMenuStyles();
+
                 // Mostrar menu principal
                 const mainMenu = document.getElementById('mainMenu');
                 if (mainMenu) {
@@ -12761,6 +14373,47 @@
                 if (savedPlayerName && this.player) {
                     this.player.setPlayerName(savedPlayerName);
                 }
+
+                // Atualizar estatísticas do menu
+                this.updateMenuStats();
+            }
+
+            // Método para atualizar as estatísticas exibidas no menu
+            updateMenuStats() {
+                try {
+                    // Soul Orbs do player
+                    const soulOrbsElement = document.getElementById('menuSoulOrbs');
+                    if (soulOrbsElement && this.player) {
+                        soulOrbsElement.textContent = this.player.soulOrbs || 0;
+                    }
+
+                    // Melhor pontuação do ranking
+                    const bestScoreElement = document.getElementById('menuBestScore');
+                    if (bestScoreElement && this.rankingSystem) {
+                        const rankings = this.rankingSystem.getRankings();
+                        const bestScore = rankings.length > 0 ? rankings[0].score : 0;
+                        bestScoreElement.textContent = bestScore.toLocaleString();
+                    }
+
+                    // Número de jogadas (pode ser salvo em localStorage)
+                    const gamesPlayedElement = document.getElementById('menuGamesPlayed');
+                    if (gamesPlayedElement) {
+                        const gamesPlayed = localStorage.getItem('totalGamesPlayed') || 0;
+                        gamesPlayedElement.textContent = gamesPlayed;
+                    }
+                } catch (error) {
+                    console.warn('Erro ao atualizar estatísticas do menu:', error);
+                }
+            }
+
+            // Método para incrementar contador de jogadas
+            incrementGamesPlayed() {
+                try {
+                    const currentCount = parseInt(localStorage.getItem('totalGamesPlayed') || '0');
+                    localStorage.setItem('totalGamesPlayed', (currentCount + 1).toString());
+                } catch (error) {
+                    console.warn('Erro ao incrementar contador de jogadas:', error);
+                }
             }
 
             hideMainMenu() {
@@ -12779,114 +14432,394 @@
                 const style = document.createElement('style');
                 style.id = 'main-menu-styles';
                 style.textContent = `
+            /* Menu Principal Moderno */
             .main-menu {
                 position: fixed;
                 top: 0;
                 left: 0;
                 width: 100%;
                 height: 100%;
-                background: linear-gradient(135deg, #0a0a0a, #1a1a1a, #0a0a0a);
+                background: 
+                    radial-gradient(circle at 20% 80%, rgba(120, 50, 180, 0.4) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 20%, rgba(50, 120, 180, 0.4) 0%, transparent 50%),
+                    linear-gradient(135deg, #0a0a1a 0%, #1a0a2a 25%, #0a1a2a 50%, #1a0a0a 75%, #0a0a1a 100%);
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 z-index: 9000;
+                overflow: hidden;
+                animation: menuFadeIn 1s ease-out;
             }
-            
+
+            /* Partículas de fundo animadas */
+            .main-menu::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-image: 
+                    radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+                    radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+                background-size: 100px 100px, 150px 150px;
+                animation: particleFloat 20s linear infinite;
+                opacity: 0.3;
+            }
+
+            /* Container principal com glassmorphism */
             .menu-container {
                 text-align: center;
-                background: rgba(20, 20, 20, 0.9);
-                padding: 40px;
-                border-radius: 20px;
-                border: 2px solid #333;
-                box-shadow: 0 0 30px rgba(0, 0, 0, 0.7);
-                min-width: 400px;
+                background: rgba(15, 15, 30, 0.8);
+                backdrop-filter: blur(20px);
+                border: 2px solid rgba(255, 255, 255, 0.1);
+                padding: 50px 40px;
+                border-radius: 25px;
+                box-shadow: 
+                    0 25px 50px rgba(0, 0, 0, 0.6),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+                min-width: 450px;
+                max-width: 500px;
+                position: relative;
+                z-index: 1;
+                animation: containerSlideUp 0.8s ease-out 0.2s both;
+            }
+
+            /* Efeito de brilho no container */
+            .menu-container::before {
+                content: '';
+                position: absolute;
+                top: -2px;
+                left: -2px;
+                right: -2px;
+                bottom: -2px;
+                background: linear-gradient(45deg, 
+                    rgba(120, 50, 180, 0.3), 
+                    rgba(50, 120, 180, 0.3),
+                    rgba(180, 120, 50, 0.3),
+                    rgba(120, 50, 180, 0.3));
+                border-radius: 27px;
+                z-index: -1;
+                animation: borderGlow 3s ease-in-out infinite;
+                filter: blur(5px);
             }
             
+            /* Título do jogo com efeitos avançados */
             .game-title {
-                font-size: 48px;
-                font-weight: bold;
+                font-size: 52px;
+                font-weight: 900;
                 color: #fff;
-                margin-bottom: 30px;
-                text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
-                background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1);
+                margin-bottom: 40px;
+                text-shadow: 
+                    0 0 20px rgba(255, 255, 255, 0.4),
+                    0 0 40px rgba(120, 50, 180, 0.3),
+                    0 0 60px rgba(50, 120, 180, 0.2);
+                background: linear-gradient(45deg, 
+                    #ff6b6b, #4ecdc4, #45b7d1, #f9ca24, #f0932b, #eb4d4b, #6c5ce7);
+                background-size: 400% 400%;
                 -webkit-background-clip: text;
                 -webkit-text-fill-color: transparent;
                 background-clip: text;
+                animation: titleGradient 4s ease-in-out infinite, titleFloat 3s ease-in-out infinite;
+                letter-spacing: 2px;
+                position: relative;
+            }
+
+            /* Subtítulo */
+            .game-subtitle {
+                font-size: 16px;
+                color: rgba(255, 255, 255, 0.7);
+                margin-bottom: 35px;
+                letter-spacing: 4px;
+                text-transform: uppercase;
+                animation: subtitleFade 1s ease-out 0.5s both;
             }
             
+            /* Container dos botões */
             .menu-buttons {
                 display: flex;
                 flex-direction: column;
-                gap: 15px;
-                margin-bottom: 30px;
+                gap: 20px;
+                margin-bottom: 40px;
             }
             
+            /* Botões modernos com efeitos visuais */
             .menu-btn {
-                padding: 15px 30px;
+                padding: 18px 35px;
                 font-size: 18px;
-                font-weight: bold;
-                background: linear-gradient(135deg, #2a2a2a, #1a2a2a);
+                font-weight: 600;
+                background: linear-gradient(135deg, 
+                    rgba(40, 40, 60, 0.8), 
+                    rgba(60, 40, 80, 0.8));
                 color: white;
-                border: 2px solid #333;
-                border-radius: 10px;
+                border: 2px solid rgba(255, 255, 255, 0.1);
+                border-radius: 15px;
                 cursor: pointer;
-                transition: all 0.3s ease;
+                transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
                 position: relative;
                 overflow: hidden;
+                backdrop-filter: blur(10px);
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                box-shadow: 
+                    0 8px 25px rgba(0, 0, 0, 0.3),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            }
+
+            /* Efeito de ondas nos botões */
+            .menu-btn::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, 
+                    transparent, 
+                    rgba(255, 255, 255, 0.2), 
+                    transparent);
+                transition: left 0.5s;
+            }
+
+            .menu-btn:hover::before {
+                left: 100%;
             }
             
             .menu-btn:hover {
-                border-color: #4CAF50;
-                transform: translateY(-2px);
-                box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
-                background: linear-gradient(135deg, #3a3a3a, #2a2a2a);
+                border-color: rgba(76, 175, 80, 0.6);
+                transform: translateY(-3px) scale(1.02);
+                box-shadow: 
+                    0 15px 35px rgba(76, 175, 80, 0.2),
+                    0 5px 15px rgba(0, 0, 0, 0.3),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+                background: linear-gradient(135deg, 
+                    rgba(60, 80, 60, 0.9), 
+                    rgba(40, 100, 80, 0.9));
+                color: #e8f5e8;
             }
             
             .menu-btn:active {
-                transform: translateY(0);
+                transform: translateY(-1px) scale(1.01);
+                transition: all 0.1s;
+            }
+
+            /* Botões específicos com cores personalizadas */
+            .menu-btn.start-game {
+                background: linear-gradient(135deg, 
+                    rgba(40, 80, 40, 0.8), 
+                    rgba(60, 120, 60, 0.8));
+                border-color: rgba(76, 175, 80, 0.3);
+            }
+
+            .menu-btn.shop {
+                background: linear-gradient(135deg, 
+                    rgba(80, 40, 80, 0.8), 
+                    rgba(120, 60, 120, 0.8));
+                border-color: rgba(150, 80, 150, 0.3);
+            }
+
+            .menu-btn.ranking {
+                background: linear-gradient(135deg, 
+                    rgba(80, 60, 40, 0.8), 
+                    rgba(120, 90, 60, 0.8));
+                border-color: rgba(255, 193, 7, 0.3);
+            }
+
+            .menu-btn.settings {
+                background: linear-gradient(135deg, 
+                    rgba(40, 60, 80, 0.8), 
+                    rgba(60, 90, 120, 0.8));
+                border-color: rgba(33, 150, 243, 0.3);
             }
             
+            /* Estatísticas do menu */
             .menu-stats {
                 display: flex;
                 justify-content: space-between;
-                gap: 20px;
-                margin-top: 20px;
-                padding-top: 20px;
-                border-top: 1px solid #333;
+                gap: 25px;
+                margin-top: 30px;
+                padding-top: 25px;
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
+                animation: statsSlideUp 1s ease-out 0.8s both;
             }
             
             .stat-item {
                 display: flex;
                 flex-direction: column;
                 align-items: center;
-                gap: 5px;
+                gap: 8px;
+                padding: 15px;
+                background: rgba(255, 255, 255, 0.05);
+                border-radius: 12px;
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                transition: all 0.3s ease;
+                flex: 1;
+            }
+
+            .stat-item:hover {
+                background: rgba(255, 255, 255, 0.1);
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
             }
             
             .stat-label {
-                font-size: 14px;
-                color: #ccc;
+                font-size: 12px;
+                color: rgba(255, 255, 255, 0.6);
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                font-weight: 500;
             }
             
             .stat-value {
                 font-size: 20px;
-                font-weight: bold;
+                font-weight: 700;
                 color: #4CAF50;
+                text-shadow: 0 0 10px rgba(76, 175, 80, 0.3);
             }
-            
+
+            /* Animações */
+            @keyframes menuFadeIn {
+                from {
+                    opacity: 0;
+                    backdrop-filter: blur(0px);
+                }
+                to {
+                    opacity: 1;
+                    backdrop-filter: blur(5px);
+                }
+            }
+
+            @keyframes containerSlideUp {
+                from {
+                    transform: translateY(50px) scale(0.95);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateY(0) scale(1);
+                    opacity: 1;
+                }
+            }
+
+            @keyframes titleGradient {
+                0%, 100% {
+                    background-position: 0% 50%;
+                }
+                50% {
+                    background-position: 100% 50%;
+                }
+            }
+
+            @keyframes titleFloat {
+                0%, 100% {
+                    transform: translateY(0px);
+                }
+                50% {
+                    transform: translateY(-5px);
+                }
+            }
+
+            @keyframes subtitleFade {
+                from {
+                    opacity: 0;
+                    transform: translateY(20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            @keyframes statsSlideUp {
+                from {
+                    transform: translateY(30px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateY(0);
+                    opacity: 1;
+                }
+            }
+
+            @keyframes borderGlow {
+                0%, 100% {
+                    opacity: 0.3;
+                    filter: blur(5px);
+                }
+                50% {
+                    opacity: 0.6;
+                    filter: blur(2px);
+                }
+            }
+
+            @keyframes particleFloat {
+                0% {
+                    transform: translateY(0px);
+                }
+                100% {
+                    transform: translateY(-100px);
+                }
+            }
+
+            /* Responsividade móvel */
             @media (max-width: 600px) {
                 .menu-container {
-                    padding: 20px;
-                    min-width: 300px;
+                    padding: 30px 25px;
+                    min-width: 320px;
+                    max-width: 90vw;
+                    margin: 20px;
                 }
                 
                 .game-title {
-                    font-size: 32px;
+                    font-size: 36px;
+                    margin-bottom: 25px;
+                }
+
+                .game-subtitle {
+                    font-size: 14px;
+                    margin-bottom: 25px;
+                    letter-spacing: 2px;
                 }
                 
                 .menu-btn {
-                    padding: 12px 24px;
+                    padding: 15px 25px;
                     font-size: 16px;
                 }
+
+                .menu-stats {
+                    gap: 15px;
+                    margin-top: 20px;
+                    padding-top: 20px;
+                }
+
+                .stat-item {
+                    padding: 12px 8px;
+                }
+
+                .stat-value {
+                    font-size: 18px;
+                }
+
+                .stat-label {
+                    font-size: 11px;
+                }
+            }
+
+            /* Efeitos especiais para elementos interativos */
+            .menu-btn, .stat-item {
+                --glow-color: rgba(76, 175, 80, 0.4);
+            }
+
+            .menu-btn.shop {
+                --glow-color: rgba(150, 80, 150, 0.4);
+            }
+
+            .menu-btn.ranking {
+                --glow-color: rgba(255, 193, 7, 0.4);
+            }
+
+            .menu-btn.settings {
+                --glow-color: rgba(33, 150, 243, 0.4);
             }
         `;
 
@@ -12977,7 +14910,9 @@
                         this.expMultiplier = gameData.settings.expMultiplier || 1;
                         
                         // Atualizar a interface das configurações se estiver carregada
-                        this.updateSettingsUI(gameData.settings);
+                        if (this.ui && this.ui.updateSettingsUI) {
+                            this.ui.updateSettingsUI(gameData.settings);
+                        }
                         
                         // Salvar configurações de áudio para garantir persistência
                         this.audioSystem.saveSettings();
