@@ -237,26 +237,9 @@ Criar um jogo de plataforma sidescroller incremental inspirado no clássico "Hel
 - **Audio Context** com user gesture requirement
 - **Viewport meta tag** para scale adequada
 
-### Estrutura de Arquivos Sugerida:
+### Estrutura de Arquivos:
 ```
 index.html
-├── css/
-│   ├── main.css
-│   └── mobile.css
-├── js/
-│   ├── game.js (core game loop e estados)
-│   ├── player.js (movimento, pulo, tiro, física)
-│   ├── enemies.js (spawn, IA, comportamento)
-│   ├── upgrades.js (sistema de níveis e upgrades)
-│   ├── terrain.js (plataformas e colisões)
-│   ├── ui.js (HUD, menus, interface)
-│   ├── audio.js (efeitos sonoros)
-│   └── utils.js (utilitários gerais)
-├── assets/
-│   ├── sprites/
-│   ├── sounds/
-│   └── fonts/
-└── manifest.json (PWA support)
 ```
 
 ### Performance Targets:
