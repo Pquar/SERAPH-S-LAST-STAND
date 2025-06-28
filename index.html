@@ -4676,23 +4676,6 @@
                 this.levelUpParticles.forEach(particle => {
                     ctx.globalAlpha = particle.alpha;
                     
-                    // Helper function to convert color to RGBA with alpha
-                    const getColorWithAlpha = (color, alpha) => {
-                        if (color.startsWith('hsl(')) {
-                            // Convert HSL to HSLA by replacing the closing parenthesis
-                            return color.replace(')', `, ${alpha})`).replace('hsl(', 'hsla(');
-                        } else if (color.startsWith('rgb(')) {
-                            // Convert RGB to RGBA
-                            return color.replace(')', `, ${alpha})`).replace('rgb(', 'rgba(');
-                        } else if (color.startsWith('#')) {
-                            // Convert hex to rgba (simplified)
-                            return `rgba(255, 255, 255, ${alpha})`; // Fallback to white
-                        } else {
-                            // Already has alpha or is a named color
-                            return color;
-                        }
-                    };
-                    
                     if (particle.type === 'star') {
                         // Desenhar estrela
                         ctx.fillStyle = particle.color;
@@ -4722,8 +4705,8 @@
                             particle.x, particle.y, 0,
                             particle.x, particle.y, outerRadius * 3
                         );
-                        gradient.addColorStop(0, getColorWithAlpha(particle.color, 0.6));
-                        gradient.addColorStop(1, getColorWithAlpha(particle.color, 0));
+                        gradient.addColorStop(0, particle.color + '60');
+                        gradient.addColorStop(1, particle.color + '00');
                         
                         ctx.fillStyle = gradient;
                         ctx.beginPath();
@@ -4736,8 +4719,8 @@
                             particle.x, particle.y, particle.size * 3
                         );
                         gradient.addColorStop(0, particle.color);
-                        gradient.addColorStop(0.5, getColorWithAlpha(particle.color, 0.5));
-                        gradient.addColorStop(1, getColorWithAlpha(particle.color, 0));
+                        gradient.addColorStop(0.5, particle.color + '80');
+                        gradient.addColorStop(1, particle.color + '00');
                         
                         ctx.fillStyle = gradient;
                         ctx.beginPath();
